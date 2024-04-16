@@ -36,6 +36,23 @@
     transform: rotate(360deg);
   }
 } */
+/* PROFILE STYLES */
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-photo {
+  width: 150px;
+  height: 150px;
+  margin-bottom: 20px;
+}
+
+.profile-info {
+  text-align: left;
+}
+
 /* WELCOME MESSAGE */
 .welcome-message {
   text-align: center;

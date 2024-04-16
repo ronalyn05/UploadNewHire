@@ -7,7 +7,7 @@ import NewHireUpload from './components/newHireUpload';
 import Reports from './components/reports';
 import Footer from './components/footer';
 import UpdateEmployeeInfo from './components/update'; 
-
+import Profile from './components/profile';
 
 function App() {
   
@@ -21,7 +21,7 @@ function App() {
           <Route path="/newHireUpload" element={<NewHireUpload />} />
           <Route path="/footer" element={<Footer />} />
           <Route path="/reports" element={<Reports />} />
-          {/* <Route path="/update" element={<UpdateEmployeeInfo />} /> */}
+          <Route path="/profile" element={<Profile />} />
           <Route path="/update/:employeeId" element={<UpdateEmployeeInfo />} />
         </Routes>
       </div>

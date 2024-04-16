@@ -52,5 +52,23 @@
     }, 1000, 'easeInOutExpo');
     e.preventDefault();
   });
+  
+  $(document).ready(function () {
+    // Hide all tab contents initially except the active tab
+    $('.tab-pane').not('.active').hide();
+
+    // Handle tab click event
+    $('.nav-link').click(function () {
+        // Get the href attribute of the clicked tab
+        var targetTab = $(this).attr('href');
+        
+        // Hide all tab contents except the one corresponding to the clicked tab
+        $('.tab-pane').not(targetTab).hide();
+        
+        // Show the content of the clicked tab
+        $(targetTab).show();
+    });
+});
+
 
 })(jQuery); // End of use strict

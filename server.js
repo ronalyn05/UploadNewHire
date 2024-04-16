@@ -31,6 +31,8 @@ app.post('/register', async (req, res) => {
     // Send response
     res.status(200).json({ message: 'Data received successfully' });
 });
+
+
 //post endpoint for user login
 app.post('/login', async (req, res) => {
   // Extract user data from the request body

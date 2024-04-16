@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Register() {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         UserName: '',
         LastName: '',
@@ -19,6 +20,8 @@ function Register() {
     };
 
     const handleSubmit = async (e) => {
+        console.log("this");
+        console.log(formData);
         e.preventDefault();
         
         // Check if password and confirm password match
@@ -42,17 +45,20 @@ function Register() {
     
             const data = await response.json();
             console.log(data); // Log the response from the server
+            alert("Account successfully registered!");
+        // Navigate to login.js
+        navigate("/");
             // Reset form fields after successful registration
-            setFormData({
-                UserName: '',
-                LastName: '',
-                FirstName: '',
-                MiddleName: '',
-                Email: '',
-                Password: '',
-                ConfirmPassword: ''
-            });
-            setErrorMessage(null); // Clear any previous error message
+            // setFormData({
+            //     UserName: '',
+            //     LastName: '',
+            //     FirstName: '',
+            //     MiddleName: '',
+            //     Email: '',
+            //     Password: '',
+            //     ConfirmPassword: ''
+            // });
+            // setErrorMessage(null); // Clear any previous error message
         } catch (error) {
             console.error('Error registering user:', error);
             setErrorMessage('Failed to register user. Please try again later.');

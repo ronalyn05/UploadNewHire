@@ -136,7 +136,7 @@ const NewHireUpload = () => {
     setExcelData(updatedData);
     setEditModalShow(false);
   };
-
+ 
   const handleSaveData = async () => {
     console.log("this");
     console.log(excelData);
@@ -152,6 +152,20 @@ const NewHireUpload = () => {
             );
             return;
         }
+      //         // Check for existing employee IDs
+      // const existingEmployeeIDs = excelData.map((row) => row.employeeID); // Assuming 'employeeID' is the key for the employee ID in your data
+
+      // // Check if there are any duplicate IDs
+      // const duplicateID = existingEmployeeIDs.some(
+      //   (id, index) => existingEmployeeIDs.indexOf(id) !== index
+      // );
+
+      // if (duplicateID) {
+      //   alert(
+      //     "One or more employee IDs already exist. Please ensure all IDs are unique."
+      //   );
+      //   return;
+      // }
 
         // Convert birthdate to date format before saving
         const formattedData = excelData.map((row) => {
@@ -183,86 +197,6 @@ const NewHireUpload = () => {
         );
     }
 };
-
-// const convertExcelDateToDate = (excelDateValue) => {
-//     if (!excelDateValue) return null;
-
-//     const excelDateNumber = parseFloat(excelDateValue);
-
-//     if (isNaN(excelDateNumber)) return null;
-
-//     const excelDateInMS = (excelDateNumber - 25569) * 86400 * 1000;
-//     const dateObj = new Date(excelDateInMS);
-
-//     return dateObj.toLocaleDateString(); // Return date in locale format
-// };
-
-  
-
-  // const handleSaveData = async () => {
-  //   console.log("this");
-  //   console.log(excelData);
-  //   try {
-  //     // Make a POST request to the API endpoint for inserting previewed data
-  //     const response = await axios.post(
-  //       variables.API_URL + "Employee/insertPreviewData",
-  //       excelData,
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       }
-  //     );
-
-  //     if (response.status !== 200) {
-  //       throw new Error("Failed to save data");
-  //     }
-
-  //     console.log(response.data); // Log the response from the API
-  //     alert("Data has been successfully uploaded!");
-  //     // Navigate to report.js
-  //     navigate("/reports");
-  //   } catch (error) {
-  //     //console.error('Error occurred while saving data:', error);
-  //     alert(
-  //       'Please check your uploaded data. Make sure all fields have values or replace empty fields with "N/A".',
-  //       error
-  //     );
-  //     // if (error.response && error.response.data && error.response.data.message === 'No data provided') {
-  //     //   // Prompt the user to check their uploaded data if no data is provided
-  //     //   alert('Please check your uploaded data. Make sure all fields have values or replace empty fields with "N/A".');
-  //     // } else {
-  //     //   // For other errors, display a generic error message
-  //     //   alert('Error occurred while saving data. Please try again later.');
-  //     // }
-  //   }
-  // };
-
-  // const handleSaveData = async () => {
-  //   console.log('this');
-  //   console.log(excelData);
-  //   try {
-  //     // Make a POST request to the API endpoint for inserting previewed data
-  //     const response = await fetch(variables.API_URL + 'Employee/insertPreviewData', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify(excelData), // Convert excelData to JSON string
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error('Failed to save data');
-  //     }
-
-  //     const data = await response.json();
-  //     console.log(data); // Log the response from the API
-  //     alert('Data has been successfully  uploaded!')
-  //   } catch (error) {
-  //     console.error('Error occurred while saving data:', error);
-  //     alert('Error occurred while saving data. Please try again later.');
-  //   }
-  // };
 
   return (
     <div>

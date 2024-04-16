@@ -1,11 +1,13 @@
 import React from "react";
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import '../App.css';
 
 function TopNavbar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { FirstName, LastName } = location.state || {};
+  // const { FirstName, LastName } = location.state || {};
+    // Get user data from location state
+    const data = location.state;
 
   // Retrieve user's first name and last name from sessionStorage
   const firstName = sessionStorage.getItem('firstName');
@@ -44,10 +46,15 @@ function TopNavbar() {
           </a>
           {/* Dropdown - User Information */}
           <div className="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-            <a className="dropdown-item" href="#">
+            
+          <Link className="dropdown-item" to={{ pathname: "/profile"}} state={data} >
+                <i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                <span>Profile</span>
+              </Link>
+            {/* <a className="dropdown-item" to={{ pathname: "/profile"}} state={data}>
               <i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
               Profile
-            </a>
+            </a> */}
             <a className="dropdown-item" href="#">
               <i className="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
               Settings

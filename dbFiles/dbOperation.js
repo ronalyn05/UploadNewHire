@@ -182,9 +182,6 @@ const updateEmployeeById = async (employeeId, updatedEmployeeData) => {
 };
 
 
-
-
-
 module.exports = {
     insertEmployee, 
     getEmployees ,

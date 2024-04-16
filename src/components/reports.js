@@ -32,10 +32,6 @@ const Reports = () => {
     setFilteredEmployees(filtered);
   };
 
-  // const handleCloseModal = () => {
-  //   setSelectedEmployee(null);
-  // };
-
   useEffect(() => {
     async function fetchData() {
       try {
@@ -179,23 +175,6 @@ const Reports = () => {
             </div>
             {/* /.container-fluid */}
           </div>
-          {/* {selectedEmployee && (
-            <Modal show={selectedEmployee !== null} onHide={handleCloseModal}>
-              <Modal.Header closeButton>
-                <Modal.Title>Employee Details</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <p>Employee ID: {selectedEmployee.EmployeeId}</p>
-                <p>Name: {selectedEmployee.EmployeeName}</p>
-                
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={handleCloseModal}>
-                  Close
-                </Button>
-              </Modal.Footer>
-            </Modal>
-          )} */}
           {/* Footer */}
           <Footer />
           {/* End of Page Content */}
