@@ -18,7 +18,7 @@ function Dashboard() {
   useEffect(() => {
     const fetchNumberOfUsers = async () => {
       try {
-        const response = await axios.get("/newHireEmp"); // API endpoint to fetch employees count is '/UserAccount'
+        const response = await axios.get("/usersAccount"); // API endpoint to fetch employees count is '/UserAccount'
         const employeesCount = response.data.length; // response data is an array of users account
         setNumberOfusers(employeesCount);
       } catch (error) {

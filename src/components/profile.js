@@ -1,80 +1,99 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Navbar from "./navbar";
 import TopNavbar from "./topnavbar";
 import Footer from "./footer";
-import "../App.css"; // Import your custom CSS file
+import axios from 'axios';
 
 function Profile() {
-  const userName = sessionStorage.getItem("userName");
-  const firstName = sessionStorage.getItem("firstName");
-  const lastName = sessionStorage.getItem("lastName");
-  const middleName = sessionStorage.getItem("middleName");
-  const email = sessionStorage.getItem("email");
-  const profilePhoto = sessionStorage.getItem("profilePhoto");
-
   const [userData, setUserData] = useState({
-    firstName: "",
-    lastName: "",
-    profilePhoto: "",
-    // Add other profile info fields here
-  });
-  const [newPhoto, setNewPhoto] = useState(null);
-  const [errorMessage, setErrorMessage] = useState("");
+    ProfilePhoto: "/img/user.png"
 
+  });
+  const [errorMessage, setErrorMessage] = useState('');
+  const [file, setFile] = useState(null);
+
+  useEffect(() => {
+    // Fetch personal details on component mount
+    fetchPersonalDetails();
+  }, []);
+
+  const fetchPersonalDetails = useCallback(async () => {
+    try {
+      // Retrieve userId from the server/database
+      const userIdResponse = await axios.get('/api/getUserId'); // Replace '/api/getUserId' with your actual endpoint to fetch userId from the database
+      const userId = userIdResponse.data.userId; // Assuming the response contains userId
+  
+      // Check if userId is null or undefined
+      if (!userId) {
+        throw new Error('UserId is null or undefined');
+      }
+  
+      console.log('UserId:', userId);
+  
+      const response = await axios.get(`/api/personalDetails/${userId}`);
+      setUserData(response.data);
+    } catch (err) {
+      console.error(err);
+      setErrorMessage('Error fetching personal details');
+    }
+  }, []);
+  
   const handleFileChange = (event) => {
-    setNewPhoto(event.target.files[0]);
+    setFile(event.target.files[0]);
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const formData = new FormData();
-    if (newPhoto) {
-      formData.append("photo", newPhoto);
-    }
-    // Append other form data fields to formData if needed
     try {
-      const response = await fetch("/api/profile/update", {
-        method: "POST",
-        body: formData,
+      const formData = new FormData();
+      formData.append('UserId', userData.UserId);
+      formData.append('profilePhoto', file);
+
+      await axios.post('/api/updatePhoto', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       });
-      if (!response.ok) {
-        throw new Error("Failed to update profile");
-      }
-      // Handle success
-      setErrorMessage("");
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      setErrorMessage("Failed to update profile. Please try again later.");
+
+      // After updating photo, fetch updated personal details
+      fetchPersonalDetails();
+    } catch (err) {
+      console.error(err);
+      setErrorMessage('Error updating profile photo');
     }
   };
 
   const handleChange = (event) => {
-    // Handle input changes and update userData state
     setUserData({
       ...userData,
-      [event.target.id]: event.target.value,
+      [event.target.id]: event.target.value
     });
   };
 
   const handleSaveChanges = async (event) => {
     event.preventDefault();
-    // Send updated user data to server for saving
     try {
-      const response = await fetch("/api/profile/save", {
-        method: "POST",
-        body: JSON.stringify(userData),
-        headers: {
-          "Content-Type": "application/json",
-        },
+      // Retrieve userId from local storage or context
+      const UserId = localStorage.getItem('UserId');
+
+      const updatedDetails = {
+        FirstName: userData.FirstName,
+        LastName: userData.LastName,
+        MiddleName: userData.MiddleName,
+        UserName: userData.UserName,
+        Email: userData.Email
+      };
+
+      await axios.post('/api/updatePersonalDetails', {
+        UserId,
+        updatedDetails
       });
-      if (!response.ok) {
-        throw new Error("Failed to save changes");
-      }
-      // Handle success
-      setErrorMessage("");
-    } catch (error) {
-      console.error("Error saving changes:", error);
-      setErrorMessage("Failed to save changes. Please try again later.");
+
+      // After updating personal details, fetch updated details
+      fetchPersonalDetails();
+    } catch (err) {
+      console.error(err);
+      setErrorMessage('Error saving changes');
     }
   };
 
@@ -83,7 +102,6 @@ function Profile() {
       <div id="wrapper">
         <Navbar />
         <div id="content-wrapper" className="d-flex flex-column">
-          {/* Main content */}
           <div id="content">
             <TopNavbar />
             <div className="container-fluid">
@@ -100,7 +118,7 @@ function Profile() {
                         <div className="col-md-4">
                           <div className="profile-container">
                             <img
-                              src={userData.profilePhoto || "/img/user.png"}
+                              src={userData.ProfilePhoto}
                               alt="Profile"
                               className="img-fluid rounded-circle profile-photo"
                             />
@@ -121,7 +139,7 @@ function Profile() {
                         </div>
                         <div className="col-md-8">
                           <div className="profile-info">
-                          {errorMessage && (
+                            {errorMessage && (
                               <div className="row justify-content-center">
                                 <div className="col-md-6">
                                   <div className="alert alert-danger mt-3">
@@ -140,20 +158,20 @@ function Profile() {
                                   <input
                                     type="text"
                                     className="form-control form-control-user"
-                                    id="firstName"
+                                    id="FirstName"
                                     placeholder="First Name"
                                     onChange={handleChange}
-                                    value={firstName}
+                                    value={userData.FirstName}
                                   />
                                 </div>
                                 <div className="col-sm-6">
                                   <input
                                     type="text"
                                     className="form-control form-control-user"
-                                    id="lastName"
+                                    id="LastName"
                                     placeholder="Last Name"
                                     onChange={handleChange}
-                                    value={lastName}
+                                    value={userData.LastName}
                                   />
                                 </div>
                               </div>
@@ -162,20 +180,20 @@ function Profile() {
                                   <input
                                     type="text"
                                     className="form-control form-control-user"
-                                    id="middleName"
+                                    id="MiddleName"
                                     placeholder="Middle Name"
                                     onChange={handleChange}
-                                    value={middleName}
+                                    value={userData.MiddleName}
                                   />
                                 </div>
                                 <div className="col-sm-6">
                                   <input
                                     type="text"
                                     className="form-control form-control-user"
-                                    id="userName"
+                                    id="UserName"
                                     placeholder="User Name"
                                     onChange={handleChange}
-                                    value={userName}
+                                    value={userData.UserName}
                                   />
                                 </div>
                               </div>
@@ -183,10 +201,10 @@ function Profile() {
                                 <input
                                   type="email"
                                   className="form-control form-control-user"
-                                  id="email"
+                                  id="Email"
                                   placeholder="Email Address"
                                   onChange={handleChange}
-                                  value={email}
+                                  value={userData.Email}
                                 />
                               </div>
                               <div className="d-flex justify-content-center">
@@ -209,7 +227,6 @@ function Profile() {
               </div>
             </div>
           </div>
-          {/* Footer */}
           <Footer />
         </div>
       </div>

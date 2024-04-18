@@ -35,12 +35,16 @@ function LoginPage() {
       const data = await response.json();
 
       // Store user's first name and last name in sessionStorage
+      sessionStorage.setItem("userId", data[0].UserId);
       sessionStorage.setItem("firstName", data[0].FirstName);
       sessionStorage.setItem("lastName", data[0].LastName);
       sessionStorage.setItem("userName", data[0].UserName);
       sessionStorage.setItem("email", data[0].Email);
       sessionStorage.setItem("middleName", data[0].MiddleName);
       sessionStorage.setItem("profilePhoto", data[0].ProfilePhoto);
+
+      console.log('this');
+      console.log(data);
 
 
       navigate("/dashboard", { state: data[0] });
