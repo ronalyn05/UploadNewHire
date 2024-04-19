@@ -12,6 +12,9 @@ function TopNavbar() {
   // Retrieve user's first name and last name from sessionStorage
   const firstName = sessionStorage.getItem('firstName');
   const lastName = sessionStorage.getItem('lastName');
+  const profilePhoto = sessionStorage.getItem('profilePhoto');
+  const defaultPhoto = "/img/user.png";
+
 
   const handleLogout = () => {
     // Clear sessionStorage on logout
@@ -42,7 +45,8 @@ function TopNavbar() {
         <li className="nav-item dropdown no-arrow">
           <a className="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span className="mr-2 d-none d-lg-inline text-gray-600 small">{firstName} {lastName}</span>
-            <img className="img-profile rounded-circle" src="img/undraw_profile.svg" alt="User Profile" />
+            {/* <img className="img-profile rounded-circle" src="img/undraw_profile.svg" alt="User Profile" /> */}
+            <img className="img-profile rounded-circle" src={profilePhoto || defaultPhoto} alt="User Profile" />
           </a>
           {/* Dropdown - User Information */}
           <div className="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">

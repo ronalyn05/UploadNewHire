@@ -16,16 +16,19 @@ function Dashboard() {
   const userName = sessionStorage.getItem("userName");
 
   useEffect(() => {
+
     const fetchNumberOfUsers = async () => {
       try {
         const response = await axios.get("/usersAccount"); // API endpoint to fetch employees count is '/UserAccount'
         const employeesCount = response.data.length; // response data is an array of users account
         setNumberOfusers(employeesCount);
+        
       } catch (error) {
         console.error("Error fetching number of users:", error);
       }
     };
 
+    
     fetchNumberOfUsers();
   }, []);
 

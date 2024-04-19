@@ -1,18 +1,14 @@
-class Employee{
-    constructor( UserId, UserName, LastName, FirstName, MiddleName, Email, Password, ProfilePhoto){
-        // this.employee_id = employee_id;
-         this.UserId = UserId;
-        this.UserName = UserName;
+class Employee {
+    constructor(LastName, FirstName, MiddleName, Email, UserName, Password) {
+        this.UserId = null; // UserId will be auto-incremented by the database
         this.LastName = LastName;
         this.FirstName = FirstName;
         this.MiddleName = MiddleName;
         this.Email = Email;
+        this.UserName = UserName;
         this.Password = Password;
-        this.ProfilePhoto = ProfilePhoto;
-
-
+        //this.ProfilePhoto = ProfilePhoto;
     }
 }
-module.exports =   Employee ;
-    
 
+module.exports = Employee;

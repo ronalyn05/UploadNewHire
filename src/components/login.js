@@ -17,7 +17,7 @@ function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const response = await fetch("/login", {
         method: "POST",
@@ -26,33 +26,78 @@ function LoginPage() {
         },
         body: JSON.stringify(formData),
       });
-      console.log(response);
-
+      
+      console.log(response); // Log the response to see its structure
+  
       if (!response.ok) {
         throw new Error("Login Failed");
       }
-
+  
       const data = await response.json();
-
-      // Store user's first name and last name in sessionStorage
-      sessionStorage.setItem("userId", data[0].UserId);
-      sessionStorage.setItem("firstName", data[0].FirstName);
-      sessionStorage.setItem("lastName", data[0].LastName);
-      sessionStorage.setItem("userName", data[0].UserName);
-      sessionStorage.setItem("email", data[0].Email);
-      sessionStorage.setItem("middleName", data[0].MiddleName);
-      sessionStorage.setItem("profilePhoto", data[0].ProfilePhoto);
-
-      console.log('this');
-      console.log(data);
-
-
-      navigate("/dashboard", { state: data[0] });
+      console.log(data); // Log the data received from the server
+  
+      // Ensure that the data object is structured as expected
+      if (!data || !data.UserId) {
+        throw new Error("Invalid response from server");
+      }
+  
+      // Store user's data in sessionStorage
+      sessionStorage.setItem("userId", data.UserId);
+      sessionStorage.setItem("firstName", data.FirstName);
+      sessionStorage.setItem("lastName", data.LastName);
+      sessionStorage.setItem("userName", data.UserName);
+      sessionStorage.setItem("email", data.Email);
+      sessionStorage.setItem("middleName", data.MiddleName);
+      sessionStorage.setItem("profilePhoto", data.ProfilePhoto);
+  
+      // Redirect to the dashboard
+      navigate("/dashboard", { state: data });
     } catch (error) {
       console.error("Login Failed", error);
       setErrorMessage("Login Failed.");
     }
   };
+  
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   try {
+  //     const response = await fetch("/login", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(formData),
+  //     });
+  //     console.log(response);
+
+  //     if (!response.ok) {
+  //       throw new Error("Login Failed");
+  //     }
+
+  //     const data = await response.json();
+
+  //     // Store user's first name and last name in sessionStorage
+  //     sessionStorage.setItem("userId", data[0].UserId);
+  //     sessionStorage.setItem("firstName", data[0].FirstName);
+  //     sessionStorage.setItem("lastName", data[0].LastName);
+  //     sessionStorage.setItem("userName", data[0].UserName);
+  //     sessionStorage.setItem("email", data[0].Email);
+  //     sessionStorage.setItem("middleName", data[0].MiddleName);
+  //     sessionStorage.setItem("profilePhoto", data[0].ProfilePhoto);
+
+  //     console.log('this');
+  //     console.log(data);
+
+
+  //     navigate("/dashboard", { state: data[0] });
+  //   } catch (error) {
+  //     console.error("Login Failed", error);
+  //     setErrorMessage("Login Failed.");
+  //   }
+  // };
+  
   useEffect(() => {
     // Manipulate browser history on component mount
     const disableBackButton = () => {

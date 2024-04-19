@@ -7,8 +7,8 @@ const xlsx = require('xlsx');
 const NewHireEmp = require('./dbFiles/newHireEmp');
 const multer = require('multer');
 const path = require('path');
-// const crypto = require('crypto');
-// const session = require('express-session');
+const crypto = require('crypto');
+const session = require('express-session');
 
 const app = express();
 const port = 5000; 
@@ -16,146 +16,102 @@ const port = 5000;
 app.use(bodyParser.json());
 app.use(cors());
 
-// // Generate a random string
-// const generateRandomString = (length) => {
-//   return crypto.randomBytes(Math.ceil(length / 2))
-//     .toString('hex') // Convert to hexadecimal format
-//     .slice(0, length); // Return required number of characters
-// };
+// Generate a random string
+const generateRandomString = (length) => {
+  return crypto.randomBytes(Math.ceil(length / 2))
+    .toString('hex') // Convert to hexadecimal format
+    .slice(0, length); // Return required number of characters
+};
 
-// // Generate a random secret key
-// const secretKey = generateRandomString(32); // You can adjust the length as needed
+// Generate a random secret key
+const secretKey = generateRandomString(32); // You can adjust the length as needed
 
-// console.log('Secret key:', secretKey);
+console.log('Secret key:', secretKey);
 
-// // Using the secret key in the session middleware
-// app.use(
-//   session({
-//     secret: secretKey, // Use the generated secret key
-//     resave: false,
-//     saveUninitialized: true
-//   })
-// );
+// Using the secret key in the session middleware
+app.use(
+  session({
+    secret: secretKey, // Use the generated secret key
+    resave: false,
+    saveUninitialized: true
+  })
+);
 
-
-// Define a POST endpoint for user registration
+ // Define a POST endpoint for user registration
 app.post('/register', async (req, res) => {
-    // Extract user data from the request body
-    const { UserName, LastName, FirstName, MiddleName, Email, Password } = req.body;
+  // Extract user data from the request body
+  const { LastName, FirstName, MiddleName, Email, UserName, Password} = req.body;
 
-    // Insert to Database
-    let newEmp = new Employee(UserName, LastName, FirstName, MiddleName, Email, Password);
-    
-    try {
+  // Insert to Database
+  let newEmp = new Employee(LastName, FirstName, MiddleName, Email, UserName, Password);
+
+  try {
       await dbOperation.insertEmployee(newEmp);
       console.log('Employee inserted:', newEmp);
-    } catch (error) {
-      console.error("Error inserting employee:", error); // Handling error
-    }
-    
-    // Send response
-    res.status(200).json({ message: 'Data received successfully' });
+      res.status(200).json({ message: 'Employee inserted successfully' });
+  } catch (error) {
+      console.error("Error inserting employee:", error);
+      res.status(500).json({ error: 'Failed to insert employee' });
+  }
 });
-
 //post endpoint for user login
 app.post('/login', async (req, res) => {
   // Extract user data from the request body
   const { Email, Password } = req.body;
 
-  // console.log('Login Username: ' + Email);
-  // console.log('Login Password: ' + Password);
-
   try {
-    const employees = await dbOperation.getEmployees(Email, Password);
+    // Authenticate the user with the provided credentials
+    const user = await dbOperation.getEmployees(Email, Password);
 
-    // //if successful it shoud retireve the Username of the user
-    //  console.log("USER ACCOUNT: " + employees[0].UserId);
-    res.send(employees); // For example, sending the employees data back as a responses
+    if (user && user.length > 0) {
+      // Store user information in the session
+      req.session.user = user[0]; // Store the entire user object in the session
 
+      // If authentication is successful, send the user data back as a response
+      res.status(200).json(user[0]); // Send only the user data
+    } else {
+      // If authentication fails, send an appropriate error response
+      res.status(401).json({ error: 'Invalid credentials' });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error'); // Properly handle errors
   }
 });
 
-// // Endpoint to update user's profile photo
-// app.post('/api/profile/updatePhoto', async (req, res) => {
-//   const { userId, photoUrl } = req.body;
+// //post endpoint for user login
+// app.post('/login', async (req, res) => {
+//   // Extract user data from the request body
+//   const { Email, Password } = req.body;
 
-//   try {
-//     const success = await dbOperation.updateProfilePhoto(userId, photoUrl);
-//     if (success) {
-//       res.status(200).json({ message: 'Profile photo updated successfully' });
-//     } else {
-//       res.status(500).json({ error: 'Failed to update profile photo' });
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// });
+//   // console.log('Login Username: ' + Email);
+//   // console.log('Login Password: ' + Password);
+// //   const user = {
+// //     UserId: {UserId},
+// //     // Other user information
+// //   };
 
-// // Endpoint to update user's profile data
-// app.post('/api/profile/saveChanges', async (req, res) => {
-//   const { userId, userData } = req.body;
-
-//   try {
-//     const success = await dbOperation.updateProfileData(userId, userData);
-//     if (success) {
-//       res.status(200).json({ message: 'Profile data updated successfully' });
-//     } else {
-//       res.status(500).json({ error: 'Failed to update profile data' });
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// });
-// // Endpoint to fetch user's profile data
-// app.get('/api/profile', async (req, res) => {
-//   try {
-//     // Assuming you have a function to get profile data from the database
-//     // You need to pass the userId to the function
-//      const userId = req.session.UserId; // Assuming you store userId in session
-    
-//     if (!userId) {
-//       return res.status(401).json({ error: 'User not authenticated' });
-//     }
-//     const profileData = await dbOperation.getProfileData(userId);
-//     if (profileData) {
-//       res.json(profileData); // Send profile data as JSON response
-//     } else {
-//       res.status(404).json({ error: 'Profile data not found' });
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: 'Internal Server Error' }); // Properly handle errors
-//   }
-// });
+//   // Store user information in the session
+//   req.session.user = {
+//     userId: user.UserId,
+//     // Other user information
+//   };
 
 // Multer storage configuration
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/');
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-  }
-});
-
-const upload = multer({ storage: storage });
+const upload = multer();
 
 // API endpoint to update profile photo
-app.post('/api/updatePhoto', upload.single('profilePhoto'), async (req, res) => {
+app.post('/api/updatePhoto/:userId', upload.single('profilePhoto'), async (req, res) => {
   try {
-    const UserId = req.body.userId;
+    const userId = req.params.userId;
     let profilePhoto = '/img/user.png'; // Set default profile photo path
 
     if (req.file) {
-      profilePhoto = `/uploads/${req.file.filename}`;
+      // Convert file to base64 string
+      profilePhoto = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
     }
 
-    await dbOperation.updateProfilePhoto(UserId, profilePhoto);
+    await dbOperation.updateProfilePhoto(userId, profilePhoto);
     res.status(200).send("Profile photo updated successfully");
   } catch (err) {
     console.error(err);
@@ -163,51 +119,62 @@ app.post('/api/updatePhoto', upload.single('profilePhoto'), async (req, res) => 
   }
 });
 
-// API endpoint to retrieve personal details
-app.get('/api/personalDetails/:userId', async (req, res) => {
-  try {
-    const UserId = req.params.userId;
-    const personalDetails = await dbOperation.getPersonalDetailsByUserId(UserId);
-    res.status(200).json(personalDetails);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error retrieving personal details");
-  }
-});
+// // API endpoint to update profile photo
+// app.post('/api/updatePhoto/:userId', upload.single('profilePhoto'), async (req, res) => {
+//   try {
+//     const userId = req.params.userId; // Retrieve userId from the request body
+//     console.log(userId);
+//     let profilePhoto = '/img/user.png'; // Set default profile photo path
 
-// API endpoint to update personal details
-app.post('/api/updatePersonalDetails', async (req, res) => {
-  try {
-    const UserId = req.body.userId;
-    const updatedDetails = req.body.updatedDetails;
+//     if (req.file) {
+//       // Convert file to base64 string
+//       profilePhoto = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+//     }
 
-    await dbOperation.updatePersonalDetails(UserId, updatedDetails);
+//     await dbOperation.updateProfilePhoto(userId, profilePhoto);
+//     res.status(200).send("Profile photo updated successfully");
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send("Error updating profile photo");
+//   }
+// });
+
+// API endpoint to update users details
+app.post('/api/updatePersonalDetails/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const updatedDetails = req.body;
+
+    // Validate userId here if needed
+
+    await dbOperation.updatePersonalDetails(userId, updatedDetails);
     res.status(200).send("Personal details updated successfully");
   } catch (err) {
     console.error(err);
     res.status(500).send("Error updating personal details");
   }
 });
-app.get('/api/getUserId', async (req, res) => {
+//api endpoint to retrieve the users data
+app.get('/api/getUserData/:userId', async (req, res) => {
   try {
-    // Your logic to fetch userId from the database
-    // Replace 'YourDatabaseTable' with the actual table name where userId is stored
-    const query = 'SELECT UserId FROM UserAccount'; // Adjust the query based on your database schema
+    // Retrieve userId from the request parameters
+    const userId = req.params.userId;
 
-    const result = await dbOperation.getUserId(query);
+    // Fetch user data from the database based on the userId
+    const userData = await dbOperation.getUserData(userId);
 
-    if (result && result.length > 0) {
-      res.status(200).json({ userId: result[0].UserId });
-    } else {
-      res.status(404).json({ error: 'UserId not found' });
+    // If no user data found for the provided userId, return an error
+    if (!userData) {
+      return res.status(404).json({ error: 'User data not found' });
     }
+
+    // Respond with the user data
+    res.status(200).json(userData);
   } catch (error) {
-    console.error('Error fetching userId:', error);
+    console.error('Error fetching user data:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-
 // POST endpoint to handle Excel data upload
 app.post('/upload', async (req, res) => {
   const excelData = req.body; // Assuming excelData is sent as JSON
@@ -227,7 +194,6 @@ app.post('/upload', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 // Endpoint to retrieve employee data
 app.get('/newHireEmp', async (req, res) => {
   try {
@@ -291,11 +257,23 @@ app.delete('/deleteEmployee/:employeeId', async (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
   }
 });
-
+// DELETE endpoint to delete an employee by ID
+app.delete('/deleteUserAccount/:userId', async (req, res) => {
+  const { userId } = req.params;
+  try {
+      const result = await dbOperation.deleteUsersById(userId);
+      if (result.affectedRows === 0) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+      res.status(200).json({ message: 'User account deleted successfully' });
+  } catch (error) {
+      console.error('Error deleting User account:', error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-
 
