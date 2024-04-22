@@ -9,6 +9,7 @@ const multer = require('multer');
 const path = require('path');
 const crypto = require('crypto');
 const session = require('express-session');
+const bcrypt = require('bcryptjs');
 
 const app = express();
 const port = 5000; 
@@ -56,28 +57,53 @@ app.post('/register', async (req, res) => {
 });
 //post endpoint for user login
 app.post('/login', async (req, res) => {
-  // Extract user data from the request body
   const { Email, Password } = req.body;
 
   try {
-    // Authenticate the user with the provided credentials
-    const user = await dbOperation.getEmployees(Email, Password);
+    const users = await dbOperation.getEmployees(Email, Password);
 
-    if (user && user.length > 0) {
-      // Store user information in the session
-      req.session.user = user[0]; // Store the entire user object in the session
+    if (users.length > 0) {
+      const user = users[0];
+      const isValidPassword = await bcrypt.compare(Password, user.Password);
 
-      // If authentication is successful, send the user data back as a response
-      res.status(200).json(user[0]); // Send only the user data
+      if (isValidPassword) {
+        res.status(200).json(user);
+      } else {
+        res.status(401).json({ error: 'Incorrect email or password' });
+        
+      }
     } else {
-      // If authentication fails, send an appropriate error response
-      res.status(401).json({ error: 'Invalid credentials' });
+      res.status(401).json({ error: 'User not found or invalid credentials' });
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error'); // Properly handle errors
+    console.error('Login Failed:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+// app.post('/login', async (req, res) => {
+//   // Extract user data from the request body
+//   const { Email, Password } = req.body;
+
+//   try {
+//     // Authenticate the user with the provided credentials
+//     const user = await dbOperation.getEmployees(Email, Password);
+
+//     if (user && user.length > 0) {
+//       // Store user information in the session
+//       req.session.user = user[0]; // Store the entire user object in the session
+
+//       // If authentication is successful, send the user data back as a response
+//       res.status(200).json(user[0]); // Send only the user data
+//     } else {
+//       // If authentication fails, send an appropriate error response
+//       res.status(401).json({ error: 'Invalid credentials' });
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send('Internal Server Error'); // Properly handle errors
+//   }
+// });
 
 // //post endpoint for user login
 // app.post('/login', async (req, res) => {

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import bcrypt from 'bcryptjs';
+// import { check, validationResult } from 'express-validator';
 
 function Register() {
     const navigate = useNavigate();
@@ -8,12 +10,10 @@ function Register() {
         FirstName: '',
         MiddleName: '',
         Email: '',
-        UserName:'',
-        Password:'',
+        UserName: '',
+        Password: '',
         ConfirmPassword: ''
-    }
-        
-    );
+    });
 
     const [errorMessage, setErrorMessage] = useState(null);
 
@@ -21,16 +21,82 @@ function Register() {
         setFormData({ ...formData, [e.target.id]: e.target.value });
     };
 
-    const handleSubmit = async (e) => {
+
+//     const handleSubmit = async (e) => {
+//     e.preventDefault();
+
+//     // Check if password and confirm password match
+//     if (formData.Password !== formData.ConfirmPassword) {
+//         setErrorMessage('Passwords do not match');
+//         return;
+//     }
+
+//     try {
+//         const response = await fetch('/register', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify({
+//                 LastName: formData.LastName,
+//                 FirstName: formData.FirstName,
+//                 MiddleName: formData.MiddleName,
+//                 Email: formData.Email,
+//                 UserName: formData.UserName,
+//                 Password: formData.Password,
+//                 // ProfilePhoto: '' // You can add this if needed
+//             }),
+//         });
+
+//         if (!response.ok) {
+//             throw new Error('Failed to register user');
+//         }
+
+//         const data = await response.json();
+//         console.log(data); // Log the response from the server
+//         alert("Account successfully registered!");
+//         navigate("/");
+//     } catch (error) {
+//         console.error('Error registering user:', error);
+//         setErrorMessage('Failed to register user. Please try again later.');
+//     }
+// };
+
+
+const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if password and confirm password match
+    const errors = [];
+    if (!formData.FirstName.trim()) {
+        errors.push('First Name is required');
+    }
+    if (!formData.LastName.trim()) {
+        errors.push('Last Name is required');
+    }
+    if (!formData.MiddleName.trim()) {
+        errors.push('Middle Name is required');
+    }
+    if (!formData.Email.trim()) {
+        errors.push('Email is required');
+    }
+    if (!formData.UserName.trim()) {
+        errors.push('User Name is required');
+    }
+    if (formData.Password.trim().length < 6) {
+        errors.push('Password must be at least 6 characters long');
+    }
     if (formData.Password !== formData.ConfirmPassword) {
-        setErrorMessage('Passwords do not match');
+        errors.push('Passwords do not match');
+    }
+
+    if (errors.length > 0) {
+        setErrorMessage(errors.join(', '));
         return;
     }
 
     try {
+        const hashedPassword = await bcrypt.hash(formData.Password, 10);
+
         const response = await fetch('/register', {
             method: 'POST',
             headers: {
@@ -42,8 +108,7 @@ function Register() {
                 MiddleName: formData.MiddleName,
                 Email: formData.Email,
                 UserName: formData.UserName,
-                Password: formData.Password,
-                // ProfilePhoto: '' // You can add this if needed
+                Password: hashedPassword,
             }),
         });
 
@@ -54,59 +119,13 @@ function Register() {
         const data = await response.json();
         console.log(data); // Log the response from the server
         alert("Account successfully registered!");
-        navigate("/");
+        navigate("/login");
     } catch (error) {
         console.error('Error registering user:', error);
         setErrorMessage('Failed to register user. Please try again later.');
     }
 };
 
-
-    // const handleSubmit = async (e) => {
-    //     console.log("this");
-    //     console.log(formData);
-    //     e.preventDefault();
-        
-    //     // Check if password and confirm password match
-    //     if (formData.Password !== formData.ConfirmPassword) {
-    //         setErrorMessage('Passwords do not match');
-    //         return;
-    //     }
-
-    //     try {
-    //         const response = await fetch('/register', {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             body: JSON.stringify(formData),
-    //         });
-    
-    //         if (!response.ok) {
-    //             throw new Error('Failed to register user');
-    //         }
-    
-    //         const data = await response.json();
-    //         console.log(data); // Log the response from the server
-    //         alert("Account successfully registered!");
-    //     // Navigate to login.js
-    //     navigate("/");
-    //         // Reset form fields after successful registration
-    //         // setFormData({
-    //         //     UserName: '',
-    //         //     LastName: '',
-    //         //     FirstName: '',
-    //         //     MiddleName: '',
-    //         //     Email: '',
-    //         //     Password: '',
-    //         //     ConfirmPassword: ''
-    //         // });
-    //         // setErrorMessage(null); // Clear any previous error message
-    //     } catch (error) {
-    //         console.error('Error registering user:', error);
-    //         setErrorMessage('Failed to register user. Please try again later.');
-    //     }
-    // };
 
     return (
         <div className="bg-gradient-primary d-flex align-items-center justify-content-center min-vh-100">

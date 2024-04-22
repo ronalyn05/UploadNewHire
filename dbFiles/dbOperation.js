@@ -5,24 +5,37 @@ const xlsx = require("xlsx");
 // const NewHireEmp = require('./newHireEmp');
 
 //Display the list
+// const getEmployees = async (Email, Password) => {
+//   try {
+//     let pool = await sql.connect(config);
+//     let result = await pool
+//       .request()
+//       .input("Email", sql.VarChar, Email)
+//       .input("Password", sql.VarChar, Password)
+//       //  .query('SELECT * FROM UserAccount WHERE Email = @Email AND Password = @Password');
+//       .query(
+//         "SELECT UserId, FirstName, LastName, UserName, Email, MiddleName, ProfilePhoto FROM UserAccount WHERE Email = @Email AND Password = @Password"
+//       );
+
+//     return result.recordset;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
 const getEmployees = async (Email, Password) => {
   try {
     let pool = await sql.connect(config);
     let result = await pool
       .request()
-      .input("Email", sql.VarChar, Email)
-      .input("Password", sql.VarChar, Password)
-      //  .query('SELECT * FROM UserAccount WHERE Email = @Email AND Password = @Password');
-      .query(
-        "SELECT UserId, FirstName, LastName, UserName, Email, MiddleName, ProfilePhoto FROM UserAccount WHERE Email = @Email AND Password = @Password"
-      );
+      .input('Email', sql.VarChar, Email)
+      .input('Password', sql.VarChar, Password)
+      .query('SELECT * FROM UserAccount WHERE Email = @Email');
 
     return result.recordset;
   } catch (error) {
     throw error;
   }
 };
-
 // insert user account to USER ACCOUNT table
 const insertEmployee = async (Employee) => {
   try {
