@@ -214,7 +214,7 @@ app.post('/upload', async (req, res) => {
     }
 
     // Respond with success message
-    res.status(200).json({ message: 'Data inserted successfully' });
+    res.status(200).json({ message: 'Data uploaded successfully' });
   } catch (error) {
     console.error("Error occurred while inserting data:", error);
     res.status(500).json({ error: 'Internal server error' });
@@ -269,6 +269,37 @@ app.put('/updateEmployee/:employeeId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+//api endpoint for updating employee information by id
+app.put('/updateEmployeeInfo/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  const updatedEmployeeData = req.body;
+  try {
+    const result = await dbOperation.updateEmployeeInfoById(employeeId, updatedEmployeeData);
+    if (!result) {
+      return res.status(404).json({ message: 'Employee information not found' });
+    }
+    res.json({ message: 'Employee information updated successfully' });
+  } catch (error) {
+    console.error('Error updating employee information:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+//api endpoint for updating employee address by id
+app.put('/updateEmployeeAddress/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  const updatedEmployeeData = req.body;
+  try {
+    const result = await dbOperation.updateEmployeeAddressById(employeeId, updatedEmployeeData);
+    if (!result) {
+      return res.status(404).json({ message: 'Employee address not found' });
+    }
+    res.json({ message: 'Employee address updated successfully' });
+  } catch (error) {
+    console.error('Error updating address information:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 // DELETE endpoint to delete an employee by ID
 app.delete('/deleteEmployee/:employeeId', async (req, res) => {
   const { employeeId } = req.params;

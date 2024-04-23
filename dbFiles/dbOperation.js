@@ -27,9 +27,9 @@ const getEmployees = async (Email, Password) => {
     let pool = await sql.connect(config);
     let result = await pool
       .request()
-      .input('Email', sql.VarChar, Email)
-      .input('Password', sql.VarChar, Password)
-      .query('SELECT * FROM UserAccount WHERE Email = @Email');
+      .input("Email", sql.VarChar, Email)
+      .input("Password", sql.VarChar, Password)
+      .query("SELECT * FROM UserAccount WHERE Email = @Email");
 
     return result.recordset;
   } catch (error) {
@@ -58,11 +58,23 @@ const insertEmployee = async (Employee) => {
   }
 };
 
-//store user account to Employee table
 const insertNewHire = async (newHire) => {
   try {
     let pool = await sql.connect(config);
-    let newemployee = await pool
+
+    // Validate and convert bit fields
+    const validateAndConvertBit = (value) => {
+      if (value === "0" || value === "1") {
+        return Boolean(parseInt(value));
+      } else {
+        throw new Error(
+          "Invalid value for bit field. Please enter either '0' for 'yes' or '1' for 'no'."
+        );
+      }
+    };
+
+    // Insert into EmpPersonalDetails table
+    await pool
       .request()
       .input("EmployeeId", newHire.EmployeeId)
       .input("EmployeeName", newHire.EmployeeName)
@@ -80,222 +92,97 @@ const insertNewHire = async (newHire) => {
       .input("PHIC", newHire.PHIC)
       .input("HDMF", newHire.HDMF)
       .input("TIN", newHire.TIN)
-      .input("HRANID", newHire.HRANID)
       .input("ContactNumber", newHire.ContactNumber)
       .input("EmailAddress", newHire.EmailAddress).query(`
-            INSERT INTO EmpPersonalDetails (EmployeeId, EmployeeName, FirstName, MiddleName, LastName, MaidenName, 
-                Birthdate, Age, BirthMonth, AgeBracket, Gender,
-                MaritalStatus, SSS, PHIC, HDMF, TIN, HRANID, ContactNumber, 
-                EmailAddress) 
-            VALUES (@EmployeeId, @EmployeeName, @FirstName, @MiddleName, @LastName, @MaidenName,
-                    @Birthdate, @Age, @BirthMonth, @AgeBracket, @Gender, @MaritalStatus,
-                    @SSS, @PHIC, @HDMF, @TIN, @HRANID, @ContactNumber, @EmailAddress)
-        `);
+        INSERT INTO EmpPersonalDetails (EmployeeId, EmployeeName, FirstName, MiddleName, LastName, MaidenName, 
+          Birthdate, Age, BirthMonth, AgeBracket, Gender, MaritalStatus, SSS, PHIC, HDMF, TIN, ContactNumber, 
+          EmailAddress) 
+        VALUES (@EmployeeId, @EmployeeName, @FirstName, @MiddleName, @LastName, @MaidenName,
+          @Birthdate, @Age, @BirthMonth, @AgeBracket, @Gender, @MaritalStatus, @SSS, @PHIC, @HDMF, @TIN, 
+          @ContactNumber, @EmailAddress)
+      `);
 
-    // Insert employee info into EmployeeInfo table
-    let employeeInfo = await pool
+    // Insert into EmployeeInformation table with validated bit fields
+    await pool
       .request()
+      .input("EmployeeId", newHire.EmployeeId)
       .input("HRANID", newHire.HRANID)
       .input("DateHired", newHire.DateHired)
       .input("Tenure", newHire.Tenure)
-      .input("HRANID", newHire.HRANID)
-      .input("DateHired", newHire.EmployeeLevel)
-      .input("Tenure", newHire.ProjectCode)
-      .input("HRANID", newHire.ProjectName)
-      .input("DateHired", newHire.Designation)
-      .input("Tenure", newHire.Department)
-      .input("HRANID", newHire.ProdCode)
-      .input("DateHired", newHire.ProdDesc)
-      .input("Tenure", newHire.EmployementStatus)
-      .input("HRANID", newHire.EmployeeStatus)
-      .input("DateHired", newHire.WorkWeekType)
-      .input("Tenure", newHire.Shift)
-      .input("HRANID", newHire.WorkArrangement)
-      .input("DateHired", newHire.RateClass)
-      .input("Tenure", newHire.Rate)
-      .input("HRANID", newHire.ManagerID)
-      .input("DateHired", newHire.ManagerName)
-      .input("Tenure", newHire.PMPICID)
-      .input("HRANID", newHire.DU)
-      .input("DateHired", newHire.DUHID)
-      .input("Tenure", newHire.DUHName)
-      .input("DateHired", newHire.IsManager)
-      .input("Tenure", newHire.IsPMPIC)
-      .input("HRANID", newHire.IsIndividualContributor)
-      .input("DateHired", newHire.IsActive)
-      .input("Tenure", newHire.HRANType)
-      .input("HRANID", newHire.TITOType)
-      .input("DateHired", newHire.Position)
-      .input("Tenure", newHire.PositionLevel)
-      .input("HRANID", newHire.EmpID)
-      .input("DateHired", newHire.IsDUHead).query(`
-      INSERT INTO EmployeeInformation (HRANID, DateHired, Tenure, EmployeeLevel, ProjectCode,
-        ProjectName, Designation, Department, ProdCode, ProdDesc, EmployementStatus, EmployeeStatus,
-        WorkWeekType, Shift, WorkArrangement, RateClass, Rate, ManagerID, ManagerName, PMPICID,
-        PMPICIDName, DU, DUHID, DUHName, IsManager, IsPMPIC, IsIndividualContributor, IsActive,
-        HRANType, TITOType, Position, PositionLevel, EmpID, IsDUHead
-        )
-      VALUES (@HRANID, @DateHired, @Tenure, @EmployeeLevel, @ProjectCode,
-        @ProjectName, @Designation, @Department, @ProdCode, @ProdDesc, @EmployementStatus, @EmployeeStatus,
-        @WorkWeekType, @Shift, @WorkArrangement, @RateClass, @Rate, @ManagerID, @ManagerName, @PMPICID,
-        @PMPICIDName, @DU, @DUHID, @DUHName, @IsManager, @IsPMPIC, @IsIndividualContributor, @IsActive,
-        @HRANType, @TITOType, @Position, @PositionLevel, @EmpID, @IsDUHead)
-    `);
-    //insert data in ProjectCode tbl
-    let projectCode = await pool
-      .request()
+      .input("EmployeeLevel", newHire.EmployeeLevel)
       .input("ProjectCode", newHire.ProjectCode)
       .input("ProjectName", newHire.ProjectName)
-      .input("DUID", newHire.DUID)
-      .input("IsActive", newHire.IsActive).query(`
-      INSERT INTO ProjectCode (ProjectCode, ProjectName, DUID, IsActive)
-      VALUES (@ProjectCode, @ProjectName, @DUID, @IsActive)
-    `);
-    //insert data in Shift tbl
-    let shift = await pool
-      .request()
-      .input("ShiftCode", newHire.ShiftCode)
-      .input("ShiftName", newHire.ShiftName)
-      .input("LevelID", newHire.LevelID)
-      .input("ShiftType", newHire.ShiftType).query(`
-      INSERT INTO Shift (ShiftCode, ShiftName, LevelID, ShiftType)     
-      VALUES (@ShiftCode, @ShiftName, @LevelID, @ShiftType)
-    `);
-    //insert data in Delivery Unit tbl
-    let deliveryUnit = await pool
-      .request()
-      .input("DUCode", newHire.DUCode)
-      .input("DUName", newHire.DUName)
-      .input("IsActive", newHire.IsActive).query(`
-      INSERT INTO Shift (DUCode, DUName, IsActive)   
-      VALUES (@DUCode, @DUName, @IsActive)
-    `);
-    //insert data in Department tbl
-    let department = await pool
-      .request()
-      .input("DepartmentName", newHire.DepartmentName)
-      .input("DUID", newHire.DUID).query(`
-        INSERT INTO Shift (DepartmentName, DUIDe)   
-        VALUES (@DepartmentName, @DUID)
-      `);
-    //insert data in Department tbl
-    let address = await pool
-      .request()
-      .input("HouseNumber", newHire.HouseNumber)
-      .input("CompleteAddress", newHire.CompleteAddress)
-      .input("Barangay", newHire.Barangay)
-      .input("CityMunicipality", newHire.CityMunicipality)
-      .input("Province", newHire.Province)
-      .input("Region", newHire.Region)
-      .input("Country", newHire.Country)
-      .input("ZipCode", newHire.ZipCode)
-      .input("Landmark", newHire.Landmark)
-      .input("IsPermanent", newHire.IsPermanent)
-      .input("IsEmergency", newHire.IsEmergency)
-      .input("EmpID", newHire.EmpID).query(`
-      INSERT INTO Department ( HouseNumber, CompleteAddress, Barangay, CityMunicipality,
-        Province, Region, Country, ZipCode, Landmark, IsPermanent, IsEmergency, EmpID)   
-      VALUES (@HouseNumber, @CompleteAddress, @Barangay, @CityMunicipality, @Province, @Region,
-        @Country, @ZipCode, @Landmark, @IsPermanent, @IsEmergency, @EmpID)
-    `);
-    //insert data in Address tbl
-    let education = await pool
-      .request()
-      .input("EducationLevel", newHire.EducationLevel)
-      .input("School", newHire.School)
-      .input("Degree", newHire.Degree)
-      .input("MajorCourse", newHire.MajorCourse)
-      .input("HonorRank", newHire.HonorRank)
-      .input("UnitsEarned", newHire.UnitsEarned)
-      .input("DateFrom", newHire.DateFrom)
-      .input("DateTo", newHire.DateTo)
-      .input("Session", newHire.Session)
-      .input("MonthCompleted", newHire.MonthCompleted)
-      .input("IsEmergency", newHire.Completed)
-      .input("EmpID", newHire.EmpID).query(`
-                INSERT INTO Address ( EducationLevel, School, Degree, MajorCourse,
-                  HonorRank, UnitsEarned, DateFrom, DateTo, Session, MonthCompleted, Completed, EmpID)   
-                VALUES (@EducationLevel, @School, @Degree, @MajorCourse, @HonorRank, @UnitsEarned,
-                  @DateFrom, @DateTo, @Session, @MonthCompleted, @Completed, @EmpID)
-              `);
-    //insert data in Contact tbl
-    let contact = await pool
-      .request()
-      .input("ContactNumber", newHire.ContactNumber)
-      .input("EmpID", newHire.EmpID).query(`
-      INSERT INTO Contact (ContactNumber, EmpID)   
-      VALUES (@ContactNumber, @EmpID)
-    `);
-    //insert data in EmergencyContactNumber tbl
-    let emergencyContact = await pool
-      .request()
-      .input("FullName", newHire.FullName)
-      .input("AddressID", newHire.AddressID)
-      .input("ContactId", newHire.ContactId)
-      .input("EmpID", newHire.EmpID).query(`
-                    INSERT INTO EmergencyContactNumber (FullName, AddressID, ContactId, EmpID)   
-                    VALUES (@FullName, @AddressID, @ContactId, @EmpID)
-                  `);
-        //insert data in Dependent tbl
-        let dependent = await pool
-        .request()
-        .input("FullName", newHire.FullName)
-        .input("Relationship", newHire.Relationship)
-        .input("BIrthDate", newHire.BIrthDate)
-        .input("Occupation", newHire.Occupation)
-        .input("Address", newHire.Address)
-        .input("City", newHire.City)
-        .input("Province", newHire.Province)
-        .input("PostalCode", newHire.PostalCode)
-        .input("PhoneNum", newHire.PhoneNum)
-        .input("Beneficiary", newHire.Beneficiary)
-        .input("BeneficiaryDate", newHire.BeneficiaryDate)
-        .input("Insurance", newHire.Insurance)
-        .input("InsuranceDate", newHire.InsuranceDate)
-        .input("Remarks", newHire.Remarks)
-        .input("CompanyPaid", newHire.CompanyPaid)
-        .input("HMOProvider", newHire.HMOProvider)
-        .input("HMOPolicyNumber", newHire.HMOPolicyNumber)
-        .input("TypeOfCoverage", newHire.TypeOfCoverage)
-        .input("EmpID", newHire.EmpID).query(`
-                  INSERT INTO Dependent ( FullName, Relationship, BIrthDate, Occupation,
-                    Address, City, Province, PostalCode, PhoneNum, Beneficiary, BeneficiaryDate, 
-                    Insurance, InsuranceDate, Remarks, CompanyPaid, HMOProvider, HMOPolicyNumber
-                    TypeOfCoverage, EmpID)   
-                  VALUES (@FullName, @Relationship, @BIrthDate, @Occupation, @Address, @City,
-                    @Province, @PostalCode, @PhoneNum, @Beneficiary, @BeneficiaryDate, @Insurance,
-                    @InsuranceDate, @Remarks, @CompanyPaid, @HMOProvider, @HMOPolicyNumber
-                    @TypeOfCoverage, @EmpID)
-                `);
-    //insert data in Product tbl
-    let product = await pool
-      .request()
+      .input("Designation", newHire.Designation)
+      .input("Department", newHire.Department)
       .input("ProdCode", newHire.ProdCode)
-      .input("ProdDesc", newHire.ProdDesc).query(`
-      INSERT INTO Product (ProdCode, ProdDesc)   
-      VALUES (@ProdCode, @ProdDesc)
+      .input("ProdDesc", newHire.ProdDesc)
+      .input("EmploymentStatus", newHire.EmploymentStatus)
+      .input("EmployeeStatus", newHire.EmployeeStatus)
+      .input("WorkWeekType", newHire.WorkWeekType)
+      .input("Shift", newHire.Shift)
+      .input("WorkArrangement", newHire.WorkArrangement)
+      .input("RateClass", newHire.RateClass)
+      .input("Rate", newHire.Rate)
+      .input("ManagerID", newHire.ManagerID)
+      .input("ManagerName", newHire.ManagerName)
+      .input("PMPICID", newHire.PMPICID)
+      .input("PMPICIDName", newHire.PMPICIDName)
+      .input("DU", newHire.DU)
+      .input("DUHID", newHire.DUHID)
+      .input("DUHName", newHire.DUHName)
+      .input("IsManager", validateAndConvertBit(newHire.IsManager))
+      .input("IsPMPIC", validateAndConvertBit(newHire.IsPMPIC))
+      .input(
+        "IsIndividualContributor",
+        validateAndConvertBit(newHire.IsIndividualContributor)
+      )
+      .input("IsActive", validateAndConvertBit(newHire.IsActive))
+      .input("HRANType", newHire.HRANType)
+      .input("TITOType", newHire.TITOType)
+      .input("Position", newHire.Position)
+      .input("PositionLevel", newHire.PositionLevel)
+      .input("IsDUHead", validateAndConvertBit(newHire.IsDUHead)).query(`
+        INSERT INTO EmployeeInformation (EmployeeId, HRANID, DateHired, Tenure, EmployeeLevel, ProjectCode,
+          ProjectName, Designation, Department, ProdCode, ProdDesc, EmploymentStatus, EmployeeStatus,
+          WorkWeekType, Shift, WorkArrangement, RateClass, Rate, ManagerID, ManagerName, PMPICID,
+          PMPICIDName, DU, DUHID, DUHName, IsManager, IsPMPIC, IsIndividualContributor, IsActive,
+          HRANType, TITOType, Position, PositionLevel, IsDUHead)
+        VALUES (@EmployeeId, @HRANID, @DateHired, @Tenure, @EmployeeLevel, @ProjectCode, @ProjectName, 
+          @Designation, @Department, @ProdCode, @ProdDesc, @EmploymentStatus, @EmployeeStatus, @WorkWeekType, 
+          @Shift, @WorkArrangement, @RateClass, @Rate, @ManagerID, @ManagerName, @PMPICID, @PMPICIDName, @DU, 
+          @DUHID, @DUHName, @IsManager, @IsPMPIC, @IsIndividualContributor, @IsActive, @HRANType, @TITOType, 
+          @Position, @PositionLevel, @IsDUHead)
+      `);
+      // Insert into Address table
+    await pool
+    .request()
+    .input("EmployeeId", newHire.EmployeeId)
+    .input("HouseNumber", newHire.HouseNumber)
+    .input("CompleteAddress", newHire.CompleteAddress)
+    .input("Barangay", newHire.Barangay)
+    .input("CityMunicipality", newHire.CityMunicipality)
+    .input("Province", newHire.Province)
+    .input("Region", newHire.Region)
+    .input("Country", newHire.Country)
+    .input("Zipcode", newHire.Zipcode)
+    .input("LandMark", newHire.LandMark)
+    .input("IsPermanent", newHire.IsPermanent)
+    .input("IsEmergency", newHire.IsEmergency)
+    .query(`
+      INSERT INTO Address (EmployeeId, HouseNumber, CompleteAddress, Barangay, CityMunicipality, Province, 
+        Region, Country, Zipcode, LandMark, IsPermanent, IsEmergency) 
+      VALUES (@EmployeeId, @HouseNumber, @CompleteAddress, @Barangay, @CityMunicipality, @Province,
+        @Region, @Country, @Zipcode, @LandMark, @IsPermanent, @IsEmergency)
     `);
-                
-    return {
-      newemployee,
-      employeeInfo,
-      projectCode,
-      shift,
-      deliveryUnit,
-      department,
-      address,
-      education,
-      contact,
-      emergencyContact,
-      dependent,
-      product
-    };
 
-    // return newemployee;
+
+    return "Data successfully uploaded.";
   } catch (error) {
-    console.log(error);
+    console.error("Error occurred while inserting new hire data:", error);
+    throw new Error("Failed to insert new hire data.");
   }
 };
+
 // Retrieve all new hire employees from the database
 const getAllNewHireEmployees = async () => {
   try {
@@ -325,7 +212,13 @@ const getEmployeeById = async (employeeId) => {
     let result = await pool
       .request()
       .input("EmployeeId", sql.VarChar, employeeId)
-      .query("SELECT * FROM EmpPersonalDetails WHERE EmployeeId = @EmployeeId");
+      .query(`
+        SELECT PD.*, EI.*, ADDRESS.*
+        FROM EmpPersonalDetails AS PD
+        INNER JOIN EmployeeInformation AS EI ON PD.EmployeeId = EI.EmployeeId
+        INNER JOIN Address AS ADDRESS ON PD.EmployeeId = ADDRESS.EmployeeId
+        WHERE PD.EmployeeId = @EmployeeId
+      `);
 
     if (result.recordset.length === 0) {
       return null; // Return null if employee with given ID is not found
@@ -337,6 +230,7 @@ const getEmployeeById = async (employeeId) => {
     throw error;
   }
 };
+
 
 const updateEmployeeById = async (employeeId, updatedEmployeeData) => {
   try {
@@ -354,16 +248,12 @@ const updateEmployeeById = async (employeeId, updatedEmployeeData) => {
       .input("BirthMonth", sql.VarChar(255), updatedEmployeeData.BirthMonth)
       .input("AgeBracket", sql.VarChar(255), updatedEmployeeData.AgeBracket)
       .input("Gender", sql.VarChar(255), updatedEmployeeData.Gender)
-      .input(
-        "MaritalStatus",
-        sql.VarChar(255),
-        updatedEmployeeData.MaritalStatus
-      )
+      .input("MaritalStatus", sql.VarChar(255), updatedEmployeeData.MaritalStatus)
       .input("SSS", sql.VarChar(255), updatedEmployeeData.SSS)
       .input("PHIC", sql.VarChar(255), updatedEmployeeData.PHIC)
       .input("HDMF", sql.VarChar(255), updatedEmployeeData.HDMF)
       .input("TIN", sql.VarChar(255), updatedEmployeeData.TIN)
-      .input("HRANID", sql.VarChar(255), updatedEmployeeData.HRANID)
+      // .input("HRANID", sql.VarChar(255), updatedEmployeeData.HRANID)
       .input(
         "ContactNumber",
         sql.VarChar(255),
@@ -388,7 +278,6 @@ const updateEmployeeById = async (employeeId, updatedEmployeeData) => {
               PHIC = @PHIC,
               HDMF = @HDMF,
               TIN = @TIN,
-              HRANID = @HRANID, 
               ContactNumber = @ContactNumber,
               EmailAddress = @EmailAddress
           WHERE EmployeeId = @employeeId
@@ -400,21 +289,181 @@ const updateEmployeeById = async (employeeId, updatedEmployeeData) => {
     throw error;
   }
 };
-//route to delete employee by ID from the database
-const deleteEmployeeById = async (employeeId) => {
+//update employee info by id
+const updateEmployeeInfoById = async (employeeId, updatedEmployeeData) => {
+  try {
+    let pool = await sql.connect(config);
+    let result = await // Add inputs for other fields similarly
+    pool
+      .request()
+      .input("EmployeeId", sql.VarChar, employeeId)
+      .input("HRANID", sql.VarChar(255), updatedEmployeeData.HRANID)
+      .input("DateHired", sql.Date, updatedEmployeeData.DateHired)
+      .input("Tenure", sql.VarChar(255), updatedEmployeeData.Tenure)
+      .input("EmployeeLevel", sql.VarChar(255), updatedEmployeeData.EmployeeLevel)
+      .input("ProjectCode", sql.VarChar(255), updatedEmployeeData.ProjectCode)
+      .input("ProjectName", sql.VarChar(255), updatedEmployeeData.ProjectName)
+      .input("Designation", sql.VarChar(255), updatedEmployeeData.Designation)
+      .input("Department", sql.VarChar(255), updatedEmployeeData.Department)
+      .input("ProdCode", sql.VarChar(255), updatedEmployeeData.ProdCode)
+      .input("ProdDesc", sql.VarChar(255), updatedEmployeeData.ProdDesc)
+      .input("EmploymentStatus", sql.VarChar(255), updatedEmployeeData.EmploymentStatus)
+      .input("EmployeeStatus", sql.VarChar(255), updatedEmployeeData.EmployeeStatus)
+      .input("WorkWeekType", sql.VarChar(255), updatedEmployeeData.WorkWeekType)
+      .input("Shift", sql.VarChar(255), updatedEmployeeData.Shift)
+      .input("WorkArrangement", sql.VarChar(255), updatedEmployeeData.WorkArrangement)
+      .input("RateClass", sql.VarChar(255), updatedEmployeeData.RateClass)
+      .input("Rate", sql.VarChar(255), updatedEmployeeData.Rate)
+      .input("ManagerID", sql.VarChar(255), updatedEmployeeData.ManagerID)
+      .input("ManagerName", sql.VarChar(255), updatedEmployeeData.ManagerName)
+      .input("PMPICID", sql.VarChar(255), updatedEmployeeData.PMPICID)
+      .input("PMPICIDName", sql.VarChar(255), updatedEmployeeData.PMPICIDName)
+      .input("DUHID", sql.VarChar(255), updatedEmployeeData.DUHID)
+      .input("DUHName", sql.VarChar(255), updatedEmployeeData.DUHName)
+      .input("HRANType", sql.VarChar(255), updatedEmployeeData.HRANType)
+      .input("TITOType", sql.VarChar(255), updatedEmployeeData.TITOType)
+      .input("Position", sql.VarChar(255), updatedEmployeeData.Position)
+      .input("PositionLevel", sql.VarChar(255), updatedEmployeeData.PositionLevel)
+      .query(`
+          UPDATE EmployeeInformation 
+          SET HRANID = @HRANID,
+              DateHired = @DateHired,
+              Tenure = @Tenure,
+              EmployeeLevel = @EmployeeLevel,
+              ProjectCode = @ProjectCode,
+              ProjectName = @ProjectName,
+              Designation = @Designation,
+              Department = @Department,
+              ProdCode = @ProdCode,
+              ProdDesc = @ProdDesc,
+              EmploymentStatus = @EmploymentStatus,
+              EmployeeStatus = @EmployeeStatus,
+              WorkWeekType = @WorkWeekType,
+              Shift = @Shift,
+              WorkArrangement = @WorkArrangement,
+              RateClass = @RateClass,
+              Rate = @Rate,
+              ManagerID = @ManagerID,
+              ManagerName = @ManagerName,
+              PMPICID = @PMPICID,
+              PMPICIDName = @PMPICIDName,
+              DUHID = @DUHID,
+              DUHName = @DUHName,
+              HRANType = @HRANType,
+              TITOType = @TITOType,
+              Position = @Position,
+              PositionLevel = @PositionLevel
+          WHERE EmployeeId = @EmployeeId
+        `);
+
+    return result;
+  } catch (error) {
+    console.error("Error updating employee information by ID:", error);
+    throw error;
+  }
+};
+//update employee address by id
+const updateEmployeeAddressById = async (employeeId, updatedEmployeeData) => {
   try {
     let pool = await sql.connect(config);
     let result = await pool
       .request()
       .input("EmployeeId", sql.VarChar, employeeId)
-      .query("DELETE FROM EmpPersonalDetails WHERE EmployeeId = @EmployeeId");
+      .input("HouseNumber", sql.VarChar(255), updatedEmployeeData.HouseNumber)
+      .input("CompleteAddress", sql.VarChar(255), updatedEmployeeData.CompleteAddress)
+      .input("Barangay", sql.VarChar(255), updatedEmployeeData.Barangay)
+      .input("CityMunicipality", sql.VarChar(255), updatedEmployeeData.CityMunicipality)
+      .input("Province", sql.VarChar(255), updatedEmployeeData.Province)
+      .input("Region", sql.VarChar(255), updatedEmployeeData.Region)
+      .input("Country", sql.VarChar(255), updatedEmployeeData.Country)
+      .input("Zipcode", sql.VarChar(255), updatedEmployeeData.Zipcode)
+      .input("Landmark", sql.VarChar(255), updatedEmployeeData.Landmark)
+      .input("IsPermanent", sql.Bit, updatedEmployeeData.IsPermanent ? 1 : 0) // Convert boolean to 0 or 1
+      .input("IsEmergency", sql.Bit, updatedEmployeeData.IsEmergency ? 1 : 0) // Convert boolean to 0 or 1
+      .query(`
+          UPDATE Address 
+          SET HouseNumber = @HouseNumber,
+              CompleteAddress = @CompleteAddress,
+              Barangay = @Barangay,
+              CityMunicipality = @CityMunicipality,
+              Province = @Province,
+              Region = @Region,
+              Country = @Country,
+              Zipcode = @Zipcode,
+              Landmark = @Landmark,
+              IsPermanent = @IsPermanent,
+              IsEmergency = @IsEmergency
+          WHERE EmployeeId = @EmployeeId
+        `);
 
     return result;
   } catch (error) {
-    console.error("Error deleting employee:", error);
+    console.error("Error updating employee address by ID:", error);
     throw error;
   }
 };
+
+//delete employee data
+const deleteEmployeeById = async (employeeId) => {
+  try {
+    let pool = await sql.connect(config);
+    const transaction = new sql.Transaction(pool);
+
+    try {
+      // Begin a transaction
+      await transaction.begin();
+
+      // Delete from Address table
+      await transaction
+        .request()
+        .input("EmployeeId", sql.VarChar, employeeId)
+        .query("DELETE FROM Address WHERE EmployeeId = @EmployeeId");
+
+      // Delete from EmpPersonalDetails table
+      await transaction
+        .request()
+        .input("EmployeeId", sql.VarChar, employeeId)
+        .query("DELETE FROM EmpPersonalDetails WHERE EmployeeId = @EmployeeId");
+
+      // Delete from EmployeeInformation table
+      await transaction
+        .request()
+        .input("EmployeeId", sql.VarChar, employeeId)
+        .query("DELETE FROM EmployeeInformation WHERE EmployeeId = @EmployeeId");
+
+      // Commit the transaction if all DELETE operations succeed
+      await transaction.commit();
+
+      // Return success message or result
+      return { message: "Employee deleted successfully" };
+    } catch (error) {
+      // Rollback the transaction if any DELETE operation fails
+      await transaction.rollback();
+      console.error("Error deleting employee:", error);
+      throw error; // You can handle or rethrow the error as necessary
+    }
+  } catch (error) {
+    console.error("Error connecting to database:", error);
+    throw error;
+  }
+};
+
+
+// const deleteEmployeeById = async (employeeId) => {
+//   try {
+//     let pool = await sql.connect(config);
+//     let result = await pool
+//       .request()
+//       .input("EmployeeId", sql.VarChar, employeeId)
+//       .query("DELETE FROM EmpPersonalDetails WHERE EmployeeId = @EmployeeId");
+
+//     return result;
+//   } catch (error) {
+//     console.error("Error deleting employee:", error);
+//     throw error;
+//   }
+// };
+
 //route to delete employee by ID from the database
 const deleteUsersById = async (userId) => {
   try {
@@ -579,4 +628,6 @@ module.exports = {
   getAllUserAccount,
   getUserData,
   deleteUsersById,
+  updateEmployeeInfoById,
+  updateEmployeeAddressById
 };

@@ -37,26 +37,71 @@ const Reports = () => {
       try {
         // Make a GET request to fetch new hire employees from the server
         const response = await fetch('/newHireEmp');
-
+  
         // Check if the response is successful
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
-
+  
         // Extract the data from the response
         const data = await response.json();
 
+       // To convert all the capital letters in a string to title case (capitalize the first letter of each word)
+        function convertToTitleCase(str) {
+          return str.toLowerCase().replace(/\b\w/g, function (char) {
+            return char.toUpperCase();
+          });
+        }
+        // Convert names to title case before setting in state
+        const formattedData = data.map(employee => ({
+          ...employee,
+          EmployeeName: convertToTitleCase(employee.EmployeeName),
+          FirstName: convertToTitleCase(employee.FirstName),
+          MiddleName: convertToTitleCase(employee.MiddleName),
+          LastName: convertToTitleCase(employee.LastName),
+          BirthMonth: convertToTitleCase(employee.BirthMonth),
+          MaritalStatus: convertToTitleCase(employee.MaritalStatus),
+          Gender: convertToTitleCase(employee.Gender),
+        }));
+  
         // Set the retrieved data in your component state
-        setEmployees(data);
-        setFilteredEmployees(data);
+        setEmployees(formattedData);
+        setFilteredEmployees(formattedData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
-
+  
     // Call the fetchData function when the component mounts
     fetchData();
   }, []); // Empty dependency array to run only once when the component mounts
+  
+
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     try {
+  //       // Make a GET request to fetch new hire employees from the server
+  //       const response = await fetch('/newHireEmp');
+
+  //       // Check if the response is successful
+  //       if (!response.ok) {
+  //         throw new Error("Failed to fetch data");
+  //       }
+
+  //       // Extract the data from the response
+  //       const data = await response.json();
+
+  //       // Set the retrieved data in your component state
+  //       setEmployees(data);
+  //       setFilteredEmployees(data);
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   }
+
+  //   // Call the fetchData function when the component mounts
+  //   fetchData();
+  // }, []); // Empty dependency array to run only once when the component mounts
 
   return (
     <div>
@@ -120,7 +165,7 @@ const Reports = () => {
                               <th scope="col">HDMF</th>
                               <th scope="col">TIN</th>
                               {/* <th scope="col">ADDRESS</th> */}
-                              <th scope="col">HRANID</th>
+                              {/* <th scope="col">HRANID</th> */}
                               <th scope="col">CONTACT NUMBER</th>
                               <th scope="col">EMAIL ADDRESS</th>
                             </tr>
@@ -155,7 +200,7 @@ const Reports = () => {
                                   <td>{employee.PHIC}</td>
                                   <td>{employee.HDMF}</td>
                                   <td>{employee.TIN}</td>
-                                  <td>{employee.HRANID}</td>
+                                  {/* <td>{employee.HRANID}</td> */}
                                   <td>{employee.ContactNumber}</td>
                                   <td>{employee.EmailAddress}</td>
                                 </tr>

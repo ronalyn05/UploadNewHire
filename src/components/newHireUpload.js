@@ -9,7 +9,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const NewHireUpload = () => {
-
   const [file, setFile] = useState(null);
   const [excelData, setExcelData] = useState([]);
   const [showPreview, setShowPreview] = useState(false);
@@ -136,67 +135,243 @@ const NewHireUpload = () => {
     setExcelData(updatedData);
     setEditModalShow(false);
   };
- 
+
+  // const handleSaveData = async () => {
+  //   console.log("this");
+  //   console.log(excelData);
+  //   try {
+  //      //  Check for null values in any row
+  //       const hasNullValues = excelData.some((row) =>
+  //           Object.values(row).some((value) => value === null || value === "")
+  //       );
+
+  //       if (hasNullValues) {
+  //           alert(
+  //               "One or more fields contain null values. Please fill in all fields and fill 'N/A if fields is empty."
+  //           );
+  //           return;
+  //       }
+
+  //       // Convert birthdate to date format before saving
+  //       const formattedData = excelData.map((row) => {
+  //           const formattedRow = { ...row };
+  //           // Assuming the key containing birthdate is 'Birthdate', modify as necessary
+  //           formattedRow['Birthdate'] = convertExcelDateToDate(row['Birthdate']);
+  //           return formattedRow;
+  //       });
+
+  //     const response = await axios.post('/upload', formattedData, {
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     });
+
+  //     if (response.status !== 200) {
+  //       throw new Error("Failed to save data");
+  //     }
+
+  //     console.log(response.data); // Log the response from the API
+  //     alert("Data has been successfully uploaded!");
+  //     // Navigate to report.js
+  //     navigate("/reports");
+  //   } catch (error) {
+  //     console.error("Error occurred while saving data:", error);
+  //     if (error.response) {
+  //       // Server responded with an error status code
+  //       alert(`Server Error: ${error.response.data}`);
+  //     } else if (error.request) {
+  //       // Request made but no response received
+  //       alert("No response from the server. Please try again later.");
+  //     } else {
+  //       // Other errors
+  //       alert(
+  //         'Error occurred while uploading data. Please check your uploaded data and make sure all fields have values or replace empty fields with "N/A".'
+  //       );
+  //     }
+  //   }
+  // };
+
   const handleSaveData = async () => {
     console.log("this");
     console.log(excelData);
     try {
-        // Check for null values in any row
-        const hasNullValues = excelData.some((row) =>
-            Object.values(row).some((value) => value === null || value === "")
-        );
+      // Check for null values in any row
+      const hasNullValues = excelData.some((row) =>
+        Object.values(row).some((value) => value === null || value === "")
+      );
 
-        if (hasNullValues) {
-            alert(
-                "One or more fields contain null values. Please fill in all fields and fill 'N/A if fields is empty."
-            );
-            return;
-        }
-      //         // Check for existing employee IDs
-      // const existingEmployeeIDs = excelData.map((row) => row.employeeID); // Assuming 'employeeID' is the key for the employee ID in your data
-
-      // // Check if there are any duplicate IDs
-      // const duplicateID = existingEmployeeIDs.some(
-      //   (id, index) => existingEmployeeIDs.indexOf(id) !== index
-      // );
-
-      // if (duplicateID) {
-      //   alert(
-      //     "One or more employee IDs already exist. Please ensure all IDs are unique."
-      //   );
-      //   return;
-      // }
-
-        // Convert birthdate to date format before saving
-        const formattedData = excelData.map((row) => {
-            const formattedRow = { ...row };
-            // Assuming the key containing birthdate is 'Birthdate', modify as necessary
-            formattedRow['Birthdate'] = convertExcelDateToDate(row['Birthdate']);
-            return formattedRow;
-        });
-
-        // Make a POST request to the API endpoint for inserting previewed data
-        const response = await axios.post('/upload', formattedData, {
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
-
-        if (response.status !== 200) {
-            throw new Error("Failed to save data");
-        }
-
-        console.log(response.data); // Log the response from the API
-        alert("Data has been successfully uploaded!");
-        // Navigate to report.js
-        navigate("/reports");
-    } catch (error) {
-        console.error("Error occurred while saving data:", error);
+      if (hasNullValues) {
         alert(
-            'Error occurred while uploading data.Please check your uploaded data and make sure all fields have values or replace empty fields with "N/A".'
+          "One or more fields contain null values. Please fill in all fields and use 'N/A' if a field is empty."
         );
+        return;
+      }
+
+      // Prompt the user to check the values of bit fields
+      const promptCheckBitFields = () => {
+        const invalidFields = [];
+        excelData.forEach((row, index) => {
+          if (
+            row.IsManager !== "0" &&
+            row.IsManager !== "1" &&
+            row.IsManager !== 0 &&
+            row.IsManager !== 1
+          ) {
+            invalidFields.push(`IsManager in row ${index + 1}`);
+          }
+          if (
+            row.IsPMPIC !== "0" &&
+            row.IsPMPIC !== "1" &&
+            row.IsPMPIC !== 0 &&
+            row.IsPMPIC !== 1
+          ) {
+            invalidFields.push(`IsPMPIC in row ${index + 1}`);
+          }
+          if (
+            row.IsIndividualContributor !== "0" &&
+            row.IsIndividualContributor !== "1" &&
+            row.IsIndividualContributor !== 0 &&
+            row.IsIndividualContributor !== 1
+          ) {
+            invalidFields.push(`IsIndividualContributor in row ${index + 1}`);
+          }
+          if (
+            row.IsActive !== "0" &&
+            row.IsActive !== "1" &&
+            row.IsActive !== 0 &&
+            row.IsActive !== 1
+          ) {
+            invalidFields.push(`IsActive in row ${index + 1}`);
+          }
+          if (
+            row.IsDUHead !== "0" &&
+            row.IsDUHead !== "1" &&
+            row.IsDUHead !== 0 &&
+            row.IsDUHead !== 1
+          ) {
+            invalidFields.push(`IsDUHead in row ${index + 1}`);
+          }
+          if (
+            row.IsPermanent !== "0" &&
+            row.IsPermanent !== "1" &&
+            row.IsPermanent !== 0 &&
+            row.IsPermanent !== 1
+          ) {
+            invalidFields.push(`IsPermanent in row ${index + 1}`);
+          }
+          if (
+            row.IsEmergency !== "0" &&
+            row.IsEmergency !== "1" &&
+            row.IsEmergency !== 0 &&
+            row.IsEmergency !== 1
+          ) {
+            invalidFields.push(`IsEmergency in row ${index + 1}`);
+          }
+        });
+        // };
+        if (invalidFields.length > 0) {
+          alert(
+            `Invalid values detected for the following fields:\n${invalidFields.join(
+              "\n"
+            )}`
+          );
+          throw new Error("Invalid values detected");
+        }
+      };
+
+      promptCheckBitFields();
+
+      // Convert birthdate to date format before saving
+      const formattedData = excelData.map((row) => {
+        const formattedRow = { ...row };
+        // Assuming the key containing birthdate is 'Birthdate', modify as necessary
+        formattedRow["Birthdate"] = convertExcelDateToDate(row["Birthdate"]);
+        // Assuming the key containing DateHired is 'DateHired', modify as necessary
+        formattedRow["DateHired"] = convertExcelDateToDate(row["DateHired"]);
+        return formattedRow;
+      });
+
+      // Make a POST request to the API endpoint for inserting previewed data
+      const response = await axios.post("/upload", formattedData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.status !== 200) {
+        throw new Error("Failed to save data");
+      }
+
+      console.log(response.data); // Log the response from the API
+      alert("Data has been successfully uploaded!");
+      // Navigate to report.js
+      navigate("/reports");
+    } catch (error) {
+      // Check if the error is due to duplicate parameter names or unique constraint
+      if (error.message.includes("duplicate parameter names")) {
+        // Send an alert message to the client
+        alert(
+          "Duplicate parameter names detected. Please check the input parameters."
+        );
+      } else if (error.message.includes("unique constraint")) {
+        // Check if unique emp id already exists
+        alert("Failed to upload data. Unique employee ID already exists.");
+      } else {
+        // Failed to upload data of certain table(s) in the database
+        alert("Failed to upload data to the database.");
+      }
+      console.error("Error occurred while saving data:", error);
+      // Return an appropriate error message
+      return "Error inserting new hire data";
     }
-};
+  };
+
+  //   const handleSaveData = async () => {
+  //     console.log("this");
+  //     console.log(excelData);
+  //     try {
+  //         // Check for null values in any row
+  //         const hasNullValues = excelData.some((row) =>
+  //             Object.values(row).some((value) => value === null || value === "")
+  //         );
+
+  //         if (hasNullValues) {
+  //             alert(
+  //                 "One or more fields contain null values. Please fill in all fields and fill 'N/A if fields is empty."
+  //             );
+  //             return;
+  //         }
+
+  //         // Convert birthdate to date format before saving
+  //         const formattedData = excelData.map((row) => {
+  //             const formattedRow = { ...row };
+  //             // Assuming the key containing birthdate is 'Birthdate', modify as necessary
+  //             formattedRow['Birthdate'] = convertExcelDateToDate(row['Birthdate']);
+  //             return formattedRow;
+  //         });
+
+  //         // Make a POST request to the API endpoint for inserting previewed data
+  //         const response = await axios.post('/upload', formattedData, {
+  //             headers: {
+  //                 "Content-Type": "application/json",
+  //             },
+  //         });
+
+  //         if (response.status !== 200) {
+  //             throw new Error("Failed to save data");
+  //         }
+
+  //         console.log(response.data); // Log the response from the API
+  //         alert("Data has been successfully uploaded!");
+  //         // Navigate to report.js
+  //         navigate("/reports");
+  //     } catch (error) {
+  //         console.error("Error occurred while saving data:", error);
+  //         alert(
+  //             'Error occurred while uploading data.Please check your uploaded data and make sure all fields have values or replace empty fields with "N/A".'
+  //         );
+  //     }
+  // };
 
   return (
     <div>
@@ -343,6 +518,13 @@ const NewHireUpload = () => {
                                                 ? convertExcelDateToDate(
                                                     row[key]
                                                   )
+                                                : key
+                                                    .toLowerCase()
+                                                    .replace(/\s/g, "") ===
+                                                  "datehired"
+                                                ? convertExcelDateToDate(
+                                                    row[key]
+                                                  ) // Convert Date Hired to date format
                                                 : row[key]}
                                             </td>
                                           ))}
