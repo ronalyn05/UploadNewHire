@@ -136,60 +136,6 @@ const NewHireUpload = () => {
     setEditModalShow(false);
   };
 
-  // const handleSaveData = async () => {
-  //   console.log("this");
-  //   console.log(excelData);
-  //   try {
-  //      //  Check for null values in any row
-  //       const hasNullValues = excelData.some((row) =>
-  //           Object.values(row).some((value) => value === null || value === "")
-  //       );
-
-  //       if (hasNullValues) {
-  //           alert(
-  //               "One or more fields contain null values. Please fill in all fields and fill 'N/A if fields is empty."
-  //           );
-  //           return;
-  //       }
-
-  //       // Convert birthdate to date format before saving
-  //       const formattedData = excelData.map((row) => {
-  //           const formattedRow = { ...row };
-  //           // Assuming the key containing birthdate is 'Birthdate', modify as necessary
-  //           formattedRow['Birthdate'] = convertExcelDateToDate(row['Birthdate']);
-  //           return formattedRow;
-  //       });
-
-  //     const response = await axios.post('/upload', formattedData, {
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     });
-
-  //     if (response.status !== 200) {
-  //       throw new Error("Failed to save data");
-  //     }
-
-  //     console.log(response.data); // Log the response from the API
-  //     alert("Data has been successfully uploaded!");
-  //     // Navigate to report.js
-  //     navigate("/reports");
-  //   } catch (error) {
-  //     console.error("Error occurred while saving data:", error);
-  //     if (error.response) {
-  //       // Server responded with an error status code
-  //       alert(`Server Error: ${error.response.data}`);
-  //     } else if (error.request) {
-  //       // Request made but no response received
-  //       alert("No response from the server. Please try again later.");
-  //     } else {
-  //       // Other errors
-  //       alert(
-  //         'Error occurred while uploading data. Please check your uploaded data and make sure all fields have values or replace empty fields with "N/A".'
-  //       );
-  //     }
-  //   }
-  // };
 
   const handleSaveData = async () => {
     console.log("this");
@@ -326,52 +272,6 @@ const NewHireUpload = () => {
     }
   };
 
-  //   const handleSaveData = async () => {
-  //     console.log("this");
-  //     console.log(excelData);
-  //     try {
-  //         // Check for null values in any row
-  //         const hasNullValues = excelData.some((row) =>
-  //             Object.values(row).some((value) => value === null || value === "")
-  //         );
-
-  //         if (hasNullValues) {
-  //             alert(
-  //                 "One or more fields contain null values. Please fill in all fields and fill 'N/A if fields is empty."
-  //             );
-  //             return;
-  //         }
-
-  //         // Convert birthdate to date format before saving
-  //         const formattedData = excelData.map((row) => {
-  //             const formattedRow = { ...row };
-  //             // Assuming the key containing birthdate is 'Birthdate', modify as necessary
-  //             formattedRow['Birthdate'] = convertExcelDateToDate(row['Birthdate']);
-  //             return formattedRow;
-  //         });
-
-  //         // Make a POST request to the API endpoint for inserting previewed data
-  //         const response = await axios.post('/upload', formattedData, {
-  //             headers: {
-  //                 "Content-Type": "application/json",
-  //             },
-  //         });
-
-  //         if (response.status !== 200) {
-  //             throw new Error("Failed to save data");
-  //         }
-
-  //         console.log(response.data); // Log the response from the API
-  //         alert("Data has been successfully uploaded!");
-  //         // Navigate to report.js
-  //         navigate("/reports");
-  //     } catch (error) {
-  //         console.error("Error occurred while saving data:", error);
-  //         alert(
-  //             'Error occurred while uploading data.Please check your uploaded data and make sure all fields have values or replace empty fields with "N/A".'
-  //         );
-  //     }
-  // };
 
   return (
     <div>

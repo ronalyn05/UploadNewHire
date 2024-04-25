@@ -21,7 +21,7 @@ import '../App.css';
     Age: '',
     BirthMonth: '',
     AgeBracket: '',
-    Aender: '',
+    Gender: '',
     MaritalStatus: '',
     SSS: '',
     PHIC: '',
@@ -316,12 +316,12 @@ useEffect(() => {
                                             <input type="text" className="form-control" value={employeeData.EmailAddress} onChange={handleInputChange} name="EmailAddress" />
                                         </div>
                                     </div>
-                                    <div className="col-md-4">
+                                    {/* <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="contactNumber">Contact Number</label>
                                             <input type="text" className="form-control" value={employeeData.ContactNumber} onChange={handleInputChange} name="ContactNumber"/>
                                         </div>
-                                    </div>
+                                    </div> */}
                                 </div>
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
@@ -683,51 +683,40 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Project ID</label>
-                                            <span className="form-control"> </span>
+                                            <span className="form-control">{Array.isArray(employeeData.ProjectId) ? employeeData.ProjectId[0] : employeeData.ProjectId} </span>
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="projectCode">Project Code</label>
-                                            <input type="text" className="form-control" placeholder="enter project code" name="projectCode" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.ProjectCode} placeholder="enter project code" name="ProjectCode" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="projectName">Project Name</label>
-                                            <input type="text" className="form-control" placeholder="enter project name" name="projectName" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.ProjectName} placeholder="enter project name" name="ProjectName" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="tenure">Tenure</label>
-                                            <input type="text" className="form-control" placeholder="enter tenure" name="tenure" onChange={handleInputChange} />
+                                            <label htmlFor="duid">DUID</label>
+                                            <input type="text" className="form-control" readOnly={true} value={Array.isArray(employeeData.DUID) ? employeeData.DUID[0] : employeeData.DUID} placeholder="enter duid" name="DUID" onChange={handleInputChange} />
                                         </div>
                                     </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="empLevel">Employee Level</label>
-                                            <input type="text" className="form-control" placeholder=" enter employee Level" name="empLevel" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="du_id">DUID</label>
-                                            <input type="text" className="form-control" placeholder="enter DUID" name="du_id" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
                                     <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="isActive">Is Active</label>
-                                              <input type="text" className="form-control" placeholder="is Active" name="isActive" onChange={handleInputChange} />
+                                              <input type="text" className="form-control" value={employeeData.IsActive} placeholder="is Active" name="isActive" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                 </div>
-                                <button type="submit" className="btn btn-primary d-block mx-auto">Submit</button>
+                                <div className="row justify-content-center">
+                                    
+                                </div>
+                                <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
                             </form>
                         </div>
                       <br/>
@@ -754,7 +743,7 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="tenure">Shift Type</label>
-                                            <input type="text" className="form-control" placeholder="enter shift type" name="shiftType" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" placeholder="enter shift type" value={Array.isArray(employeeData.DUID) ? employeeData.DUID[0] : employeeData.DUID} name="shiftType" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
@@ -785,13 +774,13 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>DUID</label>
-                                            <span className="form-control"></span>
+                                            <span className="form-control">{Array.isArray(employeeData.DUID) ? employeeData.DUID[0] : employeeData.DUID}</span>
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="projectCode">DU Code</label>
-                                            <input type="text" className="form-control" placeholder="enter DU Code" name="duCode" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" readOnly={true} value={employeeData.DUCode} placeholder="enter DU Code" name="duCode" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
@@ -799,13 +788,13 @@ useEffect(() => {
                                 <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="projectName">DU Name</label>
-                                            <input type="text" className="form-control" placeholder="enter DU Name" name="duName" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.DUName} placeholder="enter DU Name" name="duName" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="tenure">is Active</label>
-                                            <input type="text" className="form-control" placeholder="is Active" name="isActive" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" readOnly={true} value={Array.isArray(employeeData.IsActive) ? employeeData.IsActive[0] : employeeData.IsActive} placeholder="is Active" name="isActive" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
@@ -822,7 +811,7 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Department ID</label>
-                                            <span className="form-control"></span>
+                                            <span className="form-control">{Array.isArray(employeeData.DUID) ? employeeData.DUID[0] : employeeData.DUID}</span>
                                         </div>
                                     </div>
                                     <div className="col-md-4">
@@ -941,7 +930,7 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Education ID</label>
-                                            <span className="form-control">{employeeData.EmpID}</span>
+                                            <span className="form-control">{Array.isArray(employeeData.DUID) ? employeeData.DUID[0] : employeeData.DUID}</span>
                                         </div>
                                     </div>
                                     <div className="col-md-4">
@@ -1023,8 +1012,8 @@ useEffect(() => {
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label>Contact ID</label>
-                                            <span className="form-control"></span>
+                                            <label>Employee Id</label>
+                                            <span className="form-control">{Array.isArray(employeeData.DUID) ? employeeData.DUID[0] : employeeData.DUID}</span>
                                         </div>
                                     </div>
                                     </div>
@@ -1032,18 +1021,11 @@ useEffect(() => {
                                     <div className="col-md-4">
                                       <div className="form-group">
                                           <label htmlFor="contactNumber">Contact Number</label>
-                                          <input type="tel" className="form-control" placeholder="Enter contact number" name="contactNumber" onChange={handleInputChange} />
+                                          <input type="tel" className="form-control" value={employeeData.ContactNumber} placeholder="Enter contact number" name="contactNumber" onChange={handleInputChange} />
                                       </div>
                                   </div>
                                     </div>
-                                    <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="projectName">Employee Id</label>
-                                            <input type="text" className="form-control" name="employeeId" readOnly={true} value={employeeData.EmployeeId} onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                </div>
+                                  
                                 <br/>
                                 <button type="submit" className="btn btn-primary d-block mx-auto">Submit</button>
                             </form>
@@ -1053,7 +1035,27 @@ useEffect(() => {
                       <div className="tab-pane fade" id="emergencyContact" role="tabpanel" aria-labelledby="emergencyContact-tab">
                           {/* Emergency Contact Form */}
                           <div className="container">
-                          
+                          <form onSubmit={handleFormSubmit}>
+                                <div className="row justify-content-center">
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label>Employee Id</label>
+                                            <span className="form-control">{Array.isArray(employeeData.DUID) ? employeeData.DUID[0] : employeeData.DUID}</span>
+                                        </div>
+                                    </div>
+                                    </div>
+                                    <div className="row justify-content-center">
+                                    <div className="col-md-4">
+                                      <div className="form-group">
+                                          <label htmlFor="contactNumber">Contact Number</label>
+                                          <input type="tel" className="form-control" value={employeeData.ContactNumber} placeholder="Enter contact number" name="contactNumber" onChange={handleInputChange} />
+                                      </div>
+                                  </div>
+                                    </div>
+                                  
+                                <br/>
+                                <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
+                            </form>
                         </div>
                       <br/>
                       </div>
@@ -1065,7 +1067,7 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Dependent ID</label>
-                                            <span className="form-control"></span>
+                                            <span className="form-control">{Array.isArray(employeeData.DependentID) ? employeeData.DependentID[0] : employeeData.DependentID}</span>
                                         </div>
                                     </div>
                                     <div className="col-md-4">
@@ -1202,7 +1204,7 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Product ID</label>
-                                            <span className="form-control"></span>
+                                            <span className="form-control">{Array.isArray(employeeData.ProdId) ? employeeData.ProdId[0] : employeeData.ProdId}</span>
                                         </div>
                                     </div>
                                     </div>
