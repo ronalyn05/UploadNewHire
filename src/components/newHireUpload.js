@@ -190,6 +190,22 @@ const NewHireUpload = () => {
             invalidFields.push(`IsActive in row ${index + 1}`);
           }
           if (
+            row.Is_Active !== "0" &&
+            row.Is_Active !== "1" &&
+            row.Is_Active !== 0 &&
+            row.Is_Active !== 1
+          ) {
+            invalidFields.push(`Is_Active in row ${index + 1}`);
+          }
+          if (
+            row.is_Active !== "0" &&
+            row.is_Active !== "1" &&
+            row.is_Active !== 0 &&
+            row.is_Active !== 1
+          ) {
+            invalidFields.push(`is_Active in row ${index + 1}`);
+          }
+          if (
             row.IsDUHead !== "0" &&
             row.IsDUHead !== "1" &&
             row.IsDUHead !== 0 &&
@@ -230,10 +246,12 @@ const NewHireUpload = () => {
       // Convert birthdate to date format before saving
       const formattedData = excelData.map((row) => {
         const formattedRow = { ...row };
-        // Assuming the key containing birthdate is 'Birthdate', modify as necessary
+        // key containing date
         formattedRow["Birthdate"] = convertExcelDateToDate(row["Birthdate"]);
-        // Assuming the key containing DateHired is 'DateHired', modify as necessary
         formattedRow["DateHired"] = convertExcelDateToDate(row["DateHired"]);
+        formattedRow["DateTo"] = convertExcelDateToDate(row["DateTo"]);
+        formattedRow["DateFrom"] = convertExcelDateToDate(row["DateFrom"]);
+        formattedRow["BirthofDate"] = convertExcelDateToDate(row["BirthofDate"]);
         return formattedRow;
       });
 

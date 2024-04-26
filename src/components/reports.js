@@ -77,31 +77,6 @@ const Reports = () => {
   }, []); // Empty dependency array to run only once when the component mounts
   
 
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     try {
-  //       // Make a GET request to fetch new hire employees from the server
-  //       const response = await fetch('/newHireEmp');
-
-  //       // Check if the response is successful
-  //       if (!response.ok) {
-  //         throw new Error("Failed to fetch data");
-  //       }
-
-  //       // Extract the data from the response
-  //       const data = await response.json();
-
-  //       // Set the retrieved data in your component state
-  //       setEmployees(data);
-  //       setFilteredEmployees(data);
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   }
-
-  //   // Call the fetchData function when the component mounts
-  //   fetchData();
-  // }, []); // Empty dependency array to run only once when the component mounts
 
   return (
     <div>

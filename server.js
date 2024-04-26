@@ -299,7 +299,21 @@ app.put('/updateEmployeeAddress/:employeeId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-
+//api endpoint for updatign project details
+app.put('/updateProject/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  const updatedEmployeeData = req.body;
+  try {
+    const result = await dbOperation.updateEmployeeProjectById(employeeId, updatedEmployeeData);
+    if (!result) {
+      return res.status(404).json({ message: 'Employee project details not found' });
+    }
+    res.json({ message: 'Employee project details updated successfully' });
+  } catch (error) {
+    console.error('Error updating project details:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 // DELETE endpoint to delete an employee by ID
 app.delete('/deleteEmployee/:employeeId', async (req, res) => {
   const { employeeId } = req.params;

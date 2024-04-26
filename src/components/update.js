@@ -238,7 +238,50 @@ useEffect(() => {
         console.error('Error updating employee address:', error);
         }
     };
-    
+    //UPDATE PROJECT CODE
+  const handleProjectFormSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`http://localhost:5000/updateProject/${employeeId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(employeeData)
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update project details');
+      }
+  
+      // Retrieve the name of the employee from employeeData
+      const { FirstName, LastName } = employeeData;
+      const employeeName = `${FirstName} ${LastName}`;
+  
+      // Compare initial employeeData with updated employeeData
+      const updatedFields = [];
+      Object.entries(employeeData).forEach(([key, value]) => {
+        if (value !== initialEmployeeData[key]) {
+          updatedFields.push(key);
+        }
+      });
+  
+      // Generate success message based on updated fields
+      let successMessage;
+      if (updatedFields.length === 0) {
+        successMessage = `No information has been updated for ${employeeName}.`;
+      } else {
+        successMessage = `Employee ${employeeName} has successfully updated ${updatedFields.join(', ')}!`;
+      }
+  
+      // Display the success message
+      alert(successMessage);
+  
+      // Navigate to report.js
+      navigate("/reports");
+    } catch (error) {
+      console.error('Error updating employee:', error);
+    }
+  };
   
 
   if (!employeeData) {
@@ -486,7 +529,7 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="projectName">Project Name</label>
-                                            <input type="text" className="form-control" value={employeeData.ProjectName} placeholder="enter project name" name="ProjectName" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.ProjectName} readOnly={true} name="ProjectName" />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
@@ -498,7 +541,7 @@ useEffect(() => {
                                     <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="department">Department</label>
-                                              <input type="text" className="form-control" value={employeeData.Department} placeholder="enter department" name="Department" onChange={handleInputChange} />
+                                              <input type="text" className="form-control" readOnly={true} value={employeeData.DepartmentName} name="Department" />
                                               </div>
                                             </div>
                                    </div>
@@ -506,13 +549,13 @@ useEffect(() => {
                                 <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="productCode">Product Code</label>
-                                              <input type="text" className="form-control" readOnly={true} value={employeeData.ProdCode} placeholder="enter product Code" name="ProductCode" onChange={handleInputChange} />
+                                              <input type="text" className="form-control" readOnly={true} value={employeeData.ProdCode} name="ProductCode"  />
                                               </div>
                                             </div>
                                             <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="prodDesc"> Product Description</label>
-                                              <input type="text" className="form-control" value={employeeData.ProdDesc} placeholder="enter production description" name="ProdDesc" onChange={handleInputChange} />      
+                                              <input type="text" className="form-control" readOnly={true} value={employeeData.ProdDesc} name="ProdDesc" />      
                                               </div>
                                             </div>
                                             <div className="col-md-4">
@@ -538,7 +581,7 @@ useEffect(() => {
                                             <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="shift">Shift</label>
-                                              <input type="text" className="form-control" value={employeeData.Shift} placeholder="enter shift" name="Shift" onChange={handleInputChange} />     
+                                              <input type="text" className="form-control" value={employeeData.ShiftName} readOnly={true} name="Shift" />     
                                               </div>
                                             </div>
                                 </div>
@@ -592,7 +635,7 @@ useEffect(() => {
                                             <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="du">Delivery Unit</label>
-                                              <input type="text" className="form-control" value={employeeData.DU} readOnly={true} placeholder="enter Delivery Unit" name="DeliveryUnit" onChange={handleInputChange} />
+                                              <input type="text" className="form-control" value={employeeData.DUName} readOnly={true} name="DeliveryUnit" />
                                               </div>
                                             </div>
                                             <div className="col-md-4">
@@ -678,12 +721,12 @@ useEffect(() => {
                       <div className="tab-pane fade" id="project_Code" role="tabpanel" aria-labelledby="project_Code-tab">
                           {/* Project Code Form */}
                           <div className="container">
-                            <form onSubmit={handleFormSubmit}>
+                            <form onSubmit={handleProjectFormSubmit}>
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Project ID</label>
-                                            <span className="form-control">{Array.isArray(employeeData.ProjectId) ? employeeData.ProjectId[0] : employeeData.ProjectId} </span>
+                                            <span className="form-control">{employeeData.ProjectId} </span>
                                         </div>
                                     </div>
                                     <div className="col-md-4">
@@ -703,13 +746,13 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="duid">DUID</label>
-                                            <input type="text" className="form-control" readOnly={true} value={Array.isArray(employeeData.DUID) ? employeeData.DUID[0] : employeeData.DUID} placeholder="enter duid" name="DUID" onChange={handleInputChange} />
+                                            <span className="form-control">{employeeData.ProjectDUID}</span>
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="isActive">Is Active</label>
-                                              <input type="text" className="form-control" value={employeeData.IsActive} placeholder="is Active" name="isActive" onChange={handleInputChange} />
+                                              <input type="text" className="form-control" value={employeeData.is_Active} placeholder="is Active" name="isActive" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                 </div>
@@ -726,16 +769,22 @@ useEffect(() => {
                           <div className="container">
                             <form onSubmit={handleFormSubmit}>
                                 <div className="row justify-content-center">
-                                    <div className="col-md-4">
+                                    {/* <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Shift ID</label>
-                                            <span className="form-control"></span>
+                                            <span className="form-control">value={Array.isArray(employeeData.ShiftId  ) ? employeeData.DUID[0] : employeeData.DUID} </span>
+                                        </div>
+                                    </div> */}
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label htmlFor="projectCode">Shift Code</label>
+                                            <input type="text" className="form-control" value={employeeData.ShiftCode} placeholder="enter project code" name="shiftCode" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="projectCode">Shift Code</label>
-                                            <input type="text" className="form-control" placeholder="enter project code" name="shiftCode" onChange={handleInputChange} />
+                                            <label htmlFor="projectCode">Shift Name</label>
+                                            <input type="text" className="form-control" value={employeeData.ShiftName} placeholder="enter project code" name="shiftCode" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
@@ -743,23 +792,18 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="tenure">Shift Type</label>
-                                            <input type="text" className="form-control" placeholder="enter shift type" value={Array.isArray(employeeData.DUID) ? employeeData.DUID[0] : employeeData.DUID} name="shiftType" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.ShiftType} placeholder="enter shift type" name="shiftType" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="projectCode">Project Code</label>
-                                            <input type="text" className="form-control" id="projectCode" name="projectCode" value={employeeData.FirstName} onChange={handleInputChange} />
+                                            <label htmlFor="projectName">Level Id</label>
+                                            <input type="text" className="form-control" value={employeeData.LevelID} placeholder="enter level Id" name="levelId" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
                                 <div className="row justify-content-center">
-                                <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="projectName">Level Id</label>
-                                            <input type="text" className="form-control" placeholder="enter level Id" name="levelId" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
+                                
                                     </div>
                                 <button type="submit" className="btn btn-primary d-block mx-auto">Submit</button>
                             </form>
@@ -774,7 +818,7 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>DUID</label>
-                                            <span className="form-control">{Array.isArray(employeeData.DUID) ? employeeData.DUID[0] : employeeData.DUID}</span>
+                                            <span className="form-control">{employeeData.DUID}</span>
                                         </div>
                                     </div>
                                     <div className="col-md-4">
@@ -793,12 +837,12 @@ useEffect(() => {
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="tenure">is Active</label>
-                                            <input type="text" className="form-control" readOnly={true} value={Array.isArray(employeeData.IsActive) ? employeeData.IsActive[0] : employeeData.IsActive} placeholder="is Active" name="isActive" onChange={handleInputChange} />
+                                            <label>is Active</label>
+                                            <input type="text" className="form-control" readOnly={true} value={employeeData.Is_Active} placeholder="is Active" name="Is_Active" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
-                                <button type="submit" className="btn btn-primary d-block mx-auto">Submit</button>
+                                <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes </button>
                             </form>
                         </div>
                       <br/>
@@ -811,23 +855,27 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Department ID</label>
-                                            <span className="form-control">{Array.isArray(employeeData.DUID) ? employeeData.DUID[0] : employeeData.DUID}</span>
+                                            <span className="form-control">{employeeData.DepartmentId}</span>
                                         </div>
                                     </div>
+                                    </div>
+                                    <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="deptname">Department Name</label>
-                                            <input type="text" className="form-control" placeholder="enter department name" name="DepartmentName" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.DepartmentName} placeholder="enter department name" name="DepartmentName" onChange={handleInputChange} />
                                         </div>
                                     </div>
+                                    </div>
+                                    <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="projectName">DUID</label>
-                                            <input type="text" className="form-control" placeholder="enter DUID" name="duid" onChange={handleInputChange} />
+                                            <label >DUID</label>
+                                            <span className="form-control">{employeeData.DeptDUID}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <button type="submit" className="btn btn-primary d-block mx-auto">Submit</button>
+                                <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
                             </form>
                         </div>
                       <br/>
@@ -927,76 +975,72 @@ useEffect(() => {
                           <div className="container">
                             <form onSubmit={handleFormSubmit}>
                                 <div className="row justify-content-center">
-                                    <div className="col-md-4">
+                                <div className="col-md-4">
                                         <div className="form-group">
-                                            <label>Education ID</label>
-                                            <span className="form-control">{Array.isArray(employeeData.DUID) ? employeeData.DUID[0] : employeeData.DUID}</span>
+                                            <label htmlFor="unitEarned"> School </label>
+                                            <input type="text" className="form-control" value={employeeData.School} placeholder="Enter Unit Earned" name="unitEarned" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="educLevel">Education Level</label>
-                                            <input type="text" className="form-control" placeholder="Enter Education Level" name="educLevel" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.EducationLevel} placeholder="Enter Education Level" name="educLevel" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="degree">Degree</label>
-                                            <input type="text" className="form-control" placeholder="Enter Degree" name="degree" onChange={handleInputChange} />
+                                            <input type="text" value={employeeData.Degree} className="form-control" placeholder="Enter Degree" name="degree" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
                                 <div className="row justify-content-center">
-                                    <div className="col-md-4">
+                                <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="majorCourse">Major course</label>
-                                            <input type="text" className="form-control" placeholder="Enter Major Course" name="majorCourse" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.MajorCourse} placeholder="Enter Major Course" name="majorCourse" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="honorRank">Honor Rank</label>
-                                            <input type="text" className="form-control" placeholder="Enter Honor Rank" name="honorRank" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.HonorRank} placeholder="Enter Honor Rank" name="honorRank" onChange={handleInputChange} />
                                         </div>
                                     </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="unitEarned"> </label>
-                                            <input type="text" className="form-control" placeholder="Enter Unit Earned" name="unitEarned" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="dateFrom">Date From</label>
-                                            <input type="date" className="form-control" placeholder="Enter date From" name="dateFrom" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                        <label htmlFor="dateTo">Date To</label>
-                                            <input type="date" className="form-control" placeholder="Enter date To" name="dateTo" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
+                                    
                                     <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="session">Session</label>
-                                              <input type="text" className="form-control" placeholder="Enter Session" name="session" onChange={handleInputChange} />
+                                              <input type="text" className="form-control" value={employeeData.Session} placeholder="Enter Session" name="session" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                 </div>
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="monthCompleted">Month Completed</label>
-                                            <input type="text" className="form-control" placeholder="Enter Month Completed" name="monthCompleted" onChange={handleInputChange} />
+                                            <label htmlFor="dateFrom">Date From</label>
+                                            <input type="text" className="form-control" value={employeeData.DateFrom} placeholder="Enter date From" name="dateFrom" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
+                                        <label htmlFor="dateTo">Date To</label>
+                                            <input type="text" className="form-control" value={employeeData.DateTo} placeholder="Enter date To" name="dateTo" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label htmlFor="monthCompleted">Month Completed</label>
+                                            <input type="text" className="form-control" value={employeeData.MonthCompleted} placeholder="Enter Month Completed" name="monthCompleted" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="row justify-content-center">
+                                    
+                                    <div className="col-md-4">
+                                        <div className="form-group">
                                         <label htmlFor="completed">Completed</label>
-                                            <input type="text" className="form-control" placeholder="Enter Completed" name="completed" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.Completed} placeholder="Enter Completed" name="completed" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
@@ -1013,21 +1057,21 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Employee Id</label>
-                                            <span className="form-control">{Array.isArray(employeeData.DUID) ? employeeData.DUID[0] : employeeData.DUID}</span>
+                                            <span className="form-control">{Array.isArray(employeeData.EmployeeId) ? employeeData.EmployeeId[0] : employeeData.EmployeeId}</span>
                                         </div>
                                     </div>
                                     </div>
                                     <div className="row justify-content-center">
                                     <div className="col-md-4">
                                       <div className="form-group">
-                                          <label htmlFor="contactNumber">Contact Number</label>
-                                          <input type="tel" className="form-control" value={employeeData.ContactNumber} placeholder="Enter contact number" name="contactNumber" onChange={handleInputChange} />
+                                          <label >Contact Number</label>
+                                          <input type="tel" className="form-control" value={employeeData.ContactNumber} placeholder="Enter contact number" name="ContactNumber" onChange={handleInputChange} />
                                       </div>
                                   </div>
                                     </div>
                                   
                                 <br/>
-                                <button type="submit" className="btn btn-primary d-block mx-auto">Submit</button>
+                                <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
                             </form>
                         </div>
                       <br/>
@@ -1039,20 +1083,83 @@ useEffect(() => {
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label>Employee Id</label>
-                                            <span className="form-control">{Array.isArray(employeeData.DUID) ? employeeData.DUID[0] : employeeData.DUID}</span>
+                                            <label>Full Name</label>
+                                            <input type="text" className="form-control" value={employeeData.EmContactFullName} placeholder="Enter full name" name="ecFullname" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                      <div className="form-group">
+                                          <label>Phone Number</label>
+                                          <input type="text" className="form-control" value={employeeData.EmContactPhoneNumber} placeholder="Enter contact number" name="ecPhoneNumber" onChange={handleInputChange} />
+                                      </div>
+                                  </div>
+                                  <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label>Complete Address</label>
+                                            <input type="text" className="form-control" value={employeeData.EmContactCompleteAddress} placeholder="Enter complete address" name="ecCompleteAddress" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     </div>
                                     <div className="row justify-content-center">
                                     <div className="col-md-4">
-                                      <div className="form-group">
-                                          <label htmlFor="contactNumber">Contact Number</label>
-                                          <input type="tel" className="form-control" value={employeeData.ContactNumber} placeholder="Enter contact number" name="contactNumber" onChange={handleInputChange} />
-                                      </div>
-                                  </div>
+                                        <div className="form-group">
+                                            <label>House Number</label>
+                                            <input type="text" className="form-control" value={employeeData.EmContactHouseNo} placeholder="Enter house number" name="housenumber" onChange={handleInputChange} />
+                                        </div>
                                     </div>
-                                  
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label>Barangay</label>
+                                            <input type="text" className="form-control" value={employeeData.EmContactBarangay} placeholder="Enter Barangay" name="ecBrgy" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                  <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label>City / Municipality</label>
+                                            <input type="text" className="form-control" value={employeeData.EmContactCityMunicipality} placeholder="Enter city/municipality" name="ecMunicipalityCity" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                    </div>
+                                    <div className="row justify-content-center">
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label>Province</label>
+                                            <input type="text" className="form-control" value={employeeData.EmContactProvince} placeholder="Enter province" name="ecProvince" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label>Region</label>
+                                            <input type="text" className="form-control" value={employeeData.EmContactRegion} placeholder="Enter Region" name="ecRegion" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                  <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label>Country</label>
+                                            <input type="text" className="form-control" value={employeeData.EmContactCountry} placeholder="Enter Country" name="ecCountry" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                    </div>
+                                    <div className="row justify-content-center">
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label>Zip Code</label>
+                                            <input type="text" className="form-control" value={employeeData.EmContactZipcode} placeholder="Enter zip code" name="ecZipCode" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label>Is Permanent</label>
+                                            <input type="text" className="form-control" readOnly={true} value={employeeData.Is_Permanent} name="ecIs_Permanent" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                  <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label>Is Emergency</label>
+                                            <input type="text" className="form-control" readOnly={true} value={employeeData.Is_Emergency} name="ecIs_Emergency" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                    </div>
                                 <br/>
                                 <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
                             </form>
@@ -1067,127 +1174,127 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Dependent ID</label>
-                                            <span className="form-control">{Array.isArray(employeeData.DependentID) ? employeeData.DependentID[0] : employeeData.DependentID}</span>
+                                            <span className="form-control">{employeeData.DependentID}</span>
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="dependentFullname">Dependent Full Name</label>
-                                            <input type="text" className="form-control" placeholder="enter dependent full name" name="dependentFullname" onChange={handleInputChange} />
+                                            <label >Dependent Full Name</label>
+                                            <input type="text" className="form-control" value={employeeData.FullName} placeholder="enter dependent full name" name="dependentFullname" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="relationship">Relationhip</label>
-                                            <input type="text" className="form-control" placeholder="enter relationship" name="relationship" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="dob">Date of Birth</label>
-                                            <input type="date" className="form-control" placeholder="enter date of birth" name="dob" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="occupation">Occupation</label>
-                                            <input type="text" className="form-control" placeholder="enter  occupation" name="occupation" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="address">Address</label>
-                                            <input type="text" className="form-control" placeholder="Enter address" name="address" onChange={handleInputChange} />
+                                            <label >Relationship</label>
+                                            <input type="text" className="form-control" value={employeeData.Relationship} placeholder="enter relationship" name="relationship" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="city">City</label>
-                                            <input type="text" className="form-control" placeholder="Enter City" name="city" onChange={handleInputChange} />
+                                            <label>Date of Birth</label>
+                                            <input type="text" className="form-control" value={employeeData.DateOfBirth} placeholder="enter date of birth" name="dob" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="province">Province</label>
-                                            <input type="text" className="form-control" placeholder="Enter Province" name="province" onChange={handleInputChange} />
+                                            <label >Occupation</label>
+                                            <input type="text" className="form-control" value={employeeData.Occupation} placeholder="enter  occupation" name="occupation" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label >Address</label>
+                                            <input type="text" className="form-control" value={employeeData.Address} placeholder="Enter address" name="address" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="row justify-content-center">
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label>City</label>
+                                            <input type="text" className="form-control" value={employeeData.City} placeholder="Enter City" name="city" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label>Province</label>
+                                            <input type="text" className="form-control" value={employeeData.Province} placeholder="Enter Province" name="province" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                               <div className="form-group">
-                                              <label htmlFor="postalCode">Postal Code</label>
-                                              <input type="text" className="form-control" placeholder="Enter Postal Code" name="postalCode" onChange={handleInputChange} />
+                                              <label >Postal Code</label>
+                                              <input type="text" className="form-control" value={employeeData.PostalCode} placeholder="Enter Postal Code" name="postalCode" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                 </div>
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="phoneNumber">Phone Number</label>
-                                            <input type="tel" className="form-control" placeholder="Enter Phone Number" name="phoneNumber" onChange={handleInputChange} />
+                                            <label >Phone Number</label>
+                                            <input type="text" className="form-control" value={employeeData.PhoneNum} placeholder="Enter Phone Number" name="phoneNumber" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="beneficiary">Beneficiary</label>
-                                            <input type="text" className="form-control" placeholder="Enter Beneficiary" name="beneficiary" onChange={handleInputChange} />
+                                            <label >Beneficiary</label>
+                                            <input type="text" className="form-control" value={employeeData.Beneficiary} placeholder="Enter Beneficiary" name="beneficiary" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                               <div className="form-group">
-                                              <label htmlFor="beneficiaryDate">Beneficiary Date</label>
-                                              <input type="text" className="form-control" placeholder="Enter Beneficiary Date" name="beneficiaryDate" onChange={handleInputChange} />
+                                              <label >Beneficiary Date</label>
+                                              <input type="text" className="form-control" value={employeeData.BeneficiaryDate} placeholder="Enter Beneficiary Date" name="beneficiaryDate" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                 </div>
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="insurance">Insurance</label>
-                                            <input type="tel" className="form-control" placeholder="Enter Insurance" name="insurance" onChange={handleInputChange} />
+                                            <label >Insurance</label>
+                                            <input type="tel" className="form-control" value={employeeData.Insurance} placeholder="Enter Insurance" name="insurance" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="insuranceDate">Insurance Date</label>
-                                            <input type="text" className="form-control" placeholder="Enter Insurance Date" name="insuranceDate" onChange={handleInputChange} />
+                                            <label >Insurance Date</label>
+                                            <input type="text" className="form-control" value={employeeData.InsuranceDate} placeholder="Enter Insurance Date" name="insuranceDate" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                               <div className="form-group">
-                                              <label htmlFor="remarks">Remarks</label>
-                                              <input type="text" className="form-control" placeholder="Enter Remarks" name="remarks" onChange={handleInputChange} />
+                                              <label >Remarks</label>
+                                              <input type="text" className="form-control" value={employeeData.Remarks} placeholder="Enter Remarks" name="remarks" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                 </div>
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="companyPaid">Company Paid</label>
-                                            <input type="text" className="form-control" placeholder="Enter Company Paid" name="companyPaid" onChange={handleInputChange} />
+                                            <label >Company Paid</label>
+                                            <input type="text" className="form-control" value={employeeData.CompanyPaid} placeholder="Enter Company Paid" name="companyPaid" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="hmoProvider">HMO Provider</label>
-                                            <input type="text" className="form-control" placeholder="Enter HMO Provider" name="hmoProvider" onChange={handleInputChange} />
+                                            <label >HMO Provider</label>
+                                            <input type="text" className="form-control" value={employeeData.HMOProvider} placeholder="Enter HMO Provider" name="hmoProvider" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                               <div className="form-group">
-                                              <label htmlFor="hmoPolicynum">HMO Policy Number</label>
-                                              <input type="text" className="form-control" placeholder="Enter HMO Policy Number" name="hmoPolicynum" onChange={handleInputChange} />
+                                              <label >HMO Policy Number</label>
+                                              <input type="text" className="form-control" value={employeeData.HMOPolicyNumber} placeholder="Enter HMO Policy Number" name="hmoPolicynum" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                 </div>
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="typeOfCoverage">Type of coverage</label>
-                                            <input type="tel" className="form-control" placeholder="Enter Type of coverage" name="typeOfCoverage" onChange={handleInputChange} />
+                                            <label >Type of coverage</label>
+                                            <input type="text" className="form-control" value={employeeData.TypeOfCoverage} placeholder="Enter Type of coverage" name="typeOfCoverage" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
@@ -1204,23 +1311,23 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Product ID</label>
-                                            <span className="form-control">{Array.isArray(employeeData.ProdId) ? employeeData.ProdId[0] : employeeData.ProdId}</span>
+                                            <span className="form-control"> {employeeData.ProdId} </span>
                                         </div>
                                     </div>
                                     </div>
                                     <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="projectCode">Product Code</label>
-                                            <input type="text" className="form-control" placeholder="enter Product Code" name="productCode" onChange={handleInputChange} />
+                                            <label>Product Code</label>
+                                            <input type="text" className="form-control" value={employeeData.ProdCode} placeholder="enter Product Code" name="ProductCode" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     </div>
                                     <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="projectName">Product Description</label>
-                                            <input type="text" className="form-control" placeholder="enter Product Description" name="productDescription" onChange={handleInputChange} />
+                                            <label>Product Description</label>
+                                            <input type="text" className="form-control" value={employeeData.ProdDesc} placeholder="enter Product Description" name="productDescription" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
