@@ -27,9 +27,11 @@ const insertEmployee = async (Employee) => {
       .input("MiddleName", Employee.MiddleName)
       .input("Email", Employee.Email)
       .input("UserName", Employee.UserName)
-      .input("Password", Employee.Password).query(`
-              INSERT INTO UserAccount (LastName, FirstName, MiddleName, Email, UserName, Password)
-              VALUES (@LastName, @FirstName, @MiddleName, @Email, @UserName, @Password)
+      .input("Password", Employee.Password)
+      .input("Role", Employee.Role)
+      .query(`
+              INSERT INTO UserAccount (LastName, FirstName, MiddleName, Email, UserName, Password, Role)
+              VALUES (@LastName, @FirstName, @MiddleName, @Email, @UserName, @Password, @Role)
           `);
     return employee;
   } catch (error) {
@@ -247,7 +249,7 @@ const insertNewHire = async (newHire) => {
       .input("Occupation", newHire.Occupation)
       .input("Address", newHire.Address)
       .input("City", newHire.City)
-      .input("Province", newHire.Province)
+      .input("DepProvince", newHire.DepProvince)
       .input("PostalCode", newHire.PostalCode)
       .input("PhoneNum", newHire.PhoneNum)
       .input("Beneficiary", newHire.Beneficiary)
@@ -262,14 +264,14 @@ const insertNewHire = async (newHire) => {
       INSERT INTO Dependent 
       (
         EmployeeId, FullName, Relationship, DateOfBirth, Occupation,
-        Address, City, Province, PostalCode, PhoneNum, Beneficiary,
+        Address, City, DepProvince, PostalCode, PhoneNum, Beneficiary,
         BeneficiaryDate, Insurance, InsuranceDate, Remarks, CompanyPaid,
         HMOProvider, HMOPolicyNumber, TypeOfCoverage
       )
       VALUES 
       (
         @EmployeeId, @FullName, @Relationship, @DateOfBirth, @Occupation,
-        @Address, @City, @Province, @PostalCode, @PhoneNum, @Beneficiary,
+        @Address, @City, @DepProvince, @PostalCode, @PhoneNum, @Beneficiary,
         @BeneficiaryDate, @Insurance, @InsuranceDate, @Remarks, @CompanyPaid,
         @HMOProvider, @HMOPolicyNumber, @TypeOfCoverage
       )`);
@@ -551,18 +553,59 @@ const updateEmployeeProjectById = async (employeeId, updatedEmployeeData) => {
       .input("EmployeeId", sql.VarChar, employeeId)
       .input("ProjectCode", sql.VarChar(255), updatedEmployeeData.ProjectCode)
       .input("ProjectName", sql.VarChar(255), updatedEmployeeData.ProjectName)
-      .input("Is_Active", sql.Bit, updatedEmployeeData.Is_Active ? 1 : 0)
+      .input("is_Active", sql.Bit, updatedEmployeeData.is_Active ? 1 : 0)
       .query(`
           UPDATE Project 
           SET ProjectCode = @ProjectCode,
           ProjectName = @ProjectName,
-          Is_Active = @Is_Active
+          is_Active = @is_Active
           WHERE EmployeeId = @EmployeeId
         `);
 
     return result;
   } catch (error) {
-    console.error("Error updating employee address by ID:", error);
+    console.error("Error updating employee project by ID:", error);
+    throw error;
+  }
+};
+//update employee education details
+const updateEmployeeEducationById = async (employeeId, updatedEmployeeData) => {
+  try {
+    let pool = await sql.connect(config);
+    let result = await pool
+      .request()
+      .input("EmployeeId", sql.VarChar, employeeId)
+      .input("School", sql.VarChar(255), updatedEmployeeData.School)
+      .input("EducationLevel", sql.VarChar(255), updatedEmployeeData.EducationLevel)
+      .input("UnitsEarned", sql.VarChar(255), updatedEmployeeData.UnitsEarned)
+      .input("Degree", sql.VarChar(255), updatedEmployeeData.Degree)
+      .input("MajorCourse", sql.VarChar(255), updatedEmployeeData.MajorCourse)
+      .input("HonorRank", sql.VarChar(255), updatedEmployeeData.HonorRank)
+      .input("Session", sql.VarChar(255), updatedEmployeeData.Session)
+      .input("DateFrom", sql.VarChar(255), updatedEmployeeData.DateFrom)
+      .input("DateTo", sql.VarChar(255), updatedEmployeeData.DateTo)
+      .input("MonthCompleted", sql.VarChar(255), updatedEmployeeData.MonthCompleted)
+      .input("Completed", sql.VarChar(255), updatedEmployeeData.Completed)
+      .query(`
+          UPDATE Education 
+          SET 
+          School = @School,
+          EducationLevel = @EducationLevel,
+          Degree = @Degree,
+          UnitsEarned =@UnitsEarned,
+          MajorCourse = @MajorCourse,
+          HonorRank = @HonorRank,
+          Session = @Session,
+          DateFrom = @DateFrom,
+          DateTo = @DateTo,
+          MonthCompleted = @MonthCompleted,
+          Completed = @Completed
+          WHERE EmployeeId = @EmployeeId
+        `);
+
+    return result;
+  } catch (error) {
+    console.error("Error updating employee eduaction by ID:", error);
     throw error;
   }
 };
@@ -831,4 +874,5 @@ module.exports = {
   updateEmployeeInfoById,
   updateEmployeeAddressById,
   updateEmployeeProjectById,
+  updateEmployeeEducationById
 };

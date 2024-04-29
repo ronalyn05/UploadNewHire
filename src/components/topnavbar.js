@@ -15,6 +15,8 @@ function TopNavbar() {
   const profilePhoto = sessionStorage.getItem('profilePhoto');
   const defaultPhoto = "/img/user.png";
 
+  // Retrieve user's role from sessionStorage
+  const userRole = sessionStorage.getItem('role');
 
   const handleLogout = () => {
     // Clear sessionStorage on logout
@@ -50,15 +52,12 @@ function TopNavbar() {
           </a>
           {/* Dropdown - User Information */}
           <div className="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-            
-          <Link className="dropdown-item" to={{ pathname: "/profile"}} state={data} >
+            {userRole === 'hrAdmin' && (
+              <Link className="dropdown-item" to={{ pathname: "/profile"}} state={data}>
                 <i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                 <span>Profile</span>
               </Link>
-            {/* <a className="dropdown-item" to={{ pathname: "/profile"}} state={data}>
-              <i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-              Profile
-            </a> */}
+            )}
             <a className="dropdown-item" href="#">
               <i className="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
               Settings

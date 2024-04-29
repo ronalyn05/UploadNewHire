@@ -55,13 +55,28 @@ function LoginPage() {
       sessionStorage.setItem('email', data.Email);
       sessionStorage.setItem('middleName', data.MiddleName);
       sessionStorage.setItem('profilePhoto', data.ProfilePhoto);
+      sessionStorage.setItem('role', data.Role);
 
-      navigate('/dashboard', { state: data });
-    } catch (error) {
-      console.error('Login Failed:', error);
-      setErrorMessage(error.message || 'Login Failed.');
-    }
-  };
+            // Redirect based on user role
+            if (data.Role === "hrAdmin") {
+              navigate("/dashboard", { state: data });
+            } else if (data.Role === "employee") {
+              navigate("/employee", { state: data });
+            } else {
+              throw new Error("Invalid user role");
+            }
+          } catch (error) {
+            console.error("Login Failed", error);
+            setErrorMessage(error.message || "Login Failed.");
+          }
+        };
+
+  //     navigate('/dashboard', { state: data });
+  //   } catch (error) {
+  //     console.error('Login Failed:', error);
+  //     setErrorMessage(error.message || 'Login Failed.');
+  //   }
+  // };
 
 
 //   const handleSubmit = async (e) => {

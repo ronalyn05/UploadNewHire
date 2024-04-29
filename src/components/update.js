@@ -58,7 +58,10 @@ useEffect(() => {
         // Convert birthdate string to formatted date
         data.Birthdate = formatDate(data.Birthdate);
         data.DateHired = formatDate(data.DateHired);
-  
+        data.DateFrom = formatDate(data.DateFrom);
+        data.DateTo = formatDate(data.DateFrom);
+        data.DateOfBirth = formatDate(data.DateOfBirth);
+
         // To convert all the capital letters in a string to title case (capitalize the first letter of each word)
         function convertToTitleCase(str) {
           return str.toLowerCase().replace(/\b\w/g, function (char) {
@@ -96,6 +99,7 @@ useEffect(() => {
       [name]: value
     });
   };
+  
   //UPDATE EMPLOYEE PERSONAL DETAILS
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -133,9 +137,12 @@ useEffect(() => {
   
       // Display the success message
       alert(successMessage);
+
+       // Reload the page after showing the alert
+       window.location.reload();
   
       // Navigate to report.js
-      navigate("/reports");
+    //   navigate("/reports");
     } catch (error) {
       console.error('Error updating employee:', error);
     }
@@ -182,8 +189,11 @@ useEffect(() => {
       // Display the success message
       alert(successMessage);
 
+       // Reload the page after showing the alert
+       window.location.reload();
+
        // Navigate to report.js
-       navigate("/reports");
+    //    navigate("/reports");
   
         } catch (error) {
         console.error('Error updating employee information:', error);
@@ -231,8 +241,10 @@ useEffect(() => {
       // Display the success message
       alert(successMessage);
 
+       // Reload the page after showing the alert
+       window.location.reload();
        // Navigate to report.js
-       navigate("/reports");
+    //    navigate("/reports");
   
         } catch (error) {
         console.error('Error updating employee address:', error);
@@ -275,13 +287,62 @@ useEffect(() => {
   
       // Display the success message
       alert(successMessage);
+
+      //reload the page after showing the alert
+      window.href.reload();
   
       // Navigate to report.js
-      navigate("/reports");
+    //   navigate("/reports");
     } catch (error) {
       console.error('Error updating employee:', error);
     }
   };
+     //UPDATE EMPLOYEE EDUCATION DETAILS
+     const handleEducationFormSubmit = async (e) => {
+        e.preventDefault();
+        try {
+          const response = await fetch(`http://localhost:5000/updateEmployeeEducation/${employeeId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(employeeData)
+          });
+          if (!response.ok) {
+            throw new Error('Failed to update education details');
+          }
+      
+          // Retrieve the name of the employee from employeeData
+          const { FirstName, LastName } = employeeData;
+          const employeeName = `${FirstName} ${LastName}`;
+      
+          // Compare initial employeeData with updated employeeData
+          const updatedFields = [];
+          Object.entries(employeeData).forEach(([key, value]) => {
+            if (value !== initialEmployeeData[key]) {
+              updatedFields.push(key);
+            }
+          });
+      
+          // Generate success message based on updated fields
+          let successMessage;
+          if (updatedFields.length === 0) {
+            successMessage = `No education details has been updated for ${employeeName}.`;
+          } else {
+            successMessage = `Employee ${employeeName} education details has successfully updated ${updatedFields.join(', ')}!`;
+          }
+      
+          // Display the success message
+          alert(successMessage);
+      
+        //   // Navigate to report.js
+        //   navigate("/reports");
+         // Reload the page after showing the alert
+      window.location.reload();
+        } catch (error) {
+          console.error('Error updating employee:', error);
+        }
+      };
   
 
   if (!employeeData) {
@@ -488,7 +549,7 @@ useEffect(() => {
                                 <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="EmpID">Employee Id</label>
-                                              <input type="text" className="form-control" value={Array.isArray(employeeData.EmployeeId) ? employeeData.EmployeeId[0] : employeeData.EmployeeId} readOnly={true} placeholder="Employee Id" name="EmpID" onChange={handleInputChange} />
+                                              <span className="form-control">{Array.isArray(employeeData.EmployeeId) ? employeeData.EmployeeId[0] : employeeData.EmployeeId}</span>
                                               </div>
                                             </div>
                                     <div className="col-md-4">
@@ -500,7 +561,7 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="dateHired">Date Hired</label>
-                                            <input type="text" className="form-control" readOnly={true} value={employeeData.DateHired} placeholder="Date Hired" name="DateHired" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.DateHired} placeholder="Date Hired" name="DateHired" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
@@ -509,19 +570,18 @@ useEffect(() => {
                                         <div className="form-group">
                                             <label htmlFor="tenure">Tenure</label>
                                             <input type="text" className="form-control" value={employeeData.Tenure} onChange={handleInputChange} name="Tenure"/> 
-                                            {/* <input type="text" className="form-control" value={employeeData.Tenure} placeholder="enter Tenure" name="tenure" onChange={handleEmpInfoChange} /> */}
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="empLevel">Employee Level</label>
-                                            <input type="text" className="form-control" readOnly={true} value={employeeData.EmployeeLevel} placeholder="enter employee Level" name="EmployeeLevel" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.EmployeeLevel} placeholder="enter employee Level" name="EmployeeLevel" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="projectCode">Project Code</label>
-                                            <input type="text" className="form-control" readOnly={true} value={employeeData.ProjectCode} placeholder="enter Project Code" name="projectcode" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.ProjectCode} placeholder="enter Project Code" name="projectcode" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
@@ -529,7 +589,7 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="projectName">Project Name</label>
-                                            <input type="text" className="form-control" value={employeeData.ProjectName} readOnly={true} name="ProjectName" />
+                                            <input type="text" className="form-control" value={employeeData.ProjectName} name="ProjectName" />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
@@ -541,7 +601,7 @@ useEffect(() => {
                                     <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="department">Department</label>
-                                              <input type="text" className="form-control" readOnly={true} value={employeeData.DepartmentName} name="Department" />
+                                              <input type="text" className="form-control" value={employeeData.DepartmentName} name="Department" />
                                               </div>
                                             </div>
                                    </div>
@@ -549,13 +609,13 @@ useEffect(() => {
                                 <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="productCode">Product Code</label>
-                                              <input type="text" className="form-control" readOnly={true} value={employeeData.ProdCode} name="ProductCode"  />
+                                              <input type="text" className="form-control" value={employeeData.ProdCode} name="ProductCode"  />
                                               </div>
                                             </div>
                                             <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="prodDesc"> Product Description</label>
-                                              <input type="text" className="form-control" readOnly={true} value={employeeData.ProdDesc} name="ProdDesc" />      
+                                              <input type="text" className="form-control" value={employeeData.ProdDesc} name="ProdDesc" />      
                                               </div>
                                             </div>
                                             <div className="col-md-4">
@@ -581,7 +641,7 @@ useEffect(() => {
                                             <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="shift">Shift</label>
-                                              <input type="text" className="form-control" value={employeeData.ShiftName} readOnly={true} name="Shift" />     
+                                              <input type="text" className="form-control" value={employeeData.ShiftName} name="Shift" />     
                                               </div>
                                             </div>
                                 </div>
@@ -601,7 +661,7 @@ useEffect(() => {
                                             <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="rate">Rate</label>
-                                              <input type="text" className="form-control" readOnly={true} value={employeeData.Rate} placeholder="enter rate" name="Rate" onChange={handleInputChange} />
+                                              <input type="text" className="form-control" value={employeeData.Rate} placeholder="enter rate" name="Rate" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                 </div>
@@ -609,7 +669,7 @@ useEffect(() => {
                                 <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="managerId">Manager Id</label>
-                                              <input type="text" className="form-control" readOnly={true} value={employeeData.ManagerID} placeholder="enter manager Id" name="ManagerId" onChange={handleInputChange} />     
+                                              <input type="text" className="form-control" value={employeeData.ManagerID} placeholder="enter manager Id" name="ManagerId" onChange={handleInputChange} />     
                                               </div>
                                             </div>
                                             <div className="col-md-4">
@@ -621,7 +681,7 @@ useEffect(() => {
                                             <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="pmpicid">PMPICID</label>
-                                              <input type="text" className="form-control" readOnly={true} value={employeeData.PMPICID} placeholder="enter pmpicid" name="Pmpicid" onChange={handleInputChange} />
+                                              <input type="text" className="form-control" value={employeeData.PMPICID} placeholder="enter pmpicid" name="Pmpicid" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                 </div>
@@ -635,13 +695,13 @@ useEffect(() => {
                                             <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="du">Delivery Unit</label>
-                                              <input type="text" className="form-control" value={employeeData.DUName} readOnly={true} name="DeliveryUnit" />
+                                              <input type="text" className="form-control" value={employeeData.DUName} name="DeliveryUnit" />
                                               </div>
                                             </div>
                                             <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="duhid">DUHID</label>
-                                              <input type="text" className="form-control" readOnly={true} value={employeeData.DUHID} placeholder="enter duhid" name="Duhid" onChange={handleInputChange} />
+                                              <input type="text" className="form-control" value={employeeData.DUHID} placeholder="enter duhid" name="Duhid" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                 </div>
@@ -655,13 +715,13 @@ useEffect(() => {
                                             <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="isManager">Is Manager</label>
-                                              <input type="text" className="form-control" value={employeeData.IsManager} readOnly={true} placeholder="is Manager" name="IsManager" onChange={handleInputChange} />
+                                              <input type="text" className="form-control" value={employeeData.IsManager} placeholder="is Manager" name="IsManager" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                 <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="isPmpic">Is PMPIC</label>
-                                              <input type="text" className="form-control" value={employeeData.IsPMPIC} readOnly={true} placeholder="is Pmpic" name="IsPmpic" onChange={handleInputChange} />     
+                                              <input type="text" className="form-control" value={employeeData.IsPMPIC} placeholder="is Pmpic" name="IsPmpic" onChange={handleInputChange} />     
                                               </div>
                                             </div>
                                 </div>
@@ -669,19 +729,19 @@ useEffect(() => {
                                             <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="isIndContributor">Is Individual Contributor</label>
-                                              <input type="text" className="form-control" value={employeeData.IsIndividualContributor} readOnly={true} placeholder="is Individual Contributor" name="IsIndContributor" onChange={handleInputChange} />
+                                              <input type="text" className="form-control" value={employeeData.IsIndividualContributor} placeholder="is Individual Contributor" name="IsIndContributor" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                             <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="isActive">Is Active</label>
-                                              <input type="text" className="form-control" value={employeeData.IsActive} readOnly={true} placeholder="is Active" name="IsActive" onChange={handleInputChange} />
+                                              <input type="text" className="form-control" value={employeeData.IsActive} placeholder="is Active" name="IsActive" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                             <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="isDuHead">Is DU Head</label>
-                                              <input type="text" className="form-control" value={employeeData.IsDUHead} readOnly={true} placeholder="is Du Head" name="IsDuHead" onChange={handleInputChange} />
+                                              <input type="text" className="form-control" value={employeeData.IsDUHead} placeholder="is Du Head" name="IsDuHead" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                 </div>
@@ -749,10 +809,24 @@ useEffect(() => {
                                             <span className="form-control">{employeeData.ProjectDUID}</span>
                                         </div>
                                     </div>
+                                    {/* <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label>Is Active</label>
+                                            <input
+                                            type="text"
+                                            className="form-control"
+                                            value={employeeData.is_Active ? "true" : "false"}
+                                            placeholder="true or false"
+                                            name="is_Active"
+                                            onChange={handleInputChange}
+                                            />
+                                        </div>
+                                        </div> */}
+
                                     <div className="col-md-4">
                                               <div className="form-group">
-                                              <label htmlFor="isActive">Is Active</label>
-                                              <input type="text" className="form-control" value={employeeData.is_Active} placeholder="is Active" name="isActive" onChange={handleInputChange} />
+                                              <label>Is Active</label>
+                                              <input type="text" className="form-control" value={employeeData.is_Active} placeholder="true or false" name="is_Active" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                 </div>
@@ -823,22 +897,22 @@ useEffect(() => {
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="projectCode">DU Code</label>
-                                            <input type="text" className="form-control" readOnly={true} value={employeeData.DUCode} placeholder="enter DU Code" name="duCode" onChange={handleInputChange} />
+                                            <label>DU Code</label>
+                                            <input type="text" className="form-control" value={employeeData.DUCode} placeholder="enter DU Code" name="DUCode" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
                                 <div className="row justify-content-center">
                                 <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="projectName">DU Name</label>
-                                            <input type="text" className="form-control" value={employeeData.DUName} placeholder="enter DU Name" name="duName" onChange={handleInputChange} />
+                                            <label >DU Name</label>
+                                            <input type="text" className="form-control" value={employeeData.DUName} placeholder="enter DU Name" name="DUName" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>is Active</label>
-                                            <input type="text" className="form-control" readOnly={true} value={employeeData.Is_Active} placeholder="is Active" name="Is_Active" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.Is_Active} placeholder="is Active" name="Is_Active" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
@@ -888,7 +962,8 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Employee ID</label>
-                                            <input type="text" className="form-control" readOnly={true} value={Array.isArray(employeeData.EmployeeId) ? employeeData.EmployeeId[0] : employeeData.EmployeeId} onChange={handleInputChange} />                                        
+                                            <span className="form-control">{Array.isArray(employeeData.EmployeeId) ? employeeData.EmployeeId[0] : employeeData.EmployeeId}</span>
+                                            {/* <input type="text" className="form-control" readOnly={true} value={Array.isArray(employeeData.EmployeeId) ? employeeData.EmployeeId[0] : employeeData.EmployeeId} name="EmpID" onChange={handleInputChange} />                                         */}
                                         </div>
                                     </div>
                                     <div className="col-md-4">
@@ -955,13 +1030,13 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="isPermanent">is Permanent</label>
-                                            <input type="text" className="form-control" placeholder="is Permanent" readOnly={true} name="IsPermanent" value={employeeData.IsPermanent} onChange={handleInputChange} />
+                                            <input type="text" className="form-control" placeholder="is Permanent" name="IsPermanent" value={employeeData.IsPermanent} onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="isEmergency">is Emergency</label>
-                                              <input type="text" className="form-control" placeholder="is Emergency" readOnly={true} name="IsEmergency" value={employeeData.IsEmergency} onChange={handleInputChange} />
+                                              <input type="text" className="form-control" placeholder="is Emergency" name="IsEmergency" value={employeeData.IsEmergency} onChange={handleInputChange} />
                                               </div>
                                             </div>
                                 </div>
@@ -971,26 +1046,26 @@ useEffect(() => {
                       <br/>
                       </div>
                       <div className="tab-pane fade" id="education" role="tabpanel" aria-labelledby="education-tab">
-                          {/* Project Code Form */}
+                          {/* Education Form */}
                           <div className="container">
-                            <form onSubmit={handleFormSubmit}>
+                            <form onSubmit={handleEducationFormSubmit}>
                                 <div className="row justify-content-center">
                                 <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="unitEarned"> School </label>
-                                            <input type="text" className="form-control" value={employeeData.School} placeholder="Enter Unit Earned" name="unitEarned" onChange={handleInputChange} />
+                                            <label> School </label>
+                                            <input type="text" className="form-control" value={employeeData.School} placeholder="Enter School" name="School" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="educLevel">Education Level</label>
-                                            <input type="text" className="form-control" value={employeeData.EducationLevel} placeholder="Enter Education Level" name="educLevel" onChange={handleInputChange} />
+                                            <label>Education Level</label>
+                                            <input type="text" className="form-control" value={employeeData.EducationLevel} placeholder="Enter Education Level" name="EducationLevel" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="degree">Degree</label>
-                                            <input type="text" value={employeeData.Degree} className="form-control" placeholder="Enter Degree" name="degree" onChange={handleInputChange} />
+                                            <label>Degree</label>
+                                            <input type="text" value={employeeData.Degree} className="form-control" placeholder="Enter Degree" name="Degree" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
@@ -998,20 +1073,20 @@ useEffect(() => {
                                 <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="majorCourse">Major course</label>
-                                            <input type="text" className="form-control" value={employeeData.MajorCourse} placeholder="Enter Major Course" name="majorCourse" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.MajorCourse} placeholder="Enter Major Course" name="MajorCourse" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="honorRank">Honor Rank</label>
-                                            <input type="text" className="form-control" value={employeeData.HonorRank} placeholder="Enter Honor Rank" name="honorRank" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.HonorRank} placeholder="Enter Honor Rank" name="HonorRank" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     
                                     <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="session">Session</label>
-                                              <input type="text" className="form-control" value={employeeData.Session} placeholder="Enter Session" name="session" onChange={handleInputChange} />
+                                              <input type="text" className="form-control" value={employeeData.Session} placeholder="Enter Session" name="Session" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                 </div>
@@ -1019,28 +1094,33 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="dateFrom">Date From</label>
-                                            <input type="text" className="form-control" value={employeeData.DateFrom} placeholder="Enter date From" name="dateFrom" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.DateFrom} placeholder="Enter date From" name="DateFrom" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                         <label htmlFor="dateTo">Date To</label>
-                                            <input type="text" className="form-control" value={employeeData.DateTo} placeholder="Enter date To" name="dateTo" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.DateTo} placeholder="Enter date To" name="DateTo" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="monthCompleted">Month Completed</label>
-                                            <input type="text" className="form-control" value={employeeData.MonthCompleted} placeholder="Enter Month Completed" name="monthCompleted" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.MonthCompleted} placeholder="Enter Month Completed" name="MonthCompleted" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
                                 <div className="row justify-content-center">
-                                    
+                                <div className="col-md-4">
+                                        <div className="form-group">
+                                        <label>Units Earned</label>
+                                            <input type="text" className="form-control" value={employeeData.UnitsEarned} placeholder="Enter Units Earned" name="UnitsEarned" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                         <label htmlFor="completed">Completed</label>
-                                            <input type="text" className="form-control" value={employeeData.Completed} placeholder="Enter Completed" name="completed" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.Completed} placeholder="Enter Completed" name="Completed" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
@@ -1084,19 +1164,19 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Full Name</label>
-                                            <input type="text" className="form-control" value={employeeData.EmContactFullName} placeholder="Enter full name" name="ecFullname" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.EmContactFullName} placeholder="Enter full name" name="ecFulEmContactFullNamelname" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                       <div className="form-group">
                                           <label>Phone Number</label>
-                                          <input type="text" className="form-control" value={employeeData.EmContactPhoneNumber} placeholder="Enter contact number" name="ecPhoneNumber" onChange={handleInputChange} />
+                                          <input type="text" className="form-control" value={employeeData.EmContactPhoneNumber} placeholder="Enter contact number" name="EmContactPhoneNumber" onChange={handleInputChange} />
                                       </div>
                                   </div>
                                   <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Complete Address</label>
-                                            <input type="text" className="form-control" value={employeeData.EmContactCompleteAddress} placeholder="Enter complete address" name="ecCompleteAddress" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.EmContactCompleteAddress} placeholder="Enter complete address" name="EmContactCompleteAddress" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     </div>
@@ -1104,19 +1184,19 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>House Number</label>
-                                            <input type="text" className="form-control" value={employeeData.EmContactHouseNo} placeholder="Enter house number" name="housenumber" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.EmContactHouseNo} placeholder="Enter house number" name="EmContactHouseNo" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Barangay</label>
-                                            <input type="text" className="form-control" value={employeeData.EmContactBarangay} placeholder="Enter Barangay" name="ecBrgy" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.EmContactBarangay} placeholder="Enter Barangay" name="EmContactBarangay" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                   <div className="col-md-4">
                                         <div className="form-group">
                                             <label>City / Municipality</label>
-                                            <input type="text" className="form-control" value={employeeData.EmContactCityMunicipality} placeholder="Enter city/municipality" name="ecMunicipalityCity" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.EmContactCityMunicipality} placeholder="Enter city/municipality" name="EmContactCityMunicipality" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     </div>
@@ -1124,19 +1204,19 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Province</label>
-                                            <input type="text" className="form-control" value={employeeData.EmContactProvince} placeholder="Enter province" name="ecProvince" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.EmContactProvince} placeholder="Enter province" name="EmContactProvince" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Region</label>
-                                            <input type="text" className="form-control" value={employeeData.EmContactRegion} placeholder="Enter Region" name="ecRegion" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.EmContactRegion} placeholder="Enter Region" name="EmContactRegion" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                   <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Country</label>
-                                            <input type="text" className="form-control" value={employeeData.EmContactCountry} placeholder="Enter Country" name="ecCountry" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.EmContactCountry} placeholder="Enter Country" name="EmContactCountry" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     </div>
@@ -1144,19 +1224,19 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Zip Code</label>
-                                            <input type="text" className="form-control" value={employeeData.EmContactZipcode} placeholder="Enter zip code" name="ecZipCode" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.EmContactZipcode} placeholder="Enter zip code" name="EmContactZipcode" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Is Permanent</label>
-                                            <input type="text" className="form-control" readOnly={true} value={employeeData.Is_Permanent} name="ecIs_Permanent" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.Is_Permanent} name="IsPermanent" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                   <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Is Emergency</label>
-                                            <input type="text" className="form-control" readOnly={true} value={employeeData.Is_Emergency} name="ecIs_Emergency" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.Is_Emergency} name="IsEmergency" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     </div>
@@ -1167,7 +1247,7 @@ useEffect(() => {
                       <br/>
                       </div>
                       <div className="tab-pane fade" id="dependent" role="tabpanel" aria-labelledby="dependent-tab">
-                          {/* Project Code Form */}
+                          {/* Dependent Form */}
                           <div className="container">
                             <form onSubmit={handleFormSubmit}>
                                 <div className="row justify-content-center">
@@ -1220,7 +1300,7 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Province</label>
-                                            <input type="text" className="form-control" value={employeeData.Province} placeholder="Enter Province" name="province" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.DepProvince} placeholder="Enter Province" name="province" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">

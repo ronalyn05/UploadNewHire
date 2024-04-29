@@ -2,12 +2,11 @@ import React, { useState, useEffect } from "react";
 import Navbar from "./navbar";
 import TopNavbar from "./topnavbar";
 import Footer from "./footer";
-import { useNavigate } from "react-router-dom";
+import {useNavigate } from "react-router-dom";
 
 const Reports = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  // const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [employees, setEmployees] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
 
@@ -36,7 +35,8 @@ const Reports = () => {
     async function fetchData() {
       try {
         // Make a GET request to fetch new hire employees from the server
-        const response = await fetch('/newHireEmp');
+        const response = await fetch("/newHireEmp"); // Fetch reports for the logged-in user
+        // const response = await fetch('/newHireEmp');
   
         // Check if the response is successful
         if (!response.ok) {

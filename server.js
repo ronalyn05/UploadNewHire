@@ -41,10 +41,10 @@ app.use(
  // Define a POST endpoint for user registration
 app.post('/register', async (req, res) => {
   // Extract user data from the request body
-  const { LastName, FirstName, MiddleName, Email, UserName, Password} = req.body;
+  const { LastName, FirstName, MiddleName, Email, UserName, Password, Role} = req.body;
 
   // Insert to Database
-  let newEmp = new Employee(LastName, FirstName, MiddleName, Email, UserName, Password);
+  let newEmp = new Employee(LastName, FirstName, MiddleName, Email, UserName, Password, Role);
 
   try {
       await dbOperation.insertEmployee(newEmp);
@@ -296,6 +296,21 @@ app.put('/updateEmployeeAddress/:employeeId', async (req, res) => {
     res.json({ message: 'Employee address updated successfully' });
   } catch (error) {
     console.error('Error updating address information:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+//api endpoint for updating employee address by id
+app.put('/updateEmployeeEducation/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  const updatedEmployeeData = req.body;
+  try {
+    const result = await dbOperation.updateEmployeeEducationById(employeeId, updatedEmployeeData);
+    if (!result) {
+      return res.status(404).json({ message: 'Employee education details not found' });
+    }
+    res.json({ message: 'Employee education details updated successfully' });
+  } catch (error) {
+    console.error('Error updating education details information:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
