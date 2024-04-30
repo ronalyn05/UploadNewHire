@@ -29,7 +29,18 @@ import '../App.css';
     TIN: '',
     // HRANID: '',
     ContactNumber: '',
-    EmailAddress: ''
+    EmailAddress: '',
+    is_Active: false,
+    IsActive: false,
+    Is_Active: false,
+    IsDUHead: false, 
+    IsEmergency:false,
+    IsIndividualContributor: false,
+    IsManager: false,
+    IsPMPIC: false,
+    IsPermanent: false,
+    Is_Emergency: false,
+    Is_Permanent: false
   });
   const [initialEmployeeData, setInitialEmployeeData] = useState({});
 
@@ -92,14 +103,35 @@ useEffect(() => {
   }, [employeeId]);
 
 //HANDLES INPUT TO UPDATE DATA
-  const handleInputChange = (e) => {
+const handleInputChange = (e) => {
     const { name, value } = e.target;
+    let newValue = value;
+    
+    // Convert specific fields to booleans if necessary
+    switch (name) {
+      case 'is_Active':
+      case 'IsActive':
+      case 'Is_Active':
+      case 'IsDUHead':
+      case 'IsEmergency':
+      case 'IsIndividualContributor':
+      case 'IsManager':
+      case 'IsPMPIC':
+      case 'IsPermanent':
+      case 'Is_Emergency':
+      case 'Is_Permanent':
+        newValue = value === 'true';
+        break;
+      default:
+        break;
+    }
+  
     setEmployeeData({
       ...employeeData,
-      [name]: value
+      [name]: newValue
     });
   };
-  
+
   //UPDATE EMPLOYEE PERSONAL DETAILS
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -115,25 +147,29 @@ useEffect(() => {
         throw new Error('Failed to update employee');
       }
   
-      // Retrieve the name of the employee from employeeData
-      const { FirstName, LastName } = employeeData;
-      const employeeName = `${FirstName} ${LastName}`;
-  
-      // Compare initial employeeData with updated employeeData
-      const updatedFields = [];
-      Object.entries(employeeData).forEach(([key, value]) => {
-        if (value !== initialEmployeeData[key]) {
-          updatedFields.push(key);
-        }
-      });
-  
-      // Generate success message based on updated fields
-      let successMessage;
-      if (updatedFields.length === 0) {
-        successMessage = `No information has been updated for ${employeeName}.`;
-      } else {
-        successMessage = `Employee ${employeeName} has successfully updated ${updatedFields.join(', ')}!`;
+    // Retrieve the name of the employee from employeeData
+    const { FirstName, LastName } = employeeData;
+    const employeeName = `${FirstName} ${LastName}`;
+
+    // Compare initial employeeData with updated employeeData
+    const updatedFields = [];
+    Object.entries(employeeData).forEach(([key, value]) => {
+      if (value !== initialEmployeeData[key]) {
+        updatedFields.push(key);
       }
+    });
+
+    // Filter out fields that contain EmployeeName, FirstName, MiddleName, LastName
+    const filteredFields = updatedFields.filter(field => !['EmployeeName', 'FirstName', 'MiddleName', 'LastName'].includes(field));
+
+    // Generate success message based on updated fields
+    let successMessage;
+    if (filteredFields.length === 0) {
+      successMessage = `No employee personal details has been updated for ${employeeName}.`;
+    } else {
+      successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
+    }
+
   
       // Display the success message
       alert(successMessage);
@@ -164,27 +200,29 @@ useEffect(() => {
             throw new Error('Failed to update employee');
         }
     
-        // // Success message
-        // alert('Employee information updated successfully!');
-            // Retrieve the name of the employee from employeeData
-      const { FirstName, LastName } = employeeData;
-      const employeeName = `${FirstName} ${LastName}`;
-  
-      // Compare initial employeeData with updated employeeData
-      const updatedFields = [];
-      Object.entries(employeeData).forEach(([key, value]) => {
-        if (value !== initialEmployeeData[key]) {
-          updatedFields.push(key);
-        }
-      });
-  
-      // Generate success message based on updated fields
-      let successMessage;
-      if (updatedFields.length === 0) {
-        successMessage = `No information has been updated for ${employeeName}.`;
-      } else {
-        successMessage = `Employee ${employeeName} has successfully updated ${updatedFields.join(', ')}!`;
+    // Retrieve the name of the employee from employeeData
+    const { FirstName, LastName } = employeeData;
+    const employeeName = `${FirstName} ${LastName}`;
+
+    // Compare initial employeeData with updated employeeData
+    const updatedFields = [];
+    Object.entries(employeeData).forEach(([key, value]) => {
+      if (value !== initialEmployeeData[key]) {
+        updatedFields.push(key);
       }
+    });
+
+    // Filter out fields that contain EmployeeName, FirstName, MiddleName, LastName
+    const filteredFields = updatedFields.filter(field => !['EmployeeName', 'FirstName', 'MiddleName', 'LastName'].includes(field));
+
+    // Generate success message based on updated fields
+    let successMessage;
+    if (filteredFields.length === 0) {
+      successMessage = `No employee information has been updated for ${employeeName}.`;
+    } else {
+      successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
+    }
+
   
       // Display the success message
       alert(successMessage);
@@ -216,27 +254,29 @@ useEffect(() => {
             throw new Error('Failed to update employee address');
         }
     
-        // // Success message
-        // alert('Employee information updated successfully!');
-            // Retrieve the name of the employee from employeeData
-      const { FirstName, LastName } = employeeData;
-      const employeeName = `${FirstName} ${LastName}`;
-  
-      // Compare initial employeeData with updated employeeData
-      const updatedFields = [];
-      Object.entries(employeeData).forEach(([key, value]) => {
-        if (value !== initialEmployeeData[key]) {
-          updatedFields.push(key);
-        }
-      });
-  
-      // Generate success message based on updated fields
-      let successMessage;
-      if (updatedFields.length === 0) {
-        successMessage = `No information has been updated for ${employeeName} address.`;
-      } else {
-        successMessage = `Employee ${employeeName} has successfully updated ${updatedFields.join(', ')}!`;
-      }
+     // Retrieve the name of the employee from employeeData
+     const { FirstName, LastName } = employeeData;
+     const employeeName = `${FirstName} ${LastName}`;
+ 
+     // Compare initial employeeData with updated employeeData
+     const updatedFields = [];
+     Object.entries(employeeData).forEach(([key, value]) => {
+       if (value !== initialEmployeeData[key]) {
+         updatedFields.push(key);
+       }
+     });
+ 
+     // Filter out fields that contain EmployeeName, FirstName, MiddleName, LastName
+     const filteredFields = updatedFields.filter(field => !['EmployeeName', 'FirstName', 'MiddleName', 'LastName'].includes(field));
+ 
+     // Generate success message based on updated fields
+     let successMessage;
+     if (filteredFields.length === 0) {
+       successMessage = `No address details has been updated for ${employeeName}.`;
+     } else {
+       successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
+     }
+ 
   
       // Display the success message
       alert(successMessage);
@@ -250,9 +290,10 @@ useEffect(() => {
         console.error('Error updating employee address:', error);
         }
     };
-    //UPDATE PROJECT CODE
+    //UPDATE PROJECT DETAILS
   const handleProjectFormSubmit = async (e) => {
     e.preventDefault();
+    console.log(employeeData);
     try {
       const response = await fetch(`http://localhost:5000/updateProject/${employeeId}`, {
         method: 'PUT',
@@ -265,31 +306,35 @@ useEffect(() => {
         throw new Error('Failed to update project details');
       }
   
-      // Retrieve the name of the employee from employeeData
-      const { FirstName, LastName } = employeeData;
-      const employeeName = `${FirstName} ${LastName}`;
-  
-      // Compare initial employeeData with updated employeeData
-      const updatedFields = [];
-      Object.entries(employeeData).forEach(([key, value]) => {
-        if (value !== initialEmployeeData[key]) {
-          updatedFields.push(key);
-        }
-      });
-  
-      // Generate success message based on updated fields
-      let successMessage;
-      if (updatedFields.length === 0) {
-        successMessage = `No information has been updated for ${employeeName}.`;
-      } else {
-        successMessage = `Employee ${employeeName} has successfully updated ${updatedFields.join(', ')}!`;
+    // Retrieve the name of the employee from employeeData
+    const { FirstName, LastName } = employeeData;
+    const employeeName = `${FirstName} ${LastName}`;
+
+    // Compare initial employeeData with updated employeeData
+    const updatedFields = [];
+    Object.entries(employeeData).forEach(([key, value]) => {
+      if (value !== initialEmployeeData[key]) {
+        updatedFields.push(key);
       }
+    });
+
+    // Filter out fields that contain EmployeeName, FirstName, MiddleName, LastName
+    const filteredFields = updatedFields.filter(field => !['EmployeeName', 'FirstName', 'MiddleName', 'LastName'].includes(field));
+
+    // Generate success message based on updated fields
+    let successMessage;
+    if (filteredFields.length === 0) {
+      successMessage = `No project details has been updated for ${employeeName}.`;
+    } else {
+      successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
+    }
+
   
       // Display the success message
       alert(successMessage);
 
-      //reload the page after showing the alert
-      window.href.reload();
+       // Reload the tab
+       window.location.reload();
   
       // Navigate to report.js
     //   navigate("/reports");
@@ -312,26 +357,29 @@ useEffect(() => {
             throw new Error('Failed to update education details');
           }
       
-          // Retrieve the name of the employee from employeeData
-          const { FirstName, LastName } = employeeData;
-          const employeeName = `${FirstName} ${LastName}`;
-      
-          // Compare initial employeeData with updated employeeData
-          const updatedFields = [];
-          Object.entries(employeeData).forEach(([key, value]) => {
-            if (value !== initialEmployeeData[key]) {
-              updatedFields.push(key);
-            }
-          });
-      
-          // Generate success message based on updated fields
-          let successMessage;
-          if (updatedFields.length === 0) {
-            successMessage = `No education details has been updated for ${employeeName}.`;
-          } else {
-            successMessage = `Employee ${employeeName} education details has successfully updated ${updatedFields.join(', ')}!`;
-          }
-      
+    // Retrieve the name of the employee from employeeData
+    const { FirstName, LastName } = employeeData;
+    const employeeName = `${FirstName} ${LastName}`;
+
+    // Compare initial employeeData with updated employeeData
+    const updatedFields = [];
+    Object.entries(employeeData).forEach(([key, value]) => {
+      if (value !== initialEmployeeData[key]) {
+        updatedFields.push(key);
+      }
+    });
+
+    // Filter out fields that contain EmployeeName, FirstName, MiddleName, LastName
+    const filteredFields = updatedFields.filter(field => !['EmployeeName', 'FirstName', 'MiddleName', 'LastName'].includes(field));
+
+    // Generate success message based on updated fields
+    let successMessage;
+    if (filteredFields.length === 0) {
+      successMessage = `No education details has been updated for ${employeeName}.`;
+    } else {
+      successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
+    }
+
           // Display the success message
           alert(successMessage);
       
@@ -343,7 +391,267 @@ useEffect(() => {
           console.error('Error updating employee:', error);
         }
       };
+        //UPDATE SHIFT DETAILS
+  const handleShiftFormSubmit = async (e) => {
+    e.preventDefault();
+    console.log(employeeData);
+    try {
+      const response = await fetch(`http://localhost:5000/updateShift/${employeeId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(employeeData)
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update shift details');
+      }
   
+    // Retrieve the name of the employee from employeeData
+    const { FirstName, LastName } = employeeData;
+    const employeeName = `${FirstName} ${LastName}`;
+
+    // Compare initial employeeData with updated employeeData
+    const updatedFields = [];
+    Object.entries(employeeData).forEach(([key, value]) => {
+      if (value !== initialEmployeeData[key]) {
+        updatedFields.push(key);
+      }
+    });
+
+    // Filter out fields that contain EmployeeName, FirstName, MiddleName, LastName
+    const filteredFields = updatedFields.filter(field => !['EmployeeName', 'FirstName', 'MiddleName', 'LastName'].includes(field));
+
+    // Generate success message based on updated fields
+    let successMessage;
+    if (filteredFields.length === 0) {
+      successMessage = `No shift details has been updated for ${employeeName}.`;
+    } else {
+      successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
+    }
+
+  
+      // Display the success message
+      alert(successMessage);
+
+       // Reload the tab
+       window.location.reload();
+  
+      // Navigate to report.js
+    //   navigate("/reports");
+    } catch (error) {
+      console.error('Error updating employee:', error);
+    }
+  };
+        //UPDATE DELIVERY UNIT 
+        const handleDUFormSubmit = async (e) => {
+            e.preventDefault();
+            console.log(employeeData);
+            try {
+              const response = await fetch(`http://localhost:5000/updateDU/${employeeId}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(employeeData)
+              });
+              if (!response.ok) {
+                throw new Error('Failed to update delivery unit details');
+              }
+          
+            // Retrieve the name of the employee from employeeData
+            const { FirstName, LastName } = employeeData;
+            const employeeName = `${FirstName} ${LastName}`;
+        
+            // Compare initial employeeData with updated employeeData
+            const updatedFields = [];
+            Object.entries(employeeData).forEach(([key, value]) => {
+              if (value !== initialEmployeeData[key]) {
+                updatedFields.push(key);
+              }
+            });
+        
+            // Filter out fields that contain EmployeeName, FirstName, MiddleName, LastName
+            const filteredFields = updatedFields.filter(field => !['EmployeeName', 'FirstName', 'MiddleName', 'LastName'].includes(field));
+        
+            // Generate success message based on updated fields
+            let successMessage;
+            if (filteredFields.length === 0) {
+              successMessage = `No delivery unit details has been updated for ${employeeName}.`;
+            } else {
+              successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
+            }
+        
+          
+              // Display the success message
+              alert(successMessage);
+        
+               // Reload the tab
+               window.location.reload();
+          
+              // Navigate to report.js
+            //   navigate("/reports");
+            } catch (error) {
+              console.error('Error updating employee:', error);
+            }
+          };
+        //UPDATE DEPARTMENT DETAILS
+        const handleDepartmentFormSubmit = async (e) => {
+            e.preventDefault();
+            console.log(employeeData);
+            try {
+              const response = await fetch(`http://localhost:5000/updateDepartment/${employeeId}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(employeeData)
+              });
+              if (!response.ok) {
+                throw new Error('Failed to update employee department details');
+              }
+          
+            // Retrieve the name of the employee from employeeData
+            const { FirstName, LastName } = employeeData;
+            const employeeName = `${FirstName} ${LastName}`;
+        
+            // Compare initial employeeData with updated employeeData
+            const updatedFields = [];
+            Object.entries(employeeData).forEach(([key, value]) => {
+              if (value !== initialEmployeeData[key]) {
+                updatedFields.push(key);
+              }
+            });
+        
+            // Filter out fields that contain EmployeeName, FirstName, MiddleName, LastName
+            const filteredFields = updatedFields.filter(field => !['EmployeeName', 'FirstName', 'MiddleName', 'LastName'].includes(field));
+        
+            // Generate success message based on updated fields
+            let successMessage;
+            if (filteredFields.length === 0) {
+              successMessage = `No department details has been updated for ${employeeName}.`;
+            } else {
+              successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
+            }
+        
+          
+              // Display the success message
+              alert(successMessage);
+        
+               // Reload the tab
+               window.location.reload();
+          
+              // Navigate to report.js
+            //   navigate("/reports");
+            } catch (error) {
+              console.error('Error updating employee:', error);
+            }
+          }; 
+        //UPDATE DEPENDENT DETAILS
+        const handleDependentFormSubmit = async (e) => {
+            e.preventDefault();
+            console.log(employeeData);
+            try {
+              const response = await fetch(`http://localhost:5000/updateDependent/${employeeId}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(employeeData)
+              });
+              if (!response.ok) {
+                throw new Error('Failed to update dependent details');
+              }
+          
+            // Retrieve the name of the employee from employeeData
+            const { FirstName, LastName } = employeeData;
+            const employeeName = `${FirstName} ${LastName}`;
+        
+            // Compare initial employeeData with updated employeeData
+            const updatedFields = [];
+            Object.entries(employeeData).forEach(([key, value]) => {
+              if (value !== initialEmployeeData[key]) {
+                updatedFields.push(key);
+              }
+            });
+        
+            // Filter out fields that contain EmployeeName, FirstName, MiddleName, LastName
+            const filteredFields = updatedFields.filter(field => !['EmployeeName', 'FirstName', 'MiddleName', 'LastName'].includes(field));
+        
+            // Generate success message based on updated fields
+            let successMessage;
+            if (filteredFields.length === 0) {
+              successMessage = `No dependent details has been updated for ${employeeName}.`;
+            } else {
+              successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
+            }
+        
+          
+              // Display the success message
+              alert(successMessage);
+        
+               // Reload the tab
+               window.location.reload();
+          
+              // Navigate to report.js
+            //   navigate("/reports");
+            } catch (error) {
+              console.error('Error updating employee:', error);
+            }
+          };
+           //UPDATE PRODUCT DETAILS
+        const handleProductFormSubmit = async (e) => {
+            e.preventDefault();
+            console.log(employeeData);
+            try {
+              const response = await fetch(`http://localhost:5000/updateProduct/${employeeId}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(employeeData)
+              });
+              if (!response.ok) {
+                throw new Error('Failed to update product details');
+              }
+          
+            // Retrieve the name of the employee from employeeData
+            const { FirstName, LastName } = employeeData;
+            const employeeName = `${FirstName} ${LastName}`;
+        
+            // Compare initial employeeData with updated employeeData
+            const updatedFields = [];
+            Object.entries(employeeData).forEach(([key, value]) => {
+              if (value !== initialEmployeeData[key]) {
+                updatedFields.push(key);
+              }
+            });
+        
+            // Filter out fields that contain EmployeeName, FirstName, MiddleName, LastName
+            const filteredFields = updatedFields.filter(field => !['EmployeeName', 'FirstName', 'MiddleName', 'LastName'].includes(field));
+        
+            // Generate success message based on updated fields
+            let successMessage;
+            if (filteredFields.length === 0) {
+              successMessage = `No product details has been updated for ${employeeName}.`;
+            } else {
+              successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
+            }
+        
+          
+              // Display the success message
+              alert(successMessage);
+        
+               // Reload the tab
+               window.location.reload();
+          
+              // Navigate to report.js
+            //   navigate("/reports");
+            } catch (error) {
+              console.error('Error updating employee:', error);
+            }
+          };
+
 
   if (!employeeData) {
     return <div>Loading...</div>;
@@ -417,7 +725,7 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="emailAddress">Email Address</label>
-                                            <input type="text" className="form-control" value={employeeData.EmailAddress} onChange={handleInputChange} name="EmailAddress" />
+                                            <input type="text" className="form-control" value={employeeData.EmailAddress} placeholder="enter email address" onChange={handleInputChange} name="EmailAddress" />
                                         </div>
                                     </div>
                                     {/* <div className="col-md-4">
@@ -581,7 +889,7 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="projectCode">Project Code</label>
-                                            <input type="text" className="form-control" value={employeeData.ProjectCode} placeholder="enter Project Code" name="projectcode" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.ProjectCode} placeholder="enter Project Code" name="projectcode" />
                                         </div>
                                     </div>
                                 </div>
@@ -620,18 +928,22 @@ useEffect(() => {
                                             </div>
                                             <div className="col-md-4">
                                               <div className="form-group">
-                                              <label htmlFor="employementStatus">Employment Status</label>
-                                              <input type="text" className="form-control" value={employeeData.EmploymentStatus} placeholder="enter employement status" name="EmployementStatus" onChange={handleInputChange} />
+                                              <label >Employment Status</label>
+                                              <input type="text" className="form-control" value={employeeData.EmploymentStatus} placeholder="enter employment status" name="EmploymentStatus" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                 </div>
                                 <div className="row justify-content-center">
-                                <div className="col-md-4">
-                                              <div className="form-group">
-                                              <label htmlFor="empStatus">Employee Status</label>
-                                              <input type="text" className="form-control text-success" value={employeeData.EmployeeStatus} placeholder="enter employee status" name="EmpStatus" onChange={handleInputChange} />
-                                              </div>
-                                            </div>
+                                        <div className="col-md-4">
+                                                <div className="form-group">
+                                                    <label htmlFor="empStatus">Employee Status</label>
+                                                    <select className={`form-control ${employeeData.EmployeeStatus === 'ACTIVE' ? 'text-success' : 'text-danger'}`} 
+                                                    value={employeeData.EmployeeStatus} name="EmployeeStatus" onChange={handleInputChange}>
+                                                        <option value="INACTIVE">Inactive</option>
+                                                        <option value="ACTIVE">Active</option>
+                                                    </select>
+                                                </div>
+                                        </div>
                                             <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="workWeekType"> Work week type</label>
@@ -715,13 +1027,19 @@ useEffect(() => {
                                             <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="isManager">Is Manager</label>
-                                              <input type="text" className="form-control" value={employeeData.IsManager} placeholder="is Manager" name="IsManager" onChange={handleInputChange} />
+                                              <select className="form-control" value={employeeData.IsManager} name="IsManager" onChange={handleInputChange}>
+                                                        <option value={true}>True</option>
+                                                        <option value={false}>False</option>
+                                                    </select>
                                               </div>
                                             </div>
                                 <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="isPmpic">Is PMPIC</label>
-                                              <input type="text" className="form-control" value={employeeData.IsPMPIC} placeholder="is Pmpic" name="IsPmpic" onChange={handleInputChange} />     
+                                              <select className="form-control" value={employeeData.IsPMPIC} name="IsPMPIC" onChange={handleInputChange}>
+                                                        <option value={true}>True</option>
+                                                        <option value={false}>False</option>
+                                                    </select>
                                               </div>
                                             </div>
                                 </div>
@@ -729,22 +1047,31 @@ useEffect(() => {
                                             <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="isIndContributor">Is Individual Contributor</label>
-                                              <input type="text" className="form-control" value={employeeData.IsIndividualContributor} placeholder="is Individual Contributor" name="IsIndContributor" onChange={handleInputChange} />
+                                              <select className="form-control" value={employeeData.IsIndividualContributor} name="IsIndividualContributor" onChange={handleInputChange}>
+                                                        <option value={true}>True</option>
+                                                        <option value={false}>False</option>
+                                                    </select>
                                               </div>
                                             </div>
                                             <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="isActive">Is Active</label>
-                                              <input type="text" className="form-control" value={employeeData.IsActive} placeholder="is Active" name="IsActive" onChange={handleInputChange} />
+                                              <select className="form-control" value={employeeData.IsActive} name="IsActive" onChange={handleInputChange}>
+                                                        <option value={true}>True</option>
+                                                        <option value={false}>False</option>
+                                                    </select>
                                               </div>
                                             </div>
-                                            <div className="col-md-4">
-                                              <div className="form-group">
-                                              <label htmlFor="isDuHead">Is DU Head</label>
-                                              <input type="text" className="form-control" value={employeeData.IsDUHead} placeholder="is Du Head" name="IsDuHead" onChange={handleInputChange} />
-                                              </div>
-                                            </div>
-                                </div>
+                                              <div className="col-md-4">
+                                                <div className="form-group">
+                                                    <label htmlFor="isDuHead">Is DU Head</label>
+                                                    <select className="form-control" value={employeeData.IsDUHead} name="IsDUHead" onChange={handleInputChange}>
+                                                        <option value={true}>True</option>
+                                                        <option value={false}>False</option>
+                                                    </select>
+                                                </div>
+                                     </div>
+                                </div> 
                                 
                                 <div className="row justify-content-center">
                                 <div className="col-md-4">
@@ -786,7 +1113,7 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Project ID</label>
-                                            <span className="form-control">{employeeData.ProjectId} </span>
+                                            <span className="form-control">{Array.isArray(employeeData.ProjectId) ? employeeData.ProjectId[0] : employeeData.ProjectId} </span>
                                         </div>
                                     </div>
                                     <div className="col-md-4">
@@ -809,26 +1136,15 @@ useEffect(() => {
                                             <span className="form-control">{employeeData.ProjectDUID}</span>
                                         </div>
                                     </div>
-                                    {/* <div className="col-md-4">
+                                        <div className="col-md-4">
                                         <div className="form-group">
-                                            <label>Is Active</label>
-                                            <input
-                                            type="text"
-                                            className="form-control"
-                                            value={employeeData.is_Active ? "true" : "false"}
-                                            placeholder="true or false"
-                                            name="is_Active"
-                                            onChange={handleInputChange}
-                                            />
+                                            <label htmlFor="isActive">Is Active</label>
+                                            <select className="form-control" value={employeeData.is_Active} name="is_Active" onChange={handleInputChange}>
+                                                <option value={true}>True</option>
+                                                <option value={false}>False</option>
+                                            </select>
                                         </div>
-                                        </div> */}
-
-                                    <div className="col-md-4">
-                                              <div className="form-group">
-                                              <label>Is Active</label>
-                                              <input type="text" className="form-control" value={employeeData.is_Active} placeholder="true or false" name="is_Active" onChange={handleInputChange} />
-                                              </div>
-                                            </div>
+                                    </div>
                                 </div>
                                 <div className="row justify-content-center">
                                     
@@ -841,7 +1157,7 @@ useEffect(() => {
                       <div className="tab-pane fade" id="Shift" role="tabpanel" aria-labelledby="Shift-tab">
                           {/* Project Code Form */}
                           <div className="container">
-                            <form onSubmit={handleFormSubmit}>
+                            <form onSubmit={handleShiftFormSubmit}>
                                 <div className="row justify-content-center">
                                     {/* <div className="col-md-4">
                                         <div className="form-group">
@@ -852,13 +1168,13 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="projectCode">Shift Code</label>
-                                            <input type="text" className="form-control" value={employeeData.ShiftCode} placeholder="enter project code" name="shiftCode" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.ShiftCode} placeholder="enter project code" name="ShiftCode" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="projectCode">Shift Name</label>
-                                            <input type="text" className="form-control" value={employeeData.ShiftName} placeholder="enter project code" name="shiftCode" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.ShiftName} placeholder="enter project code" name="ShiftName" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
@@ -866,20 +1182,20 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="tenure">Shift Type</label>
-                                            <input type="text" className="form-control" value={employeeData.ShiftType} placeholder="enter shift type" name="shiftType" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.ShiftType} placeholder="enter shift type" name="ShiftType" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="projectName">Level Id</label>
-                                            <input type="text" className="form-control" value={employeeData.LevelID} placeholder="enter level Id" name="levelId" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.LevelID} placeholder="enter level Id" name="LevelID" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
                                 <div className="row justify-content-center">
                                 
                                     </div>
-                                <button type="submit" className="btn btn-primary d-block mx-auto">Submit</button>
+                                <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
                             </form>
                         </div>
                       <br/>
@@ -887,12 +1203,12 @@ useEffect(() => {
                       <div className="tab-pane fade" id="deliveryUnit" role="tabpanel" aria-labelledby="deliveryUnit-tab">
                           {/* Delivery Unit Form */}
                           <div className="container">
-                            <form onSubmit={handleFormSubmit}>
+                            <form onSubmit={handleDUFormSubmit}>
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>DUID</label>
-                                            <span className="form-control">{employeeData.DUID}</span>
+                                            <span className="form-control">{Array.isArray(employeeData.DUID) ? employeeData.DUID[0] : employeeData.DUID}</span>
                                         </div>
                                     </div>
                                     <div className="col-md-4">
@@ -912,7 +1228,10 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>is Active</label>
-                                            <input type="text" className="form-control" value={employeeData.Is_Active} placeholder="is Active" name="Is_Active" onChange={handleInputChange} />
+                                            <select className="form-control" value={employeeData.Is_Active} name="Is_Active" onChange={handleInputChange}>
+                                                <option value={true}>True</option>
+                                                <option value={false}>False</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -924,12 +1243,12 @@ useEffect(() => {
                       <div className="tab-pane fade" id="Department" role="tabpanel" aria-labelledby="Department-tab">
                           {/* Department Form */}
                           <div className="container">
-                            <form onSubmit={handleFormSubmit}>
+                            <form onSubmit={handleDepartmentFormSubmit}>
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Department ID</label>
-                                            <span className="form-control">{employeeData.DepartmentId}</span>
+                                            <span className="form-control">{Array.isArray(employeeData.DepartmentId) ? employeeData.DepartmentId[0] : employeeData.DepartmentId}</span>
                                         </div>
                                     </div>
                                     </div>
@@ -989,7 +1308,7 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="cityMunicipality">City / Municipality</label>
-                                            <input type="text" className="form-control" placeholder="Enter City/Municipality" name="CityMunicipality" value={employeeData.CityMunicipality} onChange={handleInputChange} />
+                                            <input type="text" className="form-control" placeholder="Enter City/Municipality" name="City" value={employeeData.City} onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
@@ -1024,19 +1343,24 @@ useEffect(() => {
                                         <div className="form-group">
                                             <label htmlFor="landmark">Land Mark</label>
                                             <input type="text" className="form-control" placeholder="Enter Land Mark" name="Landmark" value={employeeData.Landmark} onChange={handleInputChange} />
-                                            {/* <input type="text" className="form-control" placeholder="Enter Land Mark" name="landmark" value={employeeData.Landmark} onChange={handleInputChange} /> */}
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="isPermanent">is Permanent</label>
-                                            <input type="text" className="form-control" placeholder="is Permanent" name="IsPermanent" value={employeeData.IsPermanent} onChange={handleInputChange} />
+                                            <select className="form-control" value={employeeData.IsPermanent} name="IsPermanent" onChange={handleInputChange}>
+                                                <option value={true}>True</option>
+                                                <option value={false}>False</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="isEmergency">is Emergency</label>
-                                              <input type="text" className="form-control" placeholder="is Emergency" name="IsEmergency" value={employeeData.IsEmergency} onChange={handleInputChange} />
+                                              <select className="form-control" value={employeeData.IsEmergency} name="IsEmergency" onChange={handleInputChange}>
+                                                <option value={true}>True</option>
+                                                <option value={false}>False</option>
+                                            </select>
                                               </div>
                                             </div>
                                 </div>
@@ -1249,24 +1573,30 @@ useEffect(() => {
                       <div className="tab-pane fade" id="dependent" role="tabpanel" aria-labelledby="dependent-tab">
                           {/* Dependent Form */}
                           <div className="container">
-                            <form onSubmit={handleFormSubmit}>
+                            <form onSubmit={handleDependentFormSubmit}>
                                 <div className="row justify-content-center">
-                                    <div className="col-md-4">
+                                    {/* <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Dependent ID</label>
                                             <span className="form-control">{employeeData.DependentID}</span>
                                         </div>
-                                    </div>
+                                    </div> */}
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label >Dependent Full Name</label>
-                                            <input type="text" className="form-control" value={employeeData.FullName} placeholder="enter dependent full name" name="dependentFullname" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.FullName} placeholder="enter dependent full name" name="FullName" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label >Phone Number</label>
+                                            <input type="text" className="form-control" value={employeeData.PhoneNum} placeholder="Enter Phone Number" name="PhoneNum" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label >Relationship</label>
-                                            <input type="text" className="form-control" value={employeeData.Relationship} placeholder="enter relationship" name="relationship" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.Relationship} placeholder="enter relationship" name="Relationship" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
@@ -1274,19 +1604,19 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Date of Birth</label>
-                                            <input type="text" className="form-control" value={employeeData.DateOfBirth} placeholder="enter date of birth" name="dob" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.DateOfBirth} placeholder="enter date of birth" name="DateOfBirth" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label >Occupation</label>
-                                            <input type="text" className="form-control" value={employeeData.Occupation} placeholder="enter  occupation" name="occupation" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.Occupation} placeholder="enter  occupation" name="Occupation" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label >Address</label>
-                                            <input type="text" className="form-control" value={employeeData.Address} placeholder="Enter address" name="address" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.Address} placeholder="Enter address" name="Address" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
@@ -1294,59 +1624,59 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>City</label>
-                                            <input type="text" className="form-control" value={employeeData.City} placeholder="Enter City" name="city" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.City} placeholder="Enter City" name="City" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Province</label>
-                                            <input type="text" className="form-control" value={employeeData.DepProvince} placeholder="Enter Province" name="province" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.DepProvince} placeholder="Enter Province" name="DepProvince" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                               <div className="form-group">
                                               <label >Postal Code</label>
-                                              <input type="text" className="form-control" value={employeeData.PostalCode} placeholder="Enter Postal Code" name="postalCode" onChange={handleInputChange} />
+                                              <input type="text" className="form-control" value={employeeData.PostalCode} placeholder="Enter Postal Code" name="PostalCode" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                 </div>
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label >Phone Number</label>
-                                            <input type="text" className="form-control" value={employeeData.PhoneNum} placeholder="Enter Phone Number" name="phoneNumber" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
                                             <label >Beneficiary</label>
-                                            <input type="text" className="form-control" value={employeeData.Beneficiary} placeholder="Enter Beneficiary" name="beneficiary" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.Beneficiary} placeholder="Enter Beneficiary" name="Beneficiary" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                               <div className="form-group">
                                               <label >Beneficiary Date</label>
-                                              <input type="text" className="form-control" value={employeeData.BeneficiaryDate} placeholder="Enter Beneficiary Date" name="beneficiaryDate" onChange={handleInputChange} />
+                                              <input type="text" className="form-control" value={employeeData.BeneficiaryDate} placeholder="Enter Beneficiary Date" name="BeneficiaryDate" onChange={handleInputChange} />
                                               </div>
                                             </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label >Type of coverage</label>
+                                            <input type="text" className="form-control" value={employeeData.TypeOfCoverage} placeholder="Enter Type of coverage" name="TypeOfCoverage" onChange={handleInputChange} />
+                                    </div>
+                                    </div>
                                 </div>
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label >Insurance</label>
-                                            <input type="tel" className="form-control" value={employeeData.Insurance} placeholder="Enter Insurance" name="insurance" onChange={handleInputChange} />
+                                            <input type="tel" className="form-control" value={employeeData.Insurance} placeholder="Enter Insurance" name="Insurance" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label >Insurance Date</label>
-                                            <input type="text" className="form-control" value={employeeData.InsuranceDate} placeholder="Enter Insurance Date" name="insuranceDate" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.InsuranceDate} placeholder="Enter Insurance Date" name="InsuranceDate" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                               <div className="form-group">
                                               <label >Remarks</label>
-                                              <input type="text" className="form-control" value={employeeData.Remarks} placeholder="Enter Remarks" name="remarks" onChange={handleInputChange} />
+                                              <input type="text" className="form-control" value={employeeData.Remarks} placeholder="Enter Remarks" name="Remarks" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                 </div>
@@ -1354,31 +1684,23 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label >Company Paid</label>
-                                            <input type="text" className="form-control" value={employeeData.CompanyPaid} placeholder="Enter Company Paid" name="companyPaid" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.CompanyPaid} placeholder="Enter Company Paid" name="CompanyPaid" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label >HMO Provider</label>
-                                            <input type="text" className="form-control" value={employeeData.HMOProvider} placeholder="Enter HMO Provider" name="hmoProvider" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.HMOProvider} placeholder="Enter HMO Provider" name="HMOProvider" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                               <div className="form-group">
                                               <label >HMO Policy Number</label>
-                                              <input type="text" className="form-control" value={employeeData.HMOPolicyNumber} placeholder="Enter HMO Policy Number" name="hmoPolicynum" onChange={handleInputChange} />
+                                              <input type="text" className="form-control" value={employeeData.HMOPolicyNumber} placeholder="Enter HMO Policy Number" name="HMOPolicyNumber" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                 </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >Type of coverage</label>
-                                            <input type="text" className="form-control" value={employeeData.TypeOfCoverage} placeholder="Enter Type of coverage" name="typeOfCoverage" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <button type="submit" className="btn btn-primary d-block mx-auto">Submit</button>
+                                <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
                             </form>
                         </div>
                       <br/>
@@ -1386,12 +1708,12 @@ useEffect(() => {
                       <div className="tab-pane fade" id="product" role="tabpanel" aria-labelledby="product-tab">
                           {/* Project Code Form */}
                           <div className="container">
-                            <form onSubmit={handleFormSubmit}>
+                            <form onSubmit={handleProductFormSubmit}>
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Product ID</label>
-                                            <span className="form-control"> {employeeData.ProdId} </span>
+                                            <span className="form-control"> {Array.isArray(employeeData.ProdId) ? employeeData.ProdId[0] : employeeData.ProdId} </span>
                                         </div>
                                     </div>
                                     </div>
@@ -1399,7 +1721,7 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Product Code</label>
-                                            <input type="text" className="form-control" value={employeeData.ProdCode} placeholder="enter Product Code" name="ProductCode" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.ProdCode} placeholder="enter Product Code" name="ProdCode" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     </div>
@@ -1407,7 +1729,7 @@ useEffect(() => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Product Description</label>
-                                            <input type="text" className="form-control" value={employeeData.ProdDesc} placeholder="enter Product Description" name="productDescription" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.ProdDesc} placeholder="enter Product Description" name="ProdDesc" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>

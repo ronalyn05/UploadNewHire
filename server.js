@@ -314,7 +314,7 @@ app.put('/updateEmployeeEducation/:employeeId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-//api endpoint for updatign project details
+//api endpoint for updating project details
 app.put('/updateProject/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
   const updatedEmployeeData = req.body;
@@ -329,6 +329,67 @@ app.put('/updateProject/:employeeId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+//api endpoint for updating  shift details
+app.put('/updateShift/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  const updatedEmployeeData = req.body;
+  try {
+    const result = await dbOperation.updateEmployeeShiftById(employeeId, updatedEmployeeData);
+    if (!result) {
+      return res.status(404).json({ message: 'Employee shift details not found' });
+    }
+    res.json({ message: 'Employee shift details updated successfully' });
+  } catch (error) {
+    console.error('Error updating shift details:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+//api endpoint for updating delivery unit details
+app.put('/updateDU/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  const updatedEmployeeData = req.body;
+  try {
+    const result = await dbOperation.updateEmployeeDUById(employeeId, updatedEmployeeData);
+    if (!result) {
+      return res.status(404).json({ message: 'Employee delivery unit details not found' });
+    }
+    res.json({ message: 'Employee delivery unit details updated successfully' });
+  } catch (error) {
+    console.error('Error updating delivery unit details:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+//api endpoint for updating deaprtment details
+app.put('/updateDepartment/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  const updatedEmployeeData = req.body;
+  try {
+    const result = await dbOperation.updateEmployeeDepartmentById(employeeId, updatedEmployeeData);
+    if (!result) {
+      return res.status(404).json({ message: 'Employee department details not found' });
+    }
+    res.json({ message: 'Employee department details updated successfully' });
+  } catch (error) {
+    console.error('Error updating department details:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+//api endpoint for updating department details
+app.put('/updateDependent/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  const updatedEmployeeData = req.body;
+  try {
+    const result = await dbOperation.updateEmployeeDependentById(employeeId, updatedEmployeeData);
+    if (!result) {
+      return res.status(404).json({ message: 'Employee department details not found' });
+    }
+    res.json({ message: 'Employee department details updated successfully' });
+  } catch (error) {
+    console.error('Error updating department details:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 // DELETE endpoint to delete an employee by ID
 app.delete('/deleteEmployee/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
@@ -354,6 +415,20 @@ app.delete('/deleteUserAccount/:userId', async (req, res) => {
       res.status(200).json({ message: 'User account deleted successfully' });
   } catch (error) {
       console.error('Error deleting User account:', error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+});
+// DELETE endpoint to delete an employee by ID
+app.delete('/deleteEmpInfo/:empInfoId', async (req, res) => {
+  const { empInfoId } = req.params;
+  try {
+      const result = await dbOperation.deleteEmpInfoById(empInfoId);
+      if (result.affectedRows === 0) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+      res.status(200).json({ message: 'employee Info deleted successfully' });
+  } catch (error) {
+      console.error('Error deleting employee Info:', error);
       res.status(500).json({ message: 'Internal server error' });
   }
 });

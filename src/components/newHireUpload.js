@@ -251,7 +251,7 @@ const NewHireUpload = () => {
         formattedRow["DateHired"] = convertExcelDateToDate(row["DateHired"]);
         formattedRow["DateTo"] = convertExcelDateToDate(row["DateTo"]);
         formattedRow["DateFrom"] = convertExcelDateToDate(row["DateFrom"]);
-        formattedRow["BirthofDate"] = convertExcelDateToDate(row["BirthofDate"]);
+        formattedRow["DateOfBirth"] = convertExcelDateToDate(row["DateOfBirth"]);
         return formattedRow;
       });
 
