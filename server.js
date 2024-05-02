@@ -38,6 +38,19 @@ app.use(
   })
 );
 
+// Check if the email already exists
+app.post('/check-email', async (req, res) => {
+  const { Email } = req.body;
+
+  try {
+      const existingUser = await dbOperation.getUserByEmail(Email);
+      res.status(200).json({ exists: !!existingUser });
+  } catch (error) {
+      console.error("Error checking email:", error);
+      res.status(500).json({ error: 'Failed to check email. Please try again later.' });
+  }
+});
+
  // Define a POST endpoint for user registration
 app.post('/register', async (req, res) => {
   // Extract user data from the request body
@@ -55,6 +68,7 @@ app.post('/register', async (req, res) => {
       res.status(500).json({ error: 'Failed to insert employee' });
   }
 });
+
 //post endpoint for user login
 app.post('/login', async (req, res) => {
   const { Email, Password } = req.body;
@@ -389,7 +403,21 @@ app.put('/updateDependent/:employeeId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-
+//api endpoint for updating department details
+app.put('/updateEmerContact/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  const updatedEmployeeData = req.body;
+  try {
+    const result = await dbOperation.updateEmergencyContactById(employeeId, updatedEmployeeData);
+    if (!result) {
+      return res.status(404).json({ message: 'Employee emergency contact not found' });
+    }
+    res.json({ message: 'Employee emergency contact details updated successfully' });
+  } catch (error) {
+    console.error('Error updating emergency contact details:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 // DELETE endpoint to delete an employee by ID
 app.delete('/deleteEmployee/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
@@ -429,6 +457,20 @@ app.delete('/deleteEmpInfo/:empInfoId', async (req, res) => {
       res.status(200).json({ message: 'employee Info deleted successfully' });
   } catch (error) {
       console.error('Error deleting employee Info:', error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+});
+// DELETE endpoint to delete an employee by ID
+app.delete('/deleteEmContact/:emergencyNumId', async (req, res) => {
+  const { emergencyNumId } = req.params;
+  try {
+      const result = await dbOperation.deleteEmContactById(emergencyNumId);
+      if (result.affectedRows === 0) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+      res.status(200).json({ message: 'Emergency Contact deleted successfully' });
+  } catch (error) {
+      console.error('Error deleting emergency Contac:', error);
       res.status(500).json({ message: 'Internal server error' });
   }
 });

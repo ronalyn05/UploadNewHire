@@ -20,10 +20,9 @@ function Register() {
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.id]: e.target.value });
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         const errors = [];
         if (!formData.FirstName.trim()) {
             errors.push('First Name is required');
@@ -49,16 +48,34 @@ function Register() {
         if (!formData.Role) {
             errors.push('Role selection is required');
         }
-
+    
         if (errors.length > 0) {
             setErrorMessage(errors.join(', '));
             return;
         }
-
+    
         try {
+            const response = await fetch('/check-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ Email: formData.Email }),
+            });
+    
+            const data = await response.json();
+    
+            if (!response.ok) {
+                throw new Error(data.error);
+            }
+    
+            if (data.exists) {
+                throw new Error('Email address is already in use. Please provide a unique email address.');
+            }
+    
             const hashedPassword = await bcrypt.hash(formData.Password, 10);
-
-            const response = await fetch('/register', {
+    
+            const registerResponse = await fetch('/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -70,23 +87,90 @@ function Register() {
                     Email: formData.Email,
                     UserName: formData.UserName,
                     Password: hashedPassword,
-                    Role: formData.Role // Include role in the request
+                    Role: formData.Role
                 }),
             });
-
-            if (!response.ok) {
+    
+            if (!registerResponse.ok) {
                 throw new Error('Failed to register user');
             }
-
-            const data = await response.json();
-            console.log(data); // Log the response from the server
+    
+            const responseData = await registerResponse.json();
+            console.log(responseData); // Log the response from the server
             alert("Account successfully registered!");
             navigate("/");
         } catch (error) {
             console.error('Error registering user:', error);
-            setErrorMessage('Failed to register user. Please try again later.');
+            setErrorMessage(error.message || 'Failed to register user. Please try again later.');
         }
     };
+    
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+
+    //     const errors = [];
+    //     if (!formData.FirstName.trim()) {
+    //         errors.push('First Name is required');
+    //     }
+    //     if (!formData.LastName.trim()) {
+    //         errors.push('Last Name is required');
+    //     }
+    //     if (!formData.MiddleName.trim()) {
+    //         errors.push('Middle Name is required');
+    //     }
+    //     if (!formData.Email.trim()) {
+    //         errors.push('Email is required');
+    //     }
+    //     if (!formData.UserName.trim()) {
+    //         errors.push('User Name is required');
+    //     }
+    //     if (formData.Password.trim().length < 6) {
+    //         errors.push('Password must be at least 6 characters long');
+    //     }
+    //     if (formData.Password !== formData.ConfirmPassword) {
+    //         errors.push('Passwords do not match');
+    //     }
+    //     if (!formData.Role) {
+    //         errors.push('Role selection is required');
+    //     }
+
+    //     if (errors.length > 0) {
+    //         setErrorMessage(errors.join(', '));
+    //         return;
+    //     }
+
+    //     try {
+    //         const hashedPassword = await bcrypt.hash(formData.Password, 10);
+
+    //         const response = await fetch('/register', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify({
+    //                 LastName: formData.LastName,
+    //                 FirstName: formData.FirstName,
+    //                 MiddleName: formData.MiddleName,
+    //                 Email: formData.Email,
+    //                 UserName: formData.UserName,
+    //                 Password: hashedPassword,
+    //                 Role: formData.Role // Include role in the request
+    //             }),
+    //         });
+
+    //         if (!response.ok) {
+    //             throw new Error('Failed to register user');
+    //         }
+
+    //         const data = await response.json();
+    //         console.log(data); // Log the response from the server
+    //         alert("Account successfully registered!");
+    //         navigate("/");
+    //     } catch (error) {
+    //         console.error('Error registering user:', error);
+    //         setErrorMessage('Failed to register user. Please try again later.');
+    //     }
+    // };
 
     return (
         <div className="bg-gradient-primary d-flex align-items-center justify-content-center min-vh-100">

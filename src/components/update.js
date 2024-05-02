@@ -676,7 +676,7 @@ const handleInputChange = (e) => {
                           <a className="nav-link" id="employmentInfo-tab" data-toggle="tab" href="#employmentInfo" role="tab" aria-controls="employmentInfo" aria-selected="false">Employment Information</a>
                       </li>
                       <li className="nav-item">
-                          <a className="nav-link " id="project_Code-tab" data-toggle="tab" href="#project_Code" role="tab" aria-controls="project_Code" aria-selected="false">Project Code</a>
+                          <a className="nav-link " id="project_Code-tab" data-toggle="tab" href="#project_Code" role="tab" aria-controls="project_Code" aria-selected="false">Project</a>
                       </li>
                       <li className="nav-item">
                           <a className="nav-link " id="Shift-tab" data-toggle="tab" href="#Shift" role="tab" aria-controls="Shift" aria-selected="false">Shift</a>
@@ -1028,8 +1028,8 @@ const handleInputChange = (e) => {
                                               <div className="form-group">
                                               <label htmlFor="isManager">Is Manager</label>
                                               <select className="form-control" value={employeeData.IsManager} name="IsManager" onChange={handleInputChange}>
-                                                        <option value={true}>True</option>
-                                                        <option value={false}>False</option>
+                                                        <option value={true}>Yes</option>
+                                                        <option value={false}>No</option>
                                                     </select>
                                               </div>
                                             </div>
@@ -1037,8 +1037,8 @@ const handleInputChange = (e) => {
                                               <div className="form-group">
                                               <label htmlFor="isPmpic">Is PMPIC</label>
                                               <select className="form-control" value={employeeData.IsPMPIC} name="IsPMPIC" onChange={handleInputChange}>
-                                                        <option value={true}>True</option>
-                                                        <option value={false}>False</option>
+                                                        <option value={true}>Yes</option>
+                                                        <option value={false}>No</option>
                                                     </select>
                                               </div>
                                             </div>
@@ -1048,8 +1048,8 @@ const handleInputChange = (e) => {
                                               <div className="form-group">
                                               <label htmlFor="isIndContributor">Is Individual Contributor</label>
                                               <select className="form-control" value={employeeData.IsIndividualContributor} name="IsIndividualContributor" onChange={handleInputChange}>
-                                                        <option value={true}>True</option>
-                                                        <option value={false}>False</option>
+                                                        <option value={true}>Yes</option>
+                                                        <option value={false}>No</option>
                                                     </select>
                                               </div>
                                             </div>
@@ -1057,8 +1057,8 @@ const handleInputChange = (e) => {
                                               <div className="form-group">
                                               <label htmlFor="isActive">Is Active</label>
                                               <select className="form-control" value={employeeData.IsActive} name="IsActive" onChange={handleInputChange}>
-                                                        <option value={true}>True</option>
-                                                        <option value={false}>False</option>
+                                                        <option value={true}>Yes</option>
+                                                        <option value={false}>No</option>
                                                     </select>
                                               </div>
                                             </div>
@@ -1066,8 +1066,8 @@ const handleInputChange = (e) => {
                                                 <div className="form-group">
                                                     <label htmlFor="isDuHead">Is DU Head</label>
                                                     <select className="form-control" value={employeeData.IsDUHead} name="IsDUHead" onChange={handleInputChange}>
-                                                        <option value={true}>True</option>
-                                                        <option value={false}>False</option>
+                                                        <option value={true}>Yes</option>
+                                                        <option value={false}>No</option>
                                                     </select>
                                                 </div>
                                      </div>
@@ -1140,8 +1140,8 @@ const handleInputChange = (e) => {
                                         <div className="form-group">
                                             <label htmlFor="isActive">Is Active</label>
                                             <select className="form-control" value={employeeData.is_Active} name="is_Active" onChange={handleInputChange}>
-                                                <option value={true}>True</option>
-                                                <option value={false}>False</option>
+                                                <option value={true}>Yes</option>
+                                                <option value={false}>No</option>
                                             </select>
                                         </div>
                                     </div>
@@ -1229,8 +1229,8 @@ const handleInputChange = (e) => {
                                         <div className="form-group">
                                             <label>is Active</label>
                                             <select className="form-control" value={employeeData.Is_Active} name="Is_Active" onChange={handleInputChange}>
-                                                <option value={true}>True</option>
-                                                <option value={false}>False</option>
+                                                <option value={true}>Yes</option>
+                                                <option value={false}>No</option>
                                             </select>
                                         </div>
                                     </div>
@@ -1308,7 +1308,7 @@ const handleInputChange = (e) => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="cityMunicipality">City / Municipality</label>
-                                            <input type="text" className="form-control" placeholder="Enter City/Municipality" name="City" value={employeeData.City} onChange={handleInputChange} />
+                                            <input type="text" className="form-control" placeholder="Enter City/Municipality" name="CityMunicipality" value={employeeData.CityMunicipality} onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
@@ -1334,7 +1334,7 @@ const handleInputChange = (e) => {
                                     <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="zipcode">Zip Code</label>
-                                              <input type="text" className="form-control" placeholder="Enter Zip Code" name="Zipcode" value={employeeData.ZipCode} onChange={handleInputChange} />
+                                              <input type="text" className="form-control" placeholder="Enter Zip Code" name="ZipCode" value={employeeData.ZipCode} onChange={handleInputChange} />
                                               </div>
                                             </div>
                                 </div>
@@ -1349,8 +1349,8 @@ const handleInputChange = (e) => {
                                         <div className="form-group">
                                             <label htmlFor="isPermanent">is Permanent</label>
                                             <select className="form-control" value={employeeData.IsPermanent} name="IsPermanent" onChange={handleInputChange}>
-                                                <option value={true}>True</option>
-                                                <option value={false}>False</option>
+                                                <option value={true}>Yes</option>
+                                                <option value={false}>No</option>
                                             </select>
                                         </div>
                                     </div>
@@ -1358,8 +1358,8 @@ const handleInputChange = (e) => {
                                               <div className="form-group">
                                               <label htmlFor="isEmergency">is Emergency</label>
                                               <select className="form-control" value={employeeData.IsEmergency} name="IsEmergency" onChange={handleInputChange}>
-                                                <option value={true}>True</option>
-                                                <option value={false}>False</option>
+                                                <option value={true}>Yes</option>
+                                                <option value={false}>No</option>
                                             </select>
                                               </div>
                                             </div>
@@ -1488,7 +1488,7 @@ const handleInputChange = (e) => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Full Name</label>
-                                            <input type="text" className="form-control" value={employeeData.EmContactFullName} placeholder="Enter full name" name="ecFulEmContactFullNamelname" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.EmContactFullName} placeholder="Enter full name" name="EmContactFullName" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
@@ -1553,14 +1553,26 @@ const handleInputChange = (e) => {
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
+                                            <label>Land Mark</label>
+                                            <input type="text" className="form-control" value={employeeData.EmContactLandMark} placeholder="Enter landmark" name="EmContactLandMark" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
                                             <label>Is Permanent</label>
-                                            <input type="text" className="form-control" value={employeeData.Is_Permanent} name="IsPermanent" onChange={handleInputChange} />
+                                            <select className="form-control" value={employeeData.Is_Permanent} name="Is_Permanent" onChange={handleInputChange}>
+                                                <option value={true}>Yes</option>
+                                                <option value={false}>No</option>
+                                            </select>
                                         </div>
                                     </div>
                                   <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Is Emergency</label>
-                                            <input type="text" className="form-control" value={employeeData.Is_Emergency} name="IsEmergency" onChange={handleInputChange} />
+                                            <select className="form-control" value={employeeData.Is_Emergency} name="Is_Emergency" onChange={handleInputChange}>
+                                                <option value={true}>Yes</option>
+                                                <option value={false}>No</option>
+                                            </select>
                                         </div>
                                     </div>
                                     </div>
