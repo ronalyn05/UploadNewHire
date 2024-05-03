@@ -16,7 +16,6 @@ const getEmployees = async (Email, Password) => {
     throw error;
   }
 };
-
 // Get user by email address
 const getUserByEmail = async (Email) => {
   try {
@@ -35,7 +34,6 @@ const getUserByEmail = async (Email) => {
     throw new Error("Error fetching user by email");
   }
 };
-
 // insert user account to USER ACCOUNT table
 const insertEmployee = async (Employee) => {
   try {
@@ -387,58 +385,7 @@ const getAllUserAccount = async () => {
     throw error;
   }
 };
-
-// Retrieve employee by ID from the database
-// const getEmployeeById = async (employeeId) => {
-//   try {
-//     let pool = await sql.connect(config);
-//     let result = await pool
-//       .request()
-//       .input("EmployeeId", sql.VarChar, employeeId)
-//       .query(`
-//       SELECT 
-//       PD.*, EI.*, ADDRESS.*, CONTACT.*, EDUC.*, 
-//       PROJ.ProjectId AS ProjectId, PROJ.DUID AS ProjectDUID, PROJ.ProjectCode, 
-//       PROJ.ProjectName, PROJ.is_Active,
-//       DU.DUID AS DUID, DU.DUCode, DU.DUName AS DUName, DU.Is_Active,
-//       DEPT.DepartmentId, DEPT.DepartmentName, DEPT.DUID AS DeptDUID,
-//       PROD.*, DEPN.*, SHFT.*,
-//       EM_CONTACT.FullName AS EmContactFullName, EM_CONTACT.ContactId AS EmContactId,
-//       EM_CONTACT.AddressID AS EmContactAddressID, EM_CONTACT.AddressID AS EmContactAddressID,
-//       EM_CONTACT.HouseNumber AS EmContactHouseNo, EM_CONTACT.CompleteAddress AS EmContactCompleteAddress,
-//       EM_CONTACT.Barangay AS EmContactBarangay, EM_CONTACT.CityMunicipality AS EmContactCityMunicipality,
-//       EM_CONTACT.Province AS EmContactProvince, EM_CONTACT.Region AS EmContactRegion,
-//       EM_CONTACT.Country AS EmContactCountry, EM_CONTACT.Zipcode AS EmContactZipcode,
-//       EM_CONTACT.LandMark AS EmContactLandMark,
-//       EM_CONTACT.Is_Permanent AS EmContactIsPermanent, EM_CONTACT.IsEmergency AS EmContactIsEmergency,
-//       EM_CONT.ContactNumber AS EmContactPhoneNumber
-//       FROM EmpPersonalDetails AS PD
-//       INNER JOIN EmployeeInfo AS EI ON PD.EmployeeId = EI.EmployeeId
-//       INNER JOIN Address AS ADDRESS ON PD.EmployeeId = ADDRESS.EmployeeId
-//       INNER JOIN Contact AS CONTACT ON PD.EmployeeId = CONTACT.EmployeeId
-//       INNER JOIN Education AS EDUC ON PD.EmployeeId = EDUC.EmployeeId
-//       LEFT JOIN Project AS PROJ ON PD.EmployeeId = PROJ.EmployeeId
-//       LEFT JOIN Shift AS SHFT ON PD.EmployeeId = SHFT.EmployeeId
-//       LEFT JOIN DeliveryUnit AS DU ON PD.EmployeeId = DU.EmployeeId
-//       LEFT JOIN Department AS DEPT ON PD.EmployeeId = DEPT.EmployeeId
-//       LEFT JOIN Dependent AS DEPN ON PD.EmployeeId = DEPN.EmployeeId
-//       LEFT JOIN Product AS PROD ON PD.EmployeeId = PROD.EmployeeId
-//       LEFT JOIN EmergencyContactNumber AS EM_CONTACT ON PD.EmployeeId = EM_CONTACT.EmployeeId
-//       LEFT JOIN Contact AS EM_CONT ON EM_CONTACT.ContactId = EM_CONT.ContactId
-//       WHERE PD.EmployeeId = @EmployeeId;
-//       `);
-//     if (result.recordset.length === 0) {
-//       return null; // Return null if employee with given ID is not found
-//     }
-
-//     return result.recordset[0]; // Return the first employee found with the given ID
-//   } catch (error) {
-//     console.error("Error fetching employee by ID:", error);
-//     throw error;
-//   }
-// };
-
-// // Retrieve employee by ID from the database
+ // Retrieve employee by ID from the database
 const getEmployeeById = async (employeeId) => {
   try {
     let pool = await sql.connect(config);
@@ -446,40 +393,40 @@ const getEmployeeById = async (employeeId) => {
       .request()
       .input("EmployeeId", sql.VarChar, employeeId)
       .query(`
-      SELECT 
-      PD.*, EI.*, ADDRESS.*, CONTACT.*, EDUC.*, EC.*, 
-      PROJ.ProjectId AS ProjectId, PROJ.DUID AS ProjectDUID, PROJ.ProjectCode, 
-      PROJ.ProjectName, PROJ.is_Active,
-      DU.DUID AS DUID, DU.DUCode, DU.DUName AS DUName, DU.Is_Active,
-      DEPT.DepartmentId, DEPT.DepartmentName, DEPT.DUID AS DeptDUID,
-      PROD.*, DEPN.*, SHFT.*,
-      C.ContactNumber AS EmContactPhoneNumber,
-      A.CompleteAddress AS EmContactCompleteAddress,
-      A.HouseNumber AS EmContactHouseNo,
-      A.Barangay AS EmergencyBarangay,
-      A.CityMunicipality AS EmergencyCityMunicipality,
-      A.Province AS EmergencyProvince,
-      A.Region AS EmergencyRegion,
-      A.Country AS EmergencyCountry,
-      A.ZipCode AS EmergencyZipCode,
-      A.LandMark AS EmergencyLandMark,
-      A.IsPermanent AS EmergencyIsPermanent,
-      A.IsEmergency AS Is_Emergency
-      FROM EmpPersonalDetails AS PD
-      INNER JOIN EmployeeInfo AS EI ON PD.EmployeeId = EI.EmployeeId
-      INNER JOIN Address AS ADDRESS ON PD.EmployeeId = ADDRESS.EmployeeId
-      INNER JOIN Contact AS CONTACT ON PD.EmployeeId = CONTACT.EmployeeId
-      INNER JOIN Education AS EDUC ON PD.EmployeeId = EDUC.EmployeeId
-      LEFT JOIN EmergencyContactNumber AS EC
-      INNER JOIN Contact AS C ON EC.ContactId = C.ContactId
-      INNER JOIN Address AS A ON EC.AddressID = A.AddressID
-      LEFT JOIN Project AS PROJ ON PD.EmployeeId = PROJ.EmployeeId
-      LEFT JOIN Shift AS SHFT ON PD.EmployeeId = SHFT.EmployeeId
-      LEFT JOIN DeliveryUnit AS DU ON PD.EmployeeId = DU.EmployeeId
-      LEFT JOIN Department AS DEPT ON PD.EmployeeId = DEPT.EmployeeId
-      LEFT JOIN Dependent AS DEPN ON PD.EmployeeId = DEPN.EmployeeId
-      LEFT JOIN Product AS PROD ON PD.EmployeeId = PROD.EmployeeId
-      WHERE PD.EmployeeId = @EmployeeId;
+        SELECT 
+          PD.*, EI.*, ADDRESS.*, CONTACT.*, EDUC.*, EC.*, 
+          PROJ.ProjectId AS ProjectId, PROJ.DUID AS ProjectDUID, PROJ.ProjectCode, 
+          PROJ.ProjectName, PROJ.is_Active,
+          DU.DUID AS DUID, DU.DUCode, DU.DUName AS DUName, DU.Is_Active,
+          DEPT.DepartmentId, DEPT.DepartmentName, DEPT.DUID AS DeptDUID,
+          PROD.*, DEPN.*, SHFT.*,
+          C.ContactNumber AS EmContactPhoneNumber,
+          A.CompleteAddress AS EmContactCompleteAddress,
+          A.HouseNumber AS EmContactHouseNo,
+          A.Barangay AS EmContactBarangay,
+          A.CityMunicipality AS EmContactCityMunicipality,
+          A.Province AS EmContactProvince,
+          A.Region AS EmContactRegion,
+          A.Country AS EmContactCountry,
+          A.ZipCode AS EmContactZipcode,
+          A.LandMark AS EmContactLandMark,
+          A.IsPermanent AS Is_Permanent,
+          A.IsEmergency AS Is_Emergency
+        FROM EmpPersonalDetails AS PD
+        INNER JOIN EmployeeInfo AS EI ON PD.EmployeeId = EI.EmployeeId
+        INNER JOIN Address AS ADDRESS ON PD.EmployeeId = ADDRESS.EmployeeId
+        INNER JOIN Contact AS CONTACT ON PD.EmployeeId = CONTACT.EmployeeId
+        INNER JOIN Education AS EDUC ON PD.EmployeeId = EDUC.EmployeeId
+        LEFT JOIN EmergencyContactNumber AS EC ON PD.EmployeeId = EC.EmployeeId
+        INNER JOIN Contact AS C ON EC.ContactId = C.ContactId
+        INNER JOIN Address AS A ON EC.AddressID = A.AddressID
+        LEFT JOIN Project AS PROJ ON PD.EmployeeId = PROJ.EmployeeId
+        LEFT JOIN Shift AS SHFT ON PD.EmployeeId = SHFT.EmployeeId
+        LEFT JOIN DeliveryUnit AS DU ON PD.EmployeeId = DU.EmployeeId
+        LEFT JOIN Department AS DEPT ON PD.EmployeeId = DEPT.EmployeeId
+        LEFT JOIN Dependent AS DEPN ON PD.EmployeeId = DEPN.EmployeeId
+        LEFT JOIN Product AS PROD ON PD.EmployeeId = PROD.EmployeeId
+        WHERE PD.EmployeeId = @EmployeeId;
       `);
     if (result.recordset.length === 0) {
       return null; // Return null if employee with given ID is not found
@@ -490,8 +437,7 @@ const getEmployeeById = async (employeeId) => {
     console.error("Error fetching employee by ID:", error);
     throw error;
   }
-};
-
+}
 //update employee personal details  by id
 const updateEmployeeById = async (employeeId, updatedEmployeeData) => {
   try {
@@ -541,15 +487,20 @@ const updateEmployeeById = async (employeeId, updatedEmployeeData) => {
           WHERE EmployeeId = @employeeId
         `);
         // Update the contact number in the Contact table first
-    await pool
-    .request()
-    .input("EmployeeId", sql.VarChar, employeeId)
-    .input("ContactNumber", sql.VarChar(255), updatedEmployeeData.ContactNumber)
-    .query(`
-      UPDATE Contact
-      SET ContactNumber = @ContactNumber
-      WHERE EmployeeId = @EmployeeId
-    `);
+        await pool
+        .request()
+        .input("EmployeeId", sql.VarChar, employeeId)
+        .input("ContactNumber", sql.VarChar(255), updatedEmployeeData.ContactNumber)
+        .query(`
+          UPDATE Contact
+          SET ContactNumber = @ContactNumber
+          WHERE EmployeeId = @EmployeeId
+          AND NOT EXISTS (
+            SELECT 1
+            FROM EmergencyContactNumber
+            WHERE ContactId = Contact.ContactId
+          );
+        `);
 
     return result;
   } catch (error) {
@@ -637,25 +588,18 @@ const updateEmployeeAddressById = async (employeeId, updatedEmployeeData) => {
     let result = await pool
       .request()
       .input("EmployeeId", sql.VarChar, employeeId)
+      .input("AddressId", sql.Int, updatedEmployeeData.AddressId)
       .input("HouseNumber", sql.VarChar(255), updatedEmployeeData.HouseNumber)
-      .input(
-        "CompleteAddress",
-        sql.VarChar(255),
-        updatedEmployeeData.CompleteAddress
-      )
+      .input("CompleteAddress", sql.VarChar(255), updatedEmployeeData.CompleteAddress)
       .input("Barangay", sql.VarChar(255), updatedEmployeeData.Barangay)
-      .input(
-        "CityMunicipality",
-        sql.VarChar(255),
-        updatedEmployeeData.CityMunicipality
-      )
+      .input("CityMunicipality", sql.VarChar(255), updatedEmployeeData.CityMunicipality)
       .input("Province", sql.VarChar(255), updatedEmployeeData.Province)
       .input("Region", sql.VarChar(255), updatedEmployeeData.Region)
       .input("Country", sql.VarChar(255), updatedEmployeeData.Country)
       .input("ZipCode", sql.VarChar(255), updatedEmployeeData.ZipCode)
       .input("Landmark", sql.VarChar(255), updatedEmployeeData.Landmark)
-      .input("IsPermanent", sql.Bit, updatedEmployeeData.IsPermanent ? 1 : 0) // Convert boolean to 0 or 1
-      .input("IsEmergency", sql.Bit, updatedEmployeeData.IsEmergency ? 1 : 0) // Convert boolean to 0 or 1
+      .input("IsPermanent", sql.Bit, updatedEmployeeData.IsPermanent ? 1 : 0)
+      .input("IsEmergency", sql.Bit, updatedEmployeeData.IsEmergency ? 1 : 0)
       .query(`
           UPDATE Address 
           SET HouseNumber = @HouseNumber,
@@ -670,6 +614,7 @@ const updateEmployeeAddressById = async (employeeId, updatedEmployeeData) => {
               IsPermanent = @IsPermanent,
               IsEmergency = @IsEmergency
           WHERE EmployeeId = @EmployeeId
+          AND AddressId NOT IN (SELECT AddressId FROM EmergencyContactNumber);
         `);
 
     return result;
@@ -867,6 +812,41 @@ const updateEmployeeDependentById = async (employeeId, updatedEmployeeData) => {
     throw error;
   }
 };
+// Function to insert a new dependent record into the database
+const insertDependent = async (newDependentData) => {
+  try {
+    let pool = await sql.connect(config);
+    let result = await pool
+      .request()
+      .input("FullName", sql.VarChar(255), newDependentData.FullName)
+      .input("PhoneNum", sql.VarChar(255), newDependentData.PhoneNum)
+      .input("Relationship", sql.VarChar(255), newDependentData.Relationship)
+      .input("DateOfBirth", sql.VarChar(255), newDependentData.DateOfBirth)
+      .input("Occupation", sql.VarChar(255), newDependentData.Occupation)
+      .input("Address", sql.VarChar(255), newDependentData.Address)
+      .input("City", sql.VarChar(255), newDependentData.City)
+      .input("DepProvince", sql.VarChar(255), newDependentData.DepProvince)
+      .input("PostalCode", sql.VarChar(255), newDependentData.PostalCode)
+      .input("Beneficiary", sql.VarChar(255), newDependentData.Beneficiary)
+      .input("BeneficiaryDate", sql.VarChar(255), newDependentData.BeneficiaryDate)
+      .input("TypeOfCoverage", sql.VarChar(255), newDependentData.TypeOfCoverage)
+      .input("Insurance", sql.VarChar(255), newDependentData.Insurance)
+      .input("InsuranceDate", sql.VarChar(255), newDependentData.InsuranceDate)
+      .input("Remarks", sql.VarChar(255), newDependentData.Remarks)
+      .input("CompanyPaid", sql.VarChar(255), newDependentData.CompanyPaid)
+      .input("HMOProvider", sql.VarChar(255), newDependentData.HMOProvider)
+      .input("HMOPolicyNumber", sql.VarChar(255), newDependentData.HMOPolicyNumber)
+      .query(`
+          INSERT INTO Dependent (FullName, PhoneNum, Relationship, DateOfBirth, Occupation, Address, City, DepProvince, PostalCode, Beneficiary, BeneficiaryDate, TypeOfCoverage, Insurance, InsuranceDate, Remarks, CompanyPaid, HMOProvider, HMOPolicyNumber)
+          VALUES (@FullName, @PhoneNum, @Relationship, @DateOfBirth, @Occupation, @Address, @City, @DepProvince, @PostalCode, @Beneficiary, @BeneficiaryDate, @TypeOfCoverage, @Insurance, @InsuranceDate, @Remarks, @CompanyPaid, @HMOProvider, @HMOPolicyNumber)
+        `);
+
+    return result;
+  } catch (error) {
+    console.error("Error inserting dependent record:", error);
+    throw error;
+  }
+};
 //update employee product details
 const updateProductById = async (employeeId, updatedEmployeeData) => {
   try {
@@ -889,28 +869,26 @@ const updateProductById = async (employeeId, updatedEmployeeData) => {
     throw error;
   }
 };
-//update employee product details
 const updateEmergencyContactById = async (employeeId, updatedEmployeeData) => {
   try {
     let pool = await sql.connect(config);
 
-    console.log(updatedEmployeeData);
-
-    // Update the address details in the Address table
-    await pool
+    // Update the address details for the emergency contact
+    let addressResult = await pool
       .request()
-      .input("AddressID", sql.Int, updatedEmployeeData.AddressID)
-      .input("HouseNumber", updatedEmployeeData.EmContactHouseNo)
-      .input("CompleteAddress", updatedEmployeeData.EmContactCompleteAddress)
-      .input("Barangay", updatedEmployeeData.EmContactBarangay)
-      .input("CityMunicipality", updatedEmployeeData.EmContactCityMunicipality)
-      .input("Province", updatedEmployeeData.EmContactProvince)
-      .input("Region", updatedEmployeeData.EmContactRegion)
-      .input("Country", updatedEmployeeData.EmContactCountry)
-      .input("Zipcode", updatedEmployeeData.EmContactZipcode)
-      .input("LandMark", updatedEmployeeData.EmContactLandMark)
-      .input("IsPermanent", validateAndConvertBit(updatedEmployeeData.Is_Permanent))
-      .input("IsEmergency", validateAndConvertBit(updatedEmployeeData.Is_Emergency))
+      .input("EmployeeId", sql.VarChar, employeeId)
+      .input("AddressId", sql.Int, updatedEmployeeData.AddressId)
+      .input("HouseNumber", sql.VarChar(255), updatedEmployeeData.EmContactHouseNo)
+      .input("CompleteAddress",  sql.VarChar(255), updatedEmployeeData.EmContactCompleteAddress)
+      .input("Barangay", sql.VarChar(255), updatedEmployeeData.EmContactBarangay)
+      .input("CityMunicipality", sql.VarChar(255), updatedEmployeeData.EmContactCityMunicipality)
+      .input("Province", sql.VarChar(255), updatedEmployeeData.EmContactProvince)
+      .input("Region", sql.VarChar(255), updatedEmployeeData.EmContactRegion)
+      .input("Country", sql.VarChar(255), updatedEmployeeData.EmContactCountry)
+      .input("ZipCode", sql.VarChar(255), updatedEmployeeData.EmContactZipcode)
+      .input("Landmark", sql.VarChar(255), updatedEmployeeData.EmContactLandMark)
+      .input("IsPermanent", sql.Bit, updatedEmployeeData.Is_Permanent ? 1 : 0)
+      .input("IsEmergency", sql.Bit, updatedEmployeeData.Is_Emergency ? 1 : 0.)
       .query(`
           UPDATE Address 
           SET HouseNumber = @HouseNumber,
@@ -920,42 +898,43 @@ const updateEmergencyContactById = async (employeeId, updatedEmployeeData) => {
               Province = @Province,
               Region = @Region,
               Country = @Country,
-              Zipcode = @Zipcode,
-              LandMark = @LandMark,
+              Zipcode = @ZipCode,
+              Landmark = @Landmark,
               IsPermanent = @IsPermanent,
               IsEmergency = @IsEmergency
-          WHERE AddressID = @AddressID
+          WHERE EmployeeId = @EmployeeId
+           AND AddressID IN (SELECT AddressID FROM EmergencyContactNumber)
         `);
 
-    // Update the contact details in the Contact table
-    await pool
-      .request()
-      .input("ContactID", sql.Int, updatedEmployeeData.ContactID)
-      .input("ContactNumber", updatedEmployeeData.EmContactPhoneNumber)
-      .query(`
-          UPDATE Contact 
-          SET ContactNumber = @ContactNumber
-          WHERE ContactID = @ContactID
-        `);
-
-    // Update the emergency contact details in the EmergencyContactNumber table
-    let result = await pool
+    // Update the contact details for the emergency contact
+    let contactResult = await pool
       .request()
       .input("EmployeeId", sql.VarChar, employeeId)
-      .input("EmContactFullName", updatedEmployeeData.EmContactFullName)
+      .input("EmContactFullName", sql.VarChar(255), updatedEmployeeData.EmContactFullName)
       .query(`
           UPDATE EmergencyContactNumber
           SET EmContactFullName = @EmContactFullName
-          WHERE EmployeeId = @EmployeeId
+          WHERE EmployeeId = @EmployeeId;
         `);
 
-    return result;
+    // Update the contact number for the emergency contact
+    let result = await pool
+      .request()
+      .input("EmployeeId", sql.VarChar, employeeId)
+      .input("ContactNumber", sql.VarChar(255), updatedEmployeeData.EmContactPhoneNumber)
+      .query(`
+          UPDATE Contact 
+          SET ContactNumber = @ContactNumber
+          WHERE EmployeeId = @EmployeeId
+          AND ContactId IN (SELECT ContactId FROM EmergencyContactNumber);
+        `);
+
+    return { addressResult, contactResult, result };
   } catch (error) {
-    console.error("Error updating employee emergency contact by ID:", error);
+    console.error("Error updating emergency contact address and details by ID:", error);
     throw error;
   }
 };
-
 //delete employee data
 const deleteEmployeeById = async (employeeId) => {  
   try {
@@ -1060,7 +1039,6 @@ const deleteEmployeeById = async (employeeId) => {
     throw error;
   }
 };
-
 // const deleteEmployeeById = async (employeeId) => {
 //   try {
 //     let pool = await sql.connect(config);
@@ -1142,7 +1120,7 @@ const getPersonalDetailsByUserId = async (UserId) => {
     throw error;
   }
 };
-// // Function to retrieve userId from the database
+ // Function to retrieve userId from the database
 // const getUserData = async (query) => {
 //     try {
 //       const pool = await sql.connect(config); // Assuming 'config' is your database configuration
@@ -1188,7 +1166,6 @@ const getUserData = async (userId) => {
     throw error;
   }
 };
-
 // Function to update profile photo by UserId
 const updateProfilePhoto = async (userId, profilePhoto) => {
   try {
@@ -1265,5 +1242,6 @@ module.exports = {
   updateProductById, 
   deleteEmContactById,
   updateEmergencyContactById,
-  getUserByEmail
+  getUserByEmail,
+  insertDependent
 };

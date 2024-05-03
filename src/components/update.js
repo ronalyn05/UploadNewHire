@@ -177,11 +177,11 @@ const handleInputChange = (e) => {
        // Reload the page after showing the alert
        window.location.reload();
   
-      // Navigate to report.js
-    //   navigate("/reports");
-    } catch (error) {
-      console.error('Error updating employee:', error);
-    }
+      } catch (error) {
+        console.error('Error updating employee personal details:', error);
+        // Send alert message for failure
+        alert('Failed to update employee personal details. Please try again later.');
+      }
   };
   //UPDATE EMPLOYEE INFORMATION
     const handleFormEmpInfoSubmit = async (e) => {
@@ -230,12 +230,11 @@ const handleInputChange = (e) => {
        // Reload the page after showing the alert
        window.location.reload();
 
-       // Navigate to report.js
-    //    navigate("/reports");
-  
-        } catch (error) {
+      } catch (error) {
         console.error('Error updating employee information:', error);
-        }
+        // Send alert message for failure
+        alert('Failed to update employee information. Please try again later.');
+      }
     };
       //UPDATE ADDRESS DETAILS
       const handleAddressFormSubmit = async (e) => {
@@ -437,11 +436,11 @@ const handleInputChange = (e) => {
        // Reload the tab
        window.location.reload();
   
-      // Navigate to report.js
-    //   navigate("/reports");
-    } catch (error) {
-      console.error('Error updating employee:', error);
-    }
+      } catch (error) {
+        console.error('Error updating shift unit details:', error);
+        // Send alert message for failure
+        alert('Failed to update shift unit details. Please try again later.');
+      }
   };
         //UPDATE DELIVERY UNIT 
         const handleDUFormSubmit = async (e) => {
@@ -489,11 +488,11 @@ const handleInputChange = (e) => {
                // Reload the tab
                window.location.reload();
           
-              // Navigate to report.js
-            //   navigate("/reports");
-            } catch (error) {
-              console.error('Error updating employee:', error);
-            }
+              } catch (error) {
+                console.error('Error updating delivery unit details:', error);
+                // Send alert message for failure
+                alert('Failed to update delivery unit details. Please try again later.');
+              }
           };
         //UPDATE DEPARTMENT DETAILS
         const handleDepartmentFormSubmit = async (e) => {
@@ -541,11 +540,11 @@ const handleInputChange = (e) => {
                // Reload the tab
                window.location.reload();
           
-              // Navigate to report.js
-            //   navigate("/reports");
-            } catch (error) {
-              console.error('Error updating employee:', error);
-            }
+              } catch (error) {
+                console.error('Error updating department details:', error);
+                // Send alert message for failure
+                alert('Failed to update department details. Please try again later.');
+              }
           }; 
         //UPDATE DEPENDENT DETAILS
         const handleDependentFormSubmit = async (e) => {
@@ -593,11 +592,11 @@ const handleInputChange = (e) => {
                // Reload the tab
                window.location.reload();
           
-              // Navigate to report.js
-            //   navigate("/reports");
-            } catch (error) {
-              console.error('Error updating employee:', error);
-            }
+              } catch (error) {
+                console.error('Error updating dependent details:', error);
+                // Send alert message for failure
+                alert('Failed to update dependent details. Please try again later.');
+              }
           };
            //UPDATE PRODUCT DETAILS
         const handleProductFormSubmit = async (e) => {
@@ -641,18 +640,69 @@ const handleInputChange = (e) => {
           
               // Display the success message
               alert(successMessage);
-        
-               // Reload the tab
-               window.location.reload();
-          
-              // Navigate to report.js
-            //   navigate("/reports");
-            } catch (error) {
-              console.error('Error updating employee:', error);
-            }
+
+              // Reload the page after showing the alert
+                window.location.reload();
+              } catch (error) {
+                console.error('Error updating product details:', error);
+                // Send alert message for failure
+                alert('Failed to update product details. Please try again later.');
+              }
           };
+  //UPDATE EMERGENCY CONTACT DETAILS
+  const handleECFormSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      //to be removed
+      console.log(this);
+  console.log(employeeData.AddressID);
 
-
+      const response = await fetch(`http://localhost:5000/updateEmerContact/${employeeId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(employeeData)
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update employee emergency contact');
+      }
+  
+      // Retrieve the name of the employee from employeeData
+      const { FirstName, LastName } = employeeData;
+      const employeeName = `${FirstName} ${LastName}`;
+  
+      // Compare initial employeeData with updated employeeData
+      const updatedFields = [];
+      Object.entries(employeeData).forEach(([key, value]) => {
+        if (value !== initialEmployeeData[key]) {
+          updatedFields.push(key);
+        }
+      });
+  
+      // Filter out fields that contain EmployeeName, FirstName, MiddleName, LastName
+      const filteredFields = updatedFields.filter(field => !['EmployeeName', 'FirstName', 'MiddleName', 'LastName'].includes(field));
+  
+      // Generate success message based on updated fields
+      let successMessage;
+      if (filteredFields.length === 0) {
+        successMessage = `No employee emergency contact details have been updated for ${employeeName}.`;
+      } else {
+        successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
+      }
+  
+      // Display the success message
+      alert(successMessage);
+  
+      // Reload the page after showing the alert
+      window.location.reload();
+    } catch (error) {
+      console.error('Error updating employee emergency contact:', error);
+      // Send alert message for failure
+      alert('Failed to update employee emergency contact. Please try again later.');
+    }
+  };
+  
   if (!employeeData) {
     return <div>Loading...</div>;
   }
@@ -728,17 +778,11 @@ const handleInputChange = (e) => {
                                             <input type="text" className="form-control" value={employeeData.EmailAddress} placeholder="enter email address" onChange={handleInputChange} name="EmailAddress" />
                                         </div>
                                     </div>
-                                    {/* <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="contactNumber">Contact Number</label>
-                                            <input type="text" className="form-control" value={employeeData.ContactNumber} onChange={handleInputChange} name="ContactNumber"/>
-                                        </div>
-                                    </div> */}
                                 </div>
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label htmlFor="name">Name</label>
+                                            <label htmlFor="name">Full Name</label>
                                             <input type="text" className="form-control" value={employeeData.EmployeeName} onChange={handleInputChange} name="EmployeeName"/>
                                         </div>
                                     </div>
@@ -1110,12 +1154,12 @@ const handleInputChange = (e) => {
                           <div className="container">
                             <form onSubmit={handleProjectFormSubmit}>
                                 <div className="row justify-content-center">
-                                    <div className="col-md-4">
+                                    {/* <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Project ID</label>
                                             <span className="form-control">{Array.isArray(employeeData.ProjectId) ? employeeData.ProjectId[0] : employeeData.ProjectId} </span>
                                         </div>
-                                    </div>
+                                    </div> */}
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="projectCode">Project Code</label>
@@ -1244,14 +1288,14 @@ const handleInputChange = (e) => {
                           {/* Department Form */}
                           <div className="container">
                             <form onSubmit={handleDepartmentFormSubmit}>
-                                <div className="row justify-content-center">
+                                {/* <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Department ID</label>
                                             <span className="form-control">{Array.isArray(employeeData.DepartmentId) ? employeeData.DepartmentId[0] : employeeData.DepartmentId}</span>
                                         </div>
                                     </div>
-                                    </div>
+                                    </div> */}
                                     <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
@@ -1483,7 +1527,7 @@ const handleInputChange = (e) => {
                       <div className="tab-pane fade" id="emergencyContact" role="tabpanel" aria-labelledby="emergencyContact-tab">
                           {/* Emergency Contact Form */}
                           <div className="container">
-                          <form onSubmit={handleFormSubmit}>
+                          <form onSubmit={handleECFormSubmit}>
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
@@ -1587,15 +1631,9 @@ const handleInputChange = (e) => {
                           <div className="container">
                             <form onSubmit={handleDependentFormSubmit}>
                                 <div className="row justify-content-center">
-                                    {/* <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label>Dependent ID</label>
-                                            <span className="form-control">{employeeData.DependentID}</span>
-                                        </div>
-                                    </div> */}
                                     <div className="col-md-4">
                                         <div className="form-group">
-                                            <label >Dependent Full Name</label>
+                                            <label >Full Name</label>
                                             <input type="text" className="form-control" value={employeeData.FullName} placeholder="enter dependent full name" name="FullName" onChange={handleInputChange} />
                                         </div>
                                     </div>
@@ -1712,7 +1750,16 @@ const handleInputChange = (e) => {
                                               </div>
                                             </div>
                                 </div>
-                                <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
+                                <br/>
+                                  <div className="row justify-content-center">
+                                      <div className="col-md-3">
+                                          <button type="submit" className="btn btn-primary d-block mx-auto ">Save Changes</button>
+                                      </div>
+                                      <div className="col-md-3">
+                                          <button type="submit" className="btn btn-success d-block mx-auto ">Add New Dependent</button>
+                                      </div>
+                                  </div>
+
                             </form>
                         </div>
                       <br/>

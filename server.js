@@ -388,6 +388,18 @@ app.put('/updateDepartment/:employeeId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+// API endpoint for inserting a new dependent record
+app.post('/addDependent/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  const newDependentData = req.body;
+  try {
+    const result = await dbOperation.insertDependent(employeeId, newDependentData);
+    res.json({ message: 'Dependent record added successfully' });
+  } catch (error) {
+    console.error('Error adding dependent record:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 //api endpoint for updating department details
 app.put('/updateDependent/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
@@ -403,7 +415,7 @@ app.put('/updateDependent/:employeeId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-//api endpoint for updating department details
+// API endpoint for updating emergency contact details
 app.put('/updateEmerContact/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
   const updatedEmployeeData = req.body;
@@ -418,6 +430,7 @@ app.put('/updateEmerContact/:employeeId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 // DELETE endpoint to delete an employee by ID
 app.delete('/deleteEmployee/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
