@@ -813,11 +813,12 @@ const updateEmployeeDependentById = async (employeeId, updatedEmployeeData) => {
   }
 };
 // Function to insert a new dependent record into the database
-const insertDependent = async (newDependentData) => {
+const insertDependent = async (employeeId, newDependentData) => {
   try {
     let pool = await sql.connect(config);
     let result = await pool
       .request()
+      .input("EmployeeId", sql.VarChar, employeeId)
       .input("FullName", sql.VarChar(255), newDependentData.FullName)
       .input("PhoneNum", sql.VarChar(255), newDependentData.PhoneNum)
       .input("Relationship", sql.VarChar(255), newDependentData.Relationship)
