@@ -13,7 +13,7 @@ function Dashboard() {
   const [numberOfEmployees, setNumberOfEmployees] = useState(0);
   const [numberOfusers, setNumberOfusers] = useState(0);
 
-  const userName = sessionStorage.getItem("userName");
+  const firstName = sessionStorage.getItem("firstName");
 
   useEffect(() => {
 
@@ -113,7 +113,7 @@ function Dashboard() {
           <div className="container-fluid">
             {/* Welcome Message */}
             <div className="welcome-message">
-              <span>Hi there, {userName}!</span>
+              <span>Hi there, {firstName}!</span>
               <p> Nice to have you here! Let's make today great together!</p>
             </div>
             <br />

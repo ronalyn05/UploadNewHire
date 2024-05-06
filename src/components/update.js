@@ -1768,14 +1768,14 @@ const handleInputChange = (e) => {
                           {/* Project Code Form */}
                           <div className="container">
                             <form onSubmit={handleProductFormSubmit}>
-                                <div className="row justify-content-center">
+                                {/* <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Product ID</label>
                                             <span className="form-control"> {Array.isArray(employeeData.ProdId) ? employeeData.ProdId[0] : employeeData.ProdId} </span>
                                         </div>
                                     </div>
-                                    </div>
+                                    </div> */}
                                     <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">

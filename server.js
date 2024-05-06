@@ -38,26 +38,42 @@ app.use(
   })
 );
 
-// Check if the email already exists
-app.post('/check-email', async (req, res) => {
-  const { Email } = req.body;
-
+// employee data retrieval endpoint
+app.get('/employee/:employeeId', async (req, res) => {
+  const employeeId = req.params.employeeId;
   try {
-      const existingUser = await dbOperation.getUserByEmail(Email);
-      res.status(200).json({ exists: !!existingUser });
+    const existingUser = await dbOperation.getUserEmpId(employeeId);
+      res.status(200).json(existingUser);
   } catch (error) {
-      console.error("Error checking email:", error);
-      res.status(500).json({ error: 'Failed to check email. Please try again later.' });
+      console.error('Error retrieving employee data:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+// Backend API endpoint to check if an employee ID exists
+app.get('/api/checkEmployeeId/:employeeId', async (req, res) => {
+  try {
+    const employeeId = req.params.employeeId;
+    // Perform a query to check if the employeeId exists in the database
+    const existingEmployee = await dbOperation.getUserById(employeeId);
+    if (existingEmployee) {
+      res.status(200).json({ exists: true });
+    } else {
+      res.status(200).json({ exists: false });
+    }
+  } catch (error) {
+    console.error('Error checking employee ID:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
  // Define a POST endpoint for user registration
 app.post('/register', async (req, res) => {
   // Extract user data from the request body
-  const { LastName, FirstName, MiddleName, Email, UserName, Password, Role} = req.body;
+  const { EmployeeId, LastName, FirstName, MiddleName, EmailAddress, Password, Role} = req.body;
 
   // Insert to Database
-  let newEmp = new Employee(LastName, FirstName, MiddleName, Email, UserName, Password, Role);
+  let newEmp = new Employee( EmployeeId, LastName, FirstName, MiddleName, EmailAddress, Password, Role);
 
   try {
       await dbOperation.insertEmployee(newEmp);
@@ -71,10 +87,10 @@ app.post('/register', async (req, res) => {
 
 //post endpoint for user login
 app.post('/login', async (req, res) => {
-  const { Email, Password } = req.body;
+  const { EmployeeId, Password } = req.body;
 
   try {
-    const users = await dbOperation.getEmployees(Email, Password);
+    const users = await dbOperation.getEmployees(EmployeeId, Password);
 
     if (users.length > 0) {
       const user = users[0];
@@ -83,7 +99,7 @@ app.post('/login', async (req, res) => {
       if (isValidPassword) {
         res.status(200).json(user);
       } else {
-        res.status(401).json({ error: 'Incorrect email or password' });
+        res.status(401).json({ error: 'Incorrect employee id or password' });
         
       }
     } else {
@@ -141,9 +157,9 @@ app.post('/login', async (req, res) => {
 const upload = multer();
 
 // API endpoint to update profile photo
-app.post('/api/updatePhoto/:userId', upload.single('profilePhoto'), async (req, res) => {
+app.post('/api/updatePhoto/:employeeId', upload.single('profilePhoto'), async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const employeeId = req.params.employeeId;
     let profilePhoto = '/img/user.png'; // Set default profile photo path
 
     if (req.file) {
@@ -151,57 +167,34 @@ app.post('/api/updatePhoto/:userId', upload.single('profilePhoto'), async (req, 
       profilePhoto = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
     }
 
-    await dbOperation.updateProfilePhoto(userId, profilePhoto);
+    await dbOperation.updateProfilePhoto(employeeId, profilePhoto);
     res.status(200).send("Profile photo updated successfully");
   } catch (err) {
     console.error(err);
     res.status(500).send("Error updating profile photo");
   }
 });
-
-// // API endpoint to update profile photo
-// app.post('/api/updatePhoto/:userId', upload.single('profilePhoto'), async (req, res) => {
-//   try {
-//     const userId = req.params.userId; // Retrieve userId from the request body
-//     console.log(userId);
-//     let profilePhoto = '/img/user.png'; // Set default profile photo path
-
-//     if (req.file) {
-//       // Convert file to base64 string
-//       profilePhoto = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
-//     }
-
-//     await dbOperation.updateProfilePhoto(userId, profilePhoto);
-//     res.status(200).send("Profile photo updated successfully");
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).send("Error updating profile photo");
-//   }
-// });
-
 // API endpoint to update users details
-app.post('/api/updatePersonalDetails/:userId', async (req, res) => {
+app.post('/api/updatePersonalDetails/:employeeId', async (req, res) => {
   try {
-    const userId = req.params.userId;
-    const updatedDetails = req.body;
-
-    // Validate userId here if needed
-
-    await dbOperation.updatePersonalDetails(userId, updatedDetails);
+    const employeeId = req.params.employeeId;
+    const updatedDetails = req.body; // This should contain updated user data
+    await dbOperation.updatePersonalDetails(employeeId, updatedDetails);
     res.status(200).send("Personal details updated successfully");
   } catch (err) {
     console.error(err);
     res.status(500).send("Error updating personal details");
   }
 });
+
 //api endpoint to retrieve the users data
-app.get('/api/getUserData/:userId', async (req, res) => {
+app.get('/api/getUserData/:employeeId', async (req, res) => {
   try {
     // Retrieve userId from the request parameters
-    const userId = req.params.userId;
+    const employeeId = req.params.employeeId;
 
     // Fetch user data from the database based on the userId
-    const userData = await dbOperation.getUserData(userId);
+    const userData = await dbOperation.getUserData(employeeId);
 
     // If no user data found for the provided userId, return an error
     if (!userData) {

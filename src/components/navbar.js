@@ -9,7 +9,7 @@ import { Link, useLocation } from 'react-router-dom';
   // Get user data from location state
   const location = useLocation();
   const data = location.state;
-
+// console.log(data)
      return (
          <ul className="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
              {/* Sidebar - Brand */}

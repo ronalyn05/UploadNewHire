@@ -2,54 +2,69 @@ const config = require("./dbConfig");
 const sql = require("mssql");
 const xlsx = require("xlsx");
 
-const getEmployees = async (Email, Password) => {
+//get employee id and password for login
+const getEmployees = async (EmployeeId, Password) => {
   try {
     let pool = await sql.connect(config);
     let result = await pool
       .request()
-      .input("Email", sql.VarChar, Email)
+      .input("EmployeeId", sql.VarChar, EmployeeId)
       .input("Password", sql.VarChar, Password)
-      .query("SELECT * FROM UserAccount WHERE Email = @Email");
+      .query("SELECT * FROM UserAccount WHERE EmployeeId = @EmployeeId");
 
     return result.recordset;
   } catch (error) {
     throw error;
   }
 };
-// Get user by email address
-const getUserByEmail = async (Email) => {
+// Get user employee id for autofill function
+const getUserEmpId = async (employeeId) => {
   try {
     let pool = await sql.connect(config);
     let result = await pool
       .request()
-      .input("Email", Email)
+      .input("EmployeeId", employeeId)
       .query(`
-          SELECT * FROM UserAccount WHERE Email = @Email;
+          SELECT * FROM EmpPersonalDetails WHERE EmployeeId = @EmployeeId;
       `);
     
     // Return the user if found, or null if not found
     return result.recordset.length > 0 ? result.recordset[0] : null;
   } catch (error) {
-    console.error("Error fetching user by email:", error);
-    throw new Error("Error fetching user by email");
+    console.error("Error fetching employee id:", error);
+    throw new Error("Error fetching employee id");
   }
 };
+// Database operation to retrieve employee by ID
+const getUserById = async (employeeId) => {
+  try {
+    const pool = await sql.connect(); 
+    const request = pool.request();
+    request.input('EmployeeId', sql.VarChar, employeeId);
+    const result = await request.query('SELECT * FROM UserAccount WHERE EmployeeId = @EmployeeId');
+    return result.recordset[0]; 
+  } catch (error) {
+    console.error('Error retrieving employee by ID:', error);
+    throw error;
+  }
+};
+
 // insert user account to USER ACCOUNT table
 const insertEmployee = async (Employee) => {
   try {
     let pool = await sql.connect(config);
     let employee = await pool
       .request()
+      .input("EmployeeId", Employee.EmployeeId)
       .input("LastName", Employee.LastName)
       .input("FirstName", Employee.FirstName)
       .input("MiddleName", Employee.MiddleName)
-      .input("Email", Employee.Email)
-      .input("UserName", Employee.UserName)
+      .input("EmailAddress", Employee.EmailAddress)
       .input("Password", Employee.Password)
       .input("Role", Employee.Role)
       .query(`
-              INSERT INTO UserAccount (LastName, FirstName, MiddleName, Email, UserName, Password, Role)
-              VALUES (@LastName, @FirstName, @MiddleName, @Email, @UserName, @Password, @Role)
+              INSERT INTO UserAccount (EmployeeId, LastName, FirstName, MiddleName, EmailAddress, Password, Role)
+              VALUES (@EmployeeId, @LastName, @FirstName, @MiddleName, @EmailAddress, @Password, @Role)
           `);
     return employee;
   } catch (error) {
@@ -1101,14 +1116,14 @@ const deleteEmContactById = async (emergencyNumId) => {
   }
 };
 // Function to retrieve personal details by UserId
-const getPersonalDetailsByUserId = async (UserId) => {
+const getPersonalDetailsByUserId = async (employeeId) => {
   try {
     let pool = await sql.connect(config);
     let result = await pool
       .request()
-      .input("UserId", sql.Int, UserId)
+      .input("EmployeeId", sql.VarChar, employeeId)
       .query(
-        `SELECT LastName, FirstName, MiddleName, Email, UserName, ISNULL(ProfilePhoto, '/img/user.png') AS ProfilePhoto FROM UserAccount WHERE UserId = @UserId`
+        `SELECT LastName, FirstName, MiddleName, EmailAddress, EmployeeId, ISNULL(ProfilePhoto, '/img/user.png') AS ProfilePhoto FROM UserAccount WHERE EmployeeId = @EmployeeId`
       );
 
     if (result.recordset.length === 0) {
@@ -1121,19 +1136,8 @@ const getPersonalDetailsByUserId = async (UserId) => {
     throw error;
   }
 };
- // Function to retrieve userId from the database
-// const getUserData = async (query) => {
-//     try {
-//       const pool = await sql.connect(config); // Assuming 'config' is your database configuration
-//       const result = await pool.request().query(query);
-//       return result.recordset;
-//     } catch (error) {
-//       console.error('Error retrieving userId from database:', error);
-//       throw error;
-//     }
-//   };
 // Function to retrieve user data from the database based on userId
-const getUserData = async (userId) => {
+const getUserData = async (employeeId) => {
   try {
     // Connect to the database
     const pool = await sql.connect(config);
@@ -1141,17 +1145,17 @@ const getUserData = async (userId) => {
     // SQL query to fetch user data based on userId
     const query = `
       SELECT 
-        UserId, FirstName, LastName, UserName, Email, MiddleName, ISNULL(ProfilePhoto, '/img/user.png') AS ProfilePhoto 
+       FirstName, LastName, EmployeeId, EmailAddress, MiddleName, ISNULL(ProfilePhoto, '/img/user.png') AS ProfilePhoto 
       FROM 
         UserAccount 
       WHERE 
-        UserId = @userId
+      EmployeeId = @EmployeeId
     `;
 
     // Execute the query with the provided userId
     const result = await pool
       .request()
-      .input("userId", sql.Int, userId)
+      .input("EmployeeId", sql.VarChar, employeeId)
       .query(query);
 
     // If user data found, return it
@@ -1168,13 +1172,13 @@ const getUserData = async (userId) => {
   }
 };
 // Function to update profile photo by UserId
-const updateProfilePhoto = async (userId, profilePhoto) => {
+const updateProfilePhoto = async (employeeId, profilePhoto) => {
   try {
     const pool = await sql.connect(config);
     const request = pool.request();
 
-    const query = `UPDATE UserAccount SET ProfilePhoto = @ProfilePhoto WHERE UserId = @UserId`;
-    request.input("UserId", sql.Int, userId);
+    const query = `UPDATE UserAccount SET ProfilePhoto = @ProfilePhoto WHERE EmployeeId = @EmployeeId`;
+    request.input("EmployeeId", sql.VarChar, employeeId);
     request.input("ProfilePhoto", sql.VarChar, profilePhoto);
 
     await request.query(query);
@@ -1185,29 +1189,25 @@ const updateProfilePhoto = async (userId, profilePhoto) => {
   }
 };
 // Database operation to update users details
-const updatePersonalDetails = async (userId, updatedDetails) => {
+const updatePersonalDetails = async (employeeId, updatedDetails) => {
   try {
-    const { FirstName, LastName, MiddleName, Email, UserName } = updatedDetails;
-    const pool = await sql.connect(); // Using already configured connection
+    const { FirstName, LastName, MiddleName, EmailAddress } = updatedDetails;
+    const pool = await sql.connect(); // Establish DB connection
     const request = pool.request();
-
     const query = `
       UPDATE UserAccount 
-      SET 
+      SET
         FirstName = @FirstName,
         LastName = @LastName,
         MiddleName = @MiddleName,
-        Email = @Email,
-        UserName = @UserName
-      WHERE UserId = @UserId
+        EmailAddress = @EmailAddress
+      WHERE EmployeeId = @EmployeeId
     `;
-    request.input("UserId", sql.Int, userId);
+    request.input("EmployeeId", sql.VarChar, employeeId);
     request.input("FirstName", sql.VarChar, FirstName);
     request.input("LastName", sql.VarChar, LastName);
     request.input("MiddleName", sql.VarChar, MiddleName);
-    request.input("Email", sql.VarChar, Email);
-    request.input("UserName", sql.VarChar, UserName);
-
+    request.input("EmailAddress", sql.VarChar, EmailAddress);
     const result = await request.query(query); // Execute the query
     console.log("Personal details updated successfully");
     return result;
@@ -1243,6 +1243,7 @@ module.exports = {
   updateProductById, 
   deleteEmContactById,
   updateEmergencyContactById,
-  getUserByEmail,
+  getUserEmpId,
+  getUserById,
   insertDependent
 };

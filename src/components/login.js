@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 function LoginPage() {
   const [formData, setFormData] = useState({
-    Email: "",
+    EmployeeId: "",
     Password: "",
   });
   const navigate = useNavigate();
@@ -27,9 +27,6 @@ function LoginPage() {
         body: JSON.stringify(formData),
       });
 
-      // if (!response.ok) {
-      //   throw new Error('Login Failed');
-      // }
       if (!response.ok) {
         // If response is not ok, handle the error
         if (response.status === 401) {
@@ -49,10 +46,10 @@ function LoginPage() {
       console.log('Login Successful:', data);
 
       sessionStorage.setItem('userId', data.UserId);
+      sessionStorage.setItem('employeeId', data.EmployeeId);
       sessionStorage.setItem('firstName', data.FirstName);
       sessionStorage.setItem('lastName', data.LastName);
-      sessionStorage.setItem('userName', data.UserName);
-      sessionStorage.setItem('email', data.Email);
+      sessionStorage.setItem('email', data.EmailAddress);
       sessionStorage.setItem('middleName', data.MiddleName);
       sessionStorage.setItem('profilePhoto', data.ProfilePhoto);
       sessionStorage.setItem('role', data.Role);
@@ -70,69 +67,6 @@ function LoginPage() {
             setErrorMessage(error.message || "Login Failed.");
           }
         };
-
-  //     navigate('/dashboard', { state: data });
-  //   } catch (error) {
-  //     console.error('Login Failed:', error);
-  //     setErrorMessage(error.message || 'Login Failed.');
-  //   }
-  // };
-
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-
-//     if (!formData.Email || !formData.Password) {
-//         setErrorMessage("Please enter both email and password");
-//         return;
-//     }
-
-//     try {
-//         const response = await fetch("/login", {
-//             method: "POST",
-//             headers: {
-//                 "Content-Type": "application/json",
-//             },
-//             body: JSON.stringify(formData),
-//         });
-
-//         if (!response.ok) {
-//             throw new Error("Login Failed");
-//         }
-
-//         const data = await response.json();
-
-//         console.log(data);
-
-//         if (!data || !data.UserId) {
-//             throw new Error("Invalid response from server");
-//         }
-
-//         const isValidPassword = await bcrypt.compare(
-//             formData.Password,
-//             data.Password
-//         );
-
-//         if (!isValidPassword) {
-//             throw new Error("Incorrect email or password");
-//         }
-// console.log(this);
-// console.log(data);
-//         sessionStorage.setItem("userId", data.UserId);
-//         sessionStorage.setItem("firstName", data.FirstName);
-//         sessionStorage.setItem("lastName", data.LastName);
-//         sessionStorage.setItem("userName", data.UserName);
-//         sessionStorage.setItem("email", data.Email);
-//         sessionStorage.setItem("middleName", data.MiddleName);
-//         sessionStorage.setItem("profilePhoto", data.ProfilePhoto);
-
-//         navigate("/dashboard", { state: data });
-//     } catch (error) {
-//         console.error("Login Failed", error);
-//         setErrorMessage(error.message || "Login Failed.");
-//     }
-// };
-
 
   useEffect(() => {
     // Manipulate browser history on component mount
@@ -176,13 +110,12 @@ function LoginPage() {
                 <form className="user" onSubmit={handleSubmit}>
                   <div className="form-group">
                     <input
-                      type="email"
+                      type="text"
                       className="form-control form-control-user"
-                      id="Email"
-                      aria-describedby="emailHelp"
-                      placeholder="Enter Email Address..."
+                      id="EmployeeId"
+                      placeholder="Enter Employee Id..."
                       onChange={handleChange}
-                      value={formData.Email}
+                      value={formData.EmployeeId}
                     />
                   </div>
                   <div className="form-group">

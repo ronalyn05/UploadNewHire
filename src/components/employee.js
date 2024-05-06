@@ -11,9 +11,8 @@ function Profile() {
     FirstName: "",
     LastName: "",
     MiddleName: "",
-    UserName: "",
-    Email: "",
-    UserId: "",
+    EmailAddress: "", 
+    EmployeeId: ""
   });
   const navigate = useNavigate();
 
@@ -27,51 +26,53 @@ function Profile() {
 
   const fetchPersonalDetails = useCallback(async () => {
     try {
-      // Retrieve userId from sessionStorage
-      const userId = sessionStorage.getItem("userId");
-      console.log(userId);
+        // Retrieve userId from sessionStorage
+        const employeeId = sessionStorage.getItem("employeeId");
+        console.log(employeeId);
 
-      if (!userId) {
-        throw new Error("UserId not found in sessionStorage");
+        if (!employeeId) {
+          throw new Error('UserId not found in sessionStorage');
+        }
+
+        // Fetch user data from the backend using the userId
+        const response = await axios.get(`/api/getUserData/${employeeId}`);
+        setUserData(response.data);
+
+      } catch (error) {
+        console.error(error);
+        setErrorMessage('Error fetching user data');
       }
-
-      // Fetch user data from the backend using the userId
-      const response = await axios.get(`/api/getUserData/${userId}`);
-      setUserData(response.data);
-    } catch (error) {
-      console.error(error);
-      setErrorMessage("Error fetching user data");
-    }
   }, []);
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
   };
   //handles in saving the profile photo
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    try {
-      // Retrieve userId from the textbox
-      const userId = document.getElementById("userId").value;
+const handleSubmit = async (event) => {
+  event.preventDefault();
+  try {
+    // Retrieve employeeId from the textbox
+    // const employeeId = document.getElementById('employeeId').value;
+    const employeeId = userData.EmployeeId;
 
-      const formData = new FormData();
-      formData.append("profilePhoto", file);
+    const formData = new FormData();
+    formData.append('profilePhoto', file);
 
-      console.log(file);
+    console.log(file);
 
-      // Send POST request to update photo
-      await axios.post(`/api/updatePhoto/${userId}`, formData);
+    // Send POST request to update photo
+    await axios.post(`/api/updatePhoto/${employeeId}`, formData);
 
-      // Show success message to the user
-      alert("Profile photo updated successfully!");
+    // Show success message to the user
+    alert('Profile photo updated successfully!');
 
-      // Reload the page after showing the alert
-      window.location.reload();
-    } catch (err) {
-      console.error(err);
-      setErrorMessage("Error updating profile photo");
-    }
-  };
+    // Reload the page after showing the alert
+    window.location.reload();
+  } catch (err) {
+    console.error(err);
+    setErrorMessage('Error updating profile photo');
+  }
+};
 
   const handleChange = (event) => {
     setUserData({
@@ -82,29 +83,31 @@ function Profile() {
 
   const handleSaveChanges = async (event) => {
     event.preventDefault();
+    
     try {
       // Retrieve userId from the textbox
-      const userId = document.getElementById("userId").value;
-
+      // const employeeId = document.getElementById('employeeId').value;
+      const employeeId = userData.EmployeeId; // Use userData directly
+  
       const updatedDetails = {
         FirstName: userData.FirstName,
         LastName: userData.LastName,
         MiddleName: userData.MiddleName,
-        UserName: userData.UserName,
-        Email: userData.Email,
-        UserId: userId, // Use the userId from the textbox
+        EmailAddress: userData.EmailAddress,
+        EmployeeId: employeeId // Use the userId from the textbox
       };
-
-      await axios.post(`/api/updatePersonalDetails/${userId}`, updatedDetails);
-
+  
+      await axios.post(`/api/updatePersonalDetails/${employeeId}`, updatedDetails);
+    
       // Show success message to the user
-      alert("User data updated successfully!");
+      alert('User data updated successfully!');
 
       // Reload the page after showing the alert
-      window.location.reload();
+    window.location.reload();
+
     } catch (err) {
       console.error(err);
-      setErrorMessage("Error saving changes");
+      setErrorMessage('Error saving changes');
     }
   };
   const handleNavigateToAssistPage = () => {
@@ -177,12 +180,18 @@ function Profile() {
                             </h5>
                             <br />
                             <form className="user" onSubmit={handleSaveChanges}>
-                              <div className="form-group row">
-                                <div className="col-sm-6 mb-3 mb-sm-0">
-                                  <label htmlFor="FirstName">First Name:</label>
+                              <div className="form-group row justify-content-center">
+                              <div className="col-sm-6 mb-3 mb-sm-0">
+                                <label htmlFor="employeeId">Employee Id:</label>
+                                <span className="form-control form-control-user text-center"> {userData.EmployeeId}</span>
+                                </div>
+                              </div>
+                              <div className="form-group row ">
+                              <div className="col-sm-6 mb-3 mb-sm-0 ">
+                                <label htmlFor="FirstName">First Name:</label>
                                   <input
                                     type="text"
-                                    className="form-control form-control-user"
+                                    className="form-control form-control-user text-center"
                                     id="FirstName"
                                     placeholder="First Name"
                                     onChange={handleChange}
@@ -190,33 +199,18 @@ function Profile() {
                                   />
                                 </div>
                                 <div className="col-sm-6">
-                                  <label htmlFor="lastname">Last Name:</label>
+                                <label htmlFor="lastname">Last Name:</label>
                                   <input
                                     type="text"
-                                    className="form-control form-control-user"
+                                    className="form-control form-control-user text-center"
                                     id="LastName"
                                     placeholder="Last Name"
                                     onChange={handleChange}
                                     value={userData.LastName}
                                   />
                                 </div>
-                              </div>
-                              <div className="form-group row">
-                                <div className="col-sm-6 mb-3 mb-sm-0">
-                                  <label htmlFor="middlename">
-                                    Middle Name:
-                                  </label>
-                                  <input
-                                    type="text"
-                                    className="form-control form-control-user"
-                                    id="MiddleName"
-                                    placeholder="Middle Name"
-                                    onChange={handleChange}
-                                    value={userData.MiddleName}
-                                  />
-                                </div>
-                                <div className="col-sm-6">
-                                  <label htmlFor="username">User Name:</label>
+                                {/* <div className="col-sm-6">
+                                <label htmlFor="username">User Name:</label>
                                   <input
                                     type="text"
                                     className="form-control form-control-user"
@@ -225,32 +219,32 @@ function Profile() {
                                     onChange={handleChange}
                                     value={userData.UserName}
                                   />
-                                </div>
+                                </div> */}
                               </div>
                               <div className="form-group row">
-                                <div className="col-sm-6 mb-3 mb-sm-0">
-                                  <label htmlFor="email">Email:</label>
-                                  <input
-                                    type="email"
-                                    className="form-control form-control-user"
-                                    id="Email"
-                                    placeholder="Email Address"
-                                    onChange={handleChange}
-                                    value={userData.Email}
-                                  />
-                                </div>
-                                <div className="col-sm-6">
-                                  <label htmlFor="userid">User Id:</label>
+                              <div className="col-sm-6 mb-3 mb-sm-0">
+                                <label htmlFor="middlename">Middle Name:</label>
                                   <input
                                     type="text"
-                                    className="form-control form-control-user"
-                                    id="userId"
-                                    placeholder="User Id"
+                                    className="form-control form-control-user text-center"
+                                    id="MiddleName"
+                                    placeholder="Middle Name"
                                     onChange={handleChange}
-                                    value={userData.UserId}
-                                    readOnly={true}
+                                    value={userData.MiddleName}
                                   />
                                 </div>
+                                <div className="col-sm-6 mb-3 mb-sm-0">
+                                <label htmlFor="email">Email Address:</label>
+                                <input
+                                  type="email"
+                                  className="form-control form-control-user text-center"
+                                  id="EmailAddress"
+                                  placeholder="Email Address"
+                                  onChange={handleChange}
+                                  value={userData.EmailAddress}
+                                />
+                                </div>
+                                
                               </div>
                               <div className="d-flex justify-content-center">
                                 <div className="col-md-6 d-flex justify-content-center">
