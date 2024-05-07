@@ -23,7 +23,7 @@ const getUserEmpId = async (employeeId) => {
     let pool = await sql.connect(config);
     let result = await pool
       .request()
-      .input("EmployeeId", employeeId)
+      .input("EmployeeId",  sql.VarChar, employeeId)
       .query(`
           SELECT * FROM EmpPersonalDetails WHERE EmployeeId = @EmployeeId;
       `);
@@ -48,7 +48,6 @@ const getUserById = async (employeeId) => {
     throw error;
   }
 };
-
 // insert user account to USER ACCOUNT table
 const insertEmployee = async (Employee) => {
   try {
@@ -967,6 +966,18 @@ const deleteEmployeeById = async (employeeId) => {
         .input("EmployeeId", sql.VarChar, employeeId)
         .query("DELETE FROM EmployeeInfo WHERE EmployeeId = @EmployeeId");
 
+        // Delete from EmergencyContactNumber table
+      await transaction
+      .request()
+      .input("EmployeeId", sql.VarChar, employeeId)
+      .query("DELETE FROM EmergencyContactNumber WHERE EmployeeId = @EmployeeId");
+
+        // Delete from EmergencyContactNumber table
+        await transaction
+        .request()
+        .input("EmployeeId", sql.VarChar, employeeId)
+        .query("DELETE FROM UserAccount WHERE EmployeeId = @EmployeeId");  
+
       // Delete from Address table
       await transaction
         .request()
@@ -978,18 +989,6 @@ const deleteEmployeeById = async (employeeId) => {
         .request()
         .input("EmployeeId", sql.VarChar, employeeId)
         .query("DELETE FROM Education WHERE EmployeeId = @EmployeeId");
-
-      // // Delete from EmergencyContact table
-      // await transaction
-      //   .request()
-      //   .input("EmployeeId", sql.VarChar, employeeId)
-      //   .query("DELETE FROM EmergencyContact WHERE EmployeeId = @EmployeeId");
-
-      // Delete from EmergencyContactNumber table
-      await transaction
-      .request()
-      .input("EmployeeId", sql.VarChar, employeeId)
-      .query("DELETE FROM EmergencyContactNumber WHERE EmployeeId = @EmployeeId");
 
       // Delete from Project table
       await transaction
@@ -1217,6 +1216,35 @@ const updatePersonalDetails = async (employeeId, updatedDetails) => {
   }
 };
 
+const deleteAllFromTable = async (transaction, tableName) => {
+  const query = `DELETE FROM ${tableName}`;
+  await transaction.request().query(query);
+};
+
+const deleteAllEmployeeData = async () => {
+  try {
+    const pool = await sql.connect(config);
+
+    const transaction = new sql.Transaction(pool);
+    await transaction.begin();
+
+    // Delete records from EmployeeInfo table
+    await transaction.request().query("DELETE FROM EmployeeInfo");
+
+    // Delete records from other related tables
+    await deleteAllFromTable(transaction, "EmergencyContactNumber");
+    // Add more table deletions...
+
+    await transaction.commit();
+    await pool.close();
+    
+    return { message: "All employee data deleted successfully" };
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 module.exports = {
   insertEmployee,
   getEmployees,
@@ -1245,5 +1273,6 @@ module.exports = {
   updateEmergencyContactById,
   getUserEmpId,
   getUserById,
-  insertDependent
+  insertDependent,
+  deleteAllEmployeeData
 };

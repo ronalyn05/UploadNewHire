@@ -37,7 +37,6 @@ app.use(
     saveUninitialized: true
   })
 );
-
 // employee data retrieval endpoint
 app.get('/employee/:employeeId', async (req, res) => {
   const employeeId = req.params.employeeId;
@@ -47,6 +46,22 @@ app.get('/employee/:employeeId', async (req, res) => {
   } catch (error) {
       console.error('Error retrieving employee data:', error);
       res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+// Backend API endpoint to check if an employee ID exists
+app.get('/api/checkExistingEmployeeId/:employeeId', async (req, res) => {
+  try {
+    const employeeId = req.params.employeeId;
+    // Perform a query to check if the employeeId exists in the database
+    const existingEmployee = await dbOperation.getUserEmpId(employeeId);
+    if (existingEmployee) {
+      res.status(200).json({ exists: true });
+    } else {
+      res.status(200).json({ exists: false });
+    }
+  } catch (error) {
+    console.error('Error checking employee ID:', error);
+    res.status(500).send('Internal Server Error');
   }
 });
 // Backend API endpoint to check if an employee ID exists
@@ -65,8 +80,6 @@ app.get('/api/checkEmployeeId/:employeeId', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-
-
  // Define a POST endpoint for user registration
 app.post('/register', async (req, res) => {
   // Extract user data from the request body
@@ -84,7 +97,6 @@ app.post('/register', async (req, res) => {
       res.status(500).json({ error: 'Failed to insert employee' });
   }
 });
-
 //post endpoint for user login
 app.post('/login', async (req, res) => {
   const { EmployeeId, Password } = req.body;
@@ -110,7 +122,6 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
 // app.post('/login', async (req, res) => {
 //   // Extract user data from the request body
 //   const { Email, Password } = req.body;
@@ -155,7 +166,6 @@ app.post('/login', async (req, res) => {
 
 // Multer storage configuration
 const upload = multer();
-
 // API endpoint to update profile photo
 app.post('/api/updatePhoto/:employeeId', upload.single('profilePhoto'), async (req, res) => {
   try {
@@ -186,7 +196,6 @@ app.post('/api/updatePersonalDetails/:employeeId', async (req, res) => {
     res.status(500).send("Error updating personal details");
   }
 });
-
 //api endpoint to retrieve the users data
 app.get('/api/getUserData/:employeeId', async (req, res) => {
   try {
@@ -423,7 +432,6 @@ app.put('/updateEmerContact/:employeeId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-
 // DELETE endpoint to delete an employee by ID
 app.delete('/deleteEmployee/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
@@ -436,6 +444,17 @@ app.delete('/deleteEmployee/:employeeId', async (req, res) => {
   } catch (error) {
       console.error('Error deleting employee:', error);
       res.status(500).json({ message: 'Internal server error' });
+  }
+});
+// DELETE endpoint to delete all employee data
+app.delete('/api/deleteAllEmployeeData', async (req, res) => {
+  try {
+    const result = await dbOperation.deleteAllEmployeeData(); // Call the function
+
+    res.status(200).json({ message: result.message });
+  } catch (error) {
+    console.error('Error deleting all employee data:', error);
+    res.status(500).json({ message: 'Failed to delete all employee data. Please try again.' });
   }
 });
 // DELETE endpoint to delete an employee by ID

@@ -47,7 +47,7 @@ function Register() {
             });
         } catch (error) {
             console.error('Error autofilling employee data:', error);
-            setErrorMessage('Employee not found. Please check the Employee ID or contact the HR Admin regarding your employee Id!');
+            setErrorMessage('Employee not found. Please check the Employee ID entered or contact the HR Admin regarding your employee Id!');
         }
     };
 
@@ -82,24 +82,23 @@ function Register() {
             return;
         }
 
-         // Check if the EmployeeId exists
-  try {
-    const response = await fetch(`/api/checkEmployeeId/${formData.EmployeeId}`);
-    if (!response.ok) {
-      throw new Error('Failed to check EmployeeId');
-    }
-    const { exists } = await response.json();
-    if (exists) {
-      setErrorMessage('Employee ID already registered. Please use a different Employee ID.');
-      return;
-    }
-  } catch (error) {
-    console.error('Error checking EmployeeId:', error);
-    setErrorMessage('Failed to check Employee ID. Please try again later.');
-    return;
-  }
+                // Check if the EmployeeId exists
+        try {
+            const response = await fetch(`/api/checkEmployeeId/${formData.EmployeeId}`);
+            if (!response.ok) {
+            throw new Error('Failed to check EmployeeId');
+            }
+            const { exists } = await response.json();
+            if (exists) {
+            setErrorMessage('Employee ID already registered. Please use a different Employee ID.');
+            return;
+            }
+        } catch (error) {
+            console.error('Error checking EmployeeId:', error);
+            setErrorMessage('Failed to check Employee ID. Please try again later.');
+            return;
+        }
 
-    
         try {
             const hashedPassword = await bcrypt.hash(formData.Password, 10);
     

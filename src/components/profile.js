@@ -197,8 +197,8 @@ function Profile() {
                               <div className="form-group row justify-content-center">
                               <div className="col-sm-6 mb-3 mb-sm-0">
                                 <label htmlFor="employeeId">Employee Id:</label>
-                                {/* <span className="form-control font-bold text-center form-control-user"> {userData.EmployeeId}</span> */}
-                                  <input
+                                <span className="form-control font-bold text-center form-control-user"> {userData.EmployeeId}</span>
+                                  {/* <input
                                     type="text"
                                     className="form-control form-control-user"
                                     id="EmployeeId"
@@ -206,7 +206,7 @@ function Profile() {
                                     onChange={handleChange}
                                     value={userData.EmployeeId}
                                     readOnly={true}
-                                  />
+                                  /> */}
                                 </div>
                               </div>
                               <div className="form-group row">

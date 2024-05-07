@@ -136,10 +136,10 @@ const NewHireUpload = () => {
     setEditModalShow(false);
   };
 
-
   const handleSaveData = async () => {
-    console.log("this");
-    console.log(excelData);
+    console.log("Saving data...");
+    console.log("Excel Data:", excelData);
+
     try {
       // Check for null values in any row
       const hasNullValues = excelData.some((row) =>
@@ -147,115 +147,79 @@ const NewHireUpload = () => {
       );
 
       if (hasNullValues) {
-        alert(
+        throw new Error(
           "One or more fields contain null values. Please fill in all fields and use 'N/A' if a field is empty."
         );
-        return;
       }
 
-      // Prompt the user to check the values of bit fields
-      const promptCheckBitFields = () => {
+      // Validate bit fields
+      const validateBitFields = () => {
         const invalidFields = [];
+
         excelData.forEach((row, index) => {
-          if (
-            row.IsManager !== "0" &&
-            row.IsManager !== "1" &&
-            row.IsManager !== 0 &&
-            row.IsManager !== 1
-          ) {
-            invalidFields.push(`IsManager in row ${index + 1}`);
-          }
-          if (
-            row.IsPMPIC !== "0" &&
-            row.IsPMPIC !== "1" &&
-            row.IsPMPIC !== 0 &&
-            row.IsPMPIC !== 1
-          ) {
-            invalidFields.push(`IsPMPIC in row ${index + 1}`);
-          }
-          if (
-            row.IsIndividualContributor !== "0" &&
-            row.IsIndividualContributor !== "1" &&
-            row.IsIndividualContributor !== 0 &&
-            row.IsIndividualContributor !== 1
-          ) {
-            invalidFields.push(`IsIndividualContributor in row ${index + 1}`);
-          }
-          if (
-            row.IsActive !== "0" &&
-            row.IsActive !== "1" &&
-            row.IsActive !== 0 &&
-            row.IsActive !== 1
-          ) {
-            invalidFields.push(`IsActive in row ${index + 1}`);
-          }
-          if (
-            row.Is_Active !== "0" &&
-            row.Is_Active !== "1" &&
-            row.Is_Active !== 0 &&
-            row.Is_Active !== 1
-          ) {
-            invalidFields.push(`Is_Active in row ${index + 1}`);
-          }
-          if (
-            row.is_Active !== "0" &&
-            row.is_Active !== "1" &&
-            row.is_Active !== 0 &&
-            row.is_Active !== 1
-          ) {
-            invalidFields.push(`is_Active in row ${index + 1}`);
-          }
-          if (
-            row.IsDUHead !== "0" &&
-            row.IsDUHead !== "1" &&
-            row.IsDUHead !== 0 &&
-            row.IsDUHead !== 1
-          ) {
-            invalidFields.push(`IsDUHead in row ${index + 1}`);
-          }
-          if (
-            row.IsPermanent !== "0" &&
-            row.IsPermanent !== "1" &&
-            row.IsPermanent !== 0 &&
-            row.IsPermanent !== 1
-          ) {
-            invalidFields.push(`IsPermanent in row ${index + 1}`);
-          }
-          if (
-            row.IsEmergency !== "0" &&
-            row.IsEmergency !== "1" &&
-            row.IsEmergency !== 0 &&
-            row.IsEmergency !== 1
-          ) {
-            invalidFields.push(`IsEmergency in row ${index + 1}`);
-          }
+          const validateField = (fieldName, validValues) => {
+            if (!validValues.includes(row[fieldName])) {
+              invalidFields.push(`${fieldName} in row ${index + 1}`);
+            }
+          };
+
+          validateField("IsManager", ["0", "1", 0, 1]);
+          validateField("IsPMPIC", ["0", "1", 0, 1]);
+          validateField("IsIndividualContributor", ["0", "1", 0, 1]);
+          validateField("IsActive", ["0", "1", 0, 1]);
+          validateField("Is_Active", ["0", "1", 0, 1]);
+          validateField("is_Active", ["0", "1", 0, 1]);
+          validateField("IsDUHead", ["0", "1", 0, 1]);
+          validateField("IsPermanent", ["0", "1", 0, 1]);
+          validateField("IsEmergency", ["0", "1", 0, 1]);
         });
-        // };
+
         if (invalidFields.length > 0) {
-          alert(
-            `Invalid values detected for the following fields:\n${invalidFields.join(
-              "\n"
-            )}`
+          throw new Error(
+            `Invalid values detected:\n${invalidFields.join("\n")}`
           );
-          throw new Error("Invalid values detected");
         }
       };
 
-      promptCheckBitFields();
+      validateBitFields();
 
-      // Convert birthdate to date format before saving
+      // Check for duplicate Employee IDs against backend API
+      const duplicateEmployeeIds = [];
+      for (const row of excelData) {
+        const { EmployeeId } = row;
+        const response = await axios.get(
+          `/api/checkExistingEmployeeId/${EmployeeId}`
+        );
+        if (response.data.exists) {
+          duplicateEmployeeIds.push(EmployeeId);
+        }
+      }
+
+      if (duplicateEmployeeIds.length > 0) {
+        throw new Error(
+          `Duplicate Employee IDs detected: ${duplicateEmployeeIds.join(
+            ", "
+          )}. Each Employee ID must be unique.`
+        );
+      }
+
+      // Format date fields
       const formattedData = excelData.map((row) => {
         const formattedRow = { ...row };
-        // key containing date
-        formattedRow["Birthdate"] = convertExcelDateToDate(row["Birthdate"]);
-        formattedRow["DateHired"] = convertExcelDateToDate(row["DateHired"]);
-        formattedRow["DateTo"] = convertExcelDateToDate(row["DateTo"]);
-        formattedRow["DateFrom"] = convertExcelDateToDate(row["DateFrom"]);
-        formattedRow["DateOfBirth"] = convertExcelDateToDate(row["DateOfBirth"]);
+        const dateFields = [
+          "Birthdate",
+          "DateHired",
+          "DateTo",
+          "DateFrom",
+          "DateOfBirth",
+        ];
+        dateFields.forEach((field) => {
+          formattedRow[field] = convertExcelDateToDate(row[field]);
+        });
         return formattedRow;
       });
 
-      // Make a POST request to the API endpoint for inserting previewed data
+      // Make a POST request to upload data
       const response = await axios.post("/upload", formattedData, {
         headers: {
           "Content-Type": "application/json",
@@ -266,30 +230,45 @@ const NewHireUpload = () => {
         throw new Error("Failed to save data");
       }
 
-      console.log(response.data); // Log the response from the API
+      console.log("Upload response:", response.data);
       alert("Data has been successfully uploaded!");
-      // Navigate to report.js
-      navigate("/reports");
+      navigate("/reports"); // Navigate to report.js after successful upload
     } catch (error) {
-      // Check if the error is due to duplicate parameter names or unique constraint
-      if (error.message.includes("duplicate parameter names")) {
-        // Send an alert message to the client
-        alert(
-          "Duplicate parameter names detected. Please check the input parameters."
-        );
-      } else if (error.message.includes("unique constraint")) {
-        // Check if unique emp id already exists
-        alert("Failed to upload data. Unique employee ID already exists.");
-      } else {
-        // Failed to upload data of certain table(s) in the database
-        alert("Failed to upload data to the database.");
-      }
       console.error("Error occurred while saving data:", error);
-      // Return an appropriate error message
-      return "Error inserting new hire data";
+
+      if (error.message.includes("Duplicate Employee IDs detected")) {
+        // Extract the list of duplicate Employee IDs from the error message
+        const duplicateIds = error.message.match(
+          /Duplicate Employee IDs detected: (.*). Each Employee ID must be unique\./
+        );
+        const duplicateEmployeeIds = duplicateIds
+          ? duplicateIds[1].split(", ")
+          : [];
+
+        if (duplicateEmployeeIds.length > 0) {
+          alert(
+            `Duplicate Employee IDs detected in the uploaded data: ${duplicateEmployeeIds.join(
+              ", "
+            )}. Each Employee ID must be unique.`
+          );
+          return; // Stop further execution to prevent displaying the generic error message
+        }
+      }
+
+      // Handle other types of errors
+      if (error.message.includes("One or more fields contain null values")) {
+        alert(
+          "One or more fields contain null values. Please fill in all fields and use 'N/A' if a field is empty."
+        );
+      } else if (error.message.includes("Failed to save data")) {
+        alert("Failed to save data. Please try again.");
+      } else {
+        alert(
+          `Failed to upload data to the database. An unexpected error occurred. Please try again.`
+        );
+      }
     }
   };
-
 
   return (
     <div>

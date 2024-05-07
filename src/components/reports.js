@@ -3,6 +3,7 @@ import Navbar from "./navbar";
 import TopNavbar from "./topnavbar";
 import Footer from "./footer";
 import {useNavigate } from "react-router-dom";
+// import axios from "axios";
 
 const Reports = () => {
   const navigate = useNavigate();
@@ -15,6 +16,16 @@ const Reports = () => {
     navigate(`/update/${EmployeeId}`);
     // navigate(`/update/${employee.EmpID}`, { state: { employee } });
   };
+// //function to handle on deleting all data in different tables
+// const handleDeleteAllData = async () => {
+//   try {
+//     const response = await axios.delete('/api/deleteAllEmployeeData');
+//     alert(response.data.message);
+//   } catch (error) {
+//     console.error('Error deleting all employee data:', error);
+//     alert('Failed to delete all employee data. Please try again.');
+//   }
+// };
 
   const handleSearchChange = (event) => {
     const { value } = event.target;
@@ -116,6 +127,13 @@ const Reports = () => {
                           />
                         </div>
                       </form>
+                                    {/* <button
+                                      className="update-button btn btn-xs"
+                                      onClick={handleDeleteAllData} // handle to delete all data in different table
+                                    >
+                                      <i className="fas fa-trash-alt"></i>
+                                    </button>
+                                    <span>Delete all data</span> */}
                     </div>
                     <div className="card-body">
                       <div className="table-responsive">
@@ -139,8 +157,6 @@ const Reports = () => {
                               <th scope="col">PHIC</th>
                               <th scope="col">HDMF</th>
                               <th scope="col">TIN</th>
-                              {/* <th scope="col">ADDRESS</th> */}
-                              {/* <th scope="col">HRANID</th> */}
                               <th scope="col">CONTACT NUMBER</th>
                               <th scope="col">EMAIL ADDRESS</th>
                             </tr>
