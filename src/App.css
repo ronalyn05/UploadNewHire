@@ -52,6 +52,11 @@
 .profile-info {
   text-align: left;
 }
+/* label spacing for reports */
+/* Custom CSS for label and span spacing */
+.form-group label {
+  margin-right: 10px; 
+}
 
 /* WELCOME MESSAGE */
 .welcome-message {

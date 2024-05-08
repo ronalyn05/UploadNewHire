@@ -3,6 +3,9 @@ import Navbar from "./navbar";
 import TopNavbar from "./topnavbar";
 import Footer from "./footer";
 import {useNavigate } from "react-router-dom";
+import { Modal, Button } from 'react-bootstrap';
+import jsPDF from 'jspdf';
+import '../App.css';
 // import axios from "axios";
 
 const Reports = () => {
@@ -10,6 +13,8 @@ const Reports = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [employees, setEmployees] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   const handleUpdate = (EmployeeId) => {
     // Redirect to the update page with employee ID as a parameter
@@ -26,6 +31,15 @@ const Reports = () => {
 //     alert('Failed to delete all employee data. Please try again.');
 //   }
 // };
+const handleViewDetails = (employee) => {
+  setSelectedEmployee(employee);
+  setIsModalOpen(true);
+};
+
+const handleCloseModal = () => {
+  setSelectedEmployee(null);
+  setIsModalOpen(false);
+};
 // Effect to filter employee data based on search query
   const handleSearchChange = (event) => {
     const { value } = event.target;
@@ -86,8 +100,62 @@ const Reports = () => {
     // Call the fetchData function when the component mounts
     fetchData();
   }, []); // Empty dependency array to run only once when the component mounts
-  
 
+  //handles the downloaf of pdf file 
+  const handleDownloadPDF = () => {
+    if (!selectedEmployee) return;
+  
+    const doc = new jsPDF();
+    let y = 20;
+
+    doc.setFillColor(65, 105, 225); // background color (royal blue)
+    doc.setTextColor(255); // White text color
+    doc.setFontSize(16);
+    
+    const rectWidth = 190; // Width of the rectangle
+    const textWidth = doc.getStringUnitWidth('PERSONAL DETAILS') * 16; // Calculate text width based on font size
+    const xPosition = (rectWidth - textWidth) / 2 + 4; // Calculate x-coordinate to center the text within the rectangle
+    
+    doc.rect(4, y - 10, rectWidth, 15, 'F'); // Draw a filled rectangle for the background
+    doc.text('PERSONAL DETAILS', xPosition, y); // Centered text
+    y += 20;
+  
+    const employeeInfo = [
+      { label: 'Employee ID:', value: selectedEmployee.EmployeeId },
+      { label: 'Name:', value: selectedEmployee.EmployeeName },
+      { label: 'First Name:', value: selectedEmployee.FirstName },
+      { label: 'Middle Name:', value: selectedEmployee.MiddleName },
+      { label: 'Last Name:', value: selectedEmployee.LastName },
+      { label: 'Maiden Name:', value: selectedEmployee.MaidenName },
+      { label: 'Birthdate:', value: selectedEmployee.Birthdate },
+      { label: 'Age:', value: selectedEmployee.Age },
+      { label: 'Birth Month:', value: selectedEmployee.BirthMonth },
+      { label: 'Age Bracket:', value: selectedEmployee.AgeBracket },
+      { label: 'Gender:', value: selectedEmployee.Gender },
+      { label: 'Marital Status:', value: selectedEmployee.MaritalStatus },
+      { label: 'SSS:', value: selectedEmployee.SSS },
+      { label: 'PHIC:', value: selectedEmployee.PHIC },
+      { label: 'HDMF:', value: selectedEmployee.HDMF },
+      { label: 'TIN:', value: selectedEmployee.TIN },
+      { label: 'Contact Number:', value: selectedEmployee.ContactNumber },
+      { label: 'Email Address:', value: selectedEmployee.EmailAddress }
+    ];
+  
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+  
+    employeeInfo.forEach(({ label, value }) => {
+      doc.setFont('helvetica', 'bold');
+      doc.text(label, 20, y);
+      doc.setFont('helvetica', 'normal');
+      doc.text(value, 80, y);
+      y += 10;
+    });
+  
+    doc.save('employee_details.pdf');
+  };
+  
+  
 
   return (
     <div>
@@ -167,13 +235,19 @@ const Reports = () => {
                                 <tr key={employee.EmployeeId}>
                                   <td>
                                     <button
-                                      className="update-button btn btn-xs"
+                                      className="update-button btn btn-xs mr-2"
                                       onClick={() =>
                                         handleUpdate(employee.EmployeeId)
                                       } // Call handleUpdate with employee ID
                                     >
                                       <i className="fas fa-pencil-alt"></i>
                                     </button>
+                                    <button
+                                    className="btn btn-xs btn-success "
+                                    onClick={() => handleViewDetails(employee)}
+                                  >
+                                    <i className="far fa-eye"></i> 
+                                  </button>
                                   </td>
                                   <td>{employee.EmployeeId}</td>
                                   <td>{employee.EmployeeName}</td>
@@ -218,6 +292,148 @@ const Reports = () => {
         {/* End of Content Wrapper */}
       </div>
       {/* End of Page Wrapper */}
+       {/* Add Dependent Modal */}
+       <Modal show={isModalOpen} onHide={handleCloseModal} dialogClassName="custom-modal">
+            <Modal.Header>
+                <Modal.Title>Employee Information</Modal.Title>
+                <Button variant="default" onClick={handleCloseModal}> X </Button>
+            </Modal.Header>
+            <Modal.Body>
+               <form>
+          {selectedEmployee && (
+            <div>
+              <div className="text-center mb-3 bg-primary text-white p-2">
+          <h5 >PERSONAL DETAILS</h5>
+        </div>
+              <div className="row justify-content-center">
+                <div className="col-md-4">
+                  <div className="form-group">
+                    <label>Employee ID:</label>
+                      <span>{selectedEmployee.EmployeeId}</span><br />
+                      </div>
+                  </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label>Name:</label>
+                    <span>{selectedEmployee.EmployeeName}</span><br /> 
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                    <label>First Name:</label>
+                      <span>{selectedEmployee.FirstName}</span><br />
+                </div>
+              </div>
+            </div>
+            <div className="row justify-content-center">
+                <div className="col-md-4">
+                  <div className="form-group">
+                    <label>Middle Name:</label>
+                      <span>{selectedEmployee.MiddleName}</span><br />
+                  </div>
+                </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                <label>Last Name:</label>
+              <span>{selectedEmployee.LastName}</span><br />
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                <label>Maiden Name:</label>
+              <span>{selectedEmployee.MaidenName}</span><br />
+                </div>
+              </div>
+            </div>
+            <div className="row justify-content-center">
+                <div className="col-md-4">
+                  <div className="form-group">
+                  <label>Birthdate:</label>
+              <span>{selectedEmployee.Birthdate}</span><br />
+                  </div>
+                </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                <label>Age:</label>
+              <span>{selectedEmployee.Age}</span><br />
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                <label>Birth Month:</label>
+              <span>{selectedEmployee.BirthMonth}</span><br />
+                </div>
+              </div>
+            </div>
+            <div className="row justify-content-center">
+                <div className="col-md-4">
+                  <div className="form-group">
+                  <label>Age Bracket:</label>
+              <span>{selectedEmployee.AgeBracket}</span><br />
+                  </div>
+                </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                <label>Gender:</label>
+              <span>{selectedEmployee.Gender}</span><br />
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                <label>Marital Status:</label>
+              <span>{selectedEmployee.MaritalStatus}</span><br />
+                </div>
+              </div>
+            </div>
+            <div className="row justify-content-center">
+                <div className="col-md-4">
+                  <div className="form-group">
+                  <label>SSS:</label>
+              <span>{selectedEmployee.SSS}</span><br />
+                  </div>
+                </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                <label>PHIC:</label>
+              <span>{selectedEmployee.PHIC}</span><br />
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                <label>HDMF:</label>
+              <span>{selectedEmployee.HDMF}</span><br />
+                </div>
+              </div>
+            </div>
+            <div className="row justify-content-center">
+                <div className="col-md-4">
+                  <div className="form-group">
+                  <label>TIN:</label>
+              <span>{selectedEmployee.TIN}</span><br />
+                  </div>
+                </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                <label>Contact Number:</label>
+              <span>{selectedEmployee.ContactNumber}</span><br />
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                <label>Email Address:</label>
+              <span>{selectedEmployee.EmailAddress}</span><br />
+                </div>
+              </div>
+            </div>
+            </div>
+          )}
+          </form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>Close</Button>
+          <Button variant="primary" onClick={handleDownloadPDF}>Download PDF</Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

@@ -1709,389 +1709,386 @@ const handleInputChange = (e) => {
                       </div>
                       <div className="tab-pane fade" id="dependent" role="tabpanel" aria-labelledby="dependent-tab">
                         {/* Dependent Form */}
-                        
                            {/* <div className="container">  */}
                            <div className="card">
-      <div className="card-body d-flex justify-content-between align-items-center">
-        {/* New Record button */}
-        <button className="btn btn-xs btn-success mr-2" onClick={handleShowAddModal}>
-          <i className="fas fa-plus"></i> New Record
-        </button>
+                            <div className="card-body d-flex justify-content-between align-items-center">
+                              {/* New Record button */}
+                              <button className="btn btn-xs btn-success mr-2" onClick={handleShowAddModal}>
+                                <i className="fas fa-plus"></i> New Record
+                              </button>
 
-        {/* Search form */}
-        <form className="form-inline ml-auto">
-          <div className="input-group">
-            <input
-              type="text"
-              className="form-control bg-light border-0 small"
-              placeholder="Search by Name"
-              value={searchQuery}
-              onChange={handleSearchChange}
-            />
-            <div className="input-group-append">
-              <button className="btn btn-primary" type="button">
-                <i className="fas fa-search fa-sm"></i>
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-         
-        {/* Add Dependent Modal */}
-        <Modal show={showAddModal} onHide={handleCloseAddModal} dialogClassName="custom-modal">
-            <Modal.Header>
-                <Modal.Title>Add New Dependent</Modal.Title>
-                <Button variant="default" onClick={handleCloseAddModal}> X </Button>
-            </Modal.Header>
-            <Modal.Body>
-                {/*  adding new dependent form*/}
-                <form >
-                                <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >Full Name</label>
-                                            <input type="text" className="form-control" value={employeeData.FullName} placeholder="enter dependent full name" name="FullName" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >Phone Number</label>
-                                            <input type="tel" className="form-control" value={employeeData.PhoneNum} placeholder="Enter Phone Number" name="PhoneNum" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >Relationship</label>
-                                            <input type="text" className="form-control" value={employeeData.Relationship} placeholder="enter relationship" name="Relationship" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
+                              {/* Search form */}
+                              <form className="form-inline ml-auto">
+                                <div className="input-group">
+                                  <input
+                                    type="text"
+                                    className="form-control bg-light border-0 small"
+                                    placeholder="Search by Name"
+                                    value={searchQuery}
+                                    onChange={handleSearchChange}
+                                  />
+                                  <div className="input-group-append">
+                                    <button className="btn btn-primary" type="button">
+                                      <i className="fas fa-search fa-sm"></i>
+                                    </button>
+                                  </div>
                                 </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label>Date of Birth</label>
-                                            <input type="date" className="form-control" value={employeeData.DateOfBirth} placeholder="enter date of birth" name="DateOfBirth" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >Occupation</label>
-                                            <input type="text" className="form-control" value={employeeData.Occupation} placeholder="enter  occupation" name="Occupation" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >Address</label>
-                                            <input type="text" className="form-control" value={employeeData.Address} placeholder="Enter address" name="Address" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label>City</label>
-                                            <input type="text" className="form-control" value={employeeData.City} placeholder="Enter City" name="City" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label>Province</label>
-                                            <input type="text" className="form-control" value={employeeData.DepProvince} placeholder="Enter Province" name="DepProvince" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                              <div className="form-group">
-                                              <label >Postal Code</label>
-                                              <input type="text" className="form-control" value={employeeData.PostalCode} placeholder="Enter Postal Code" name="PostalCode" onChange={handleInputChange} />
-                                              </div>
-                                            </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >Beneficiary</label>
-                                            <input type="text" className="form-control" value={employeeData.Beneficiary} placeholder="Enter Beneficiary" name="Beneficiary" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                              <div className="form-group">
-                                              <label >Beneficiary Date</label>
-                                              <input type="date" className="form-control" value={employeeData.BeneficiaryDate} placeholder="Enter Beneficiary Date" name="BeneficiaryDate" onChange={handleInputChange} />
-                                              </div>
-                                            </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >Type of coverage</label>
-                                            <input type="text" className="form-control" value={employeeData.TypeOfCoverage} placeholder="Enter Type of coverage" name="TypeOfCoverage" onChange={handleInputChange} />
-                                    </div>
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >Insurance</label>
-                                            <input type="text" className="form-control" value={employeeData.Insurance} placeholder="Enter Insurance" name="Insurance" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >Insurance Date</label>
-                                            <input type="date" className="form-control" value={employeeData.InsuranceDate} placeholder="Enter Insurance Date" name="InsuranceDate" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                              <div className="form-group">
-                                              <label >Remarks</label>
-                                              <input type="text" className="form-control" value={employeeData.Remarks} placeholder="Enter Remarks" name="Remarks" onChange={handleInputChange} />
-                                              </div>
-                                            </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >Company Paid</label>
-                                            <input type="text" className="form-control" value={employeeData.CompanyPaid} placeholder="Enter Company Paid" name="CompanyPaid" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >HMO Provider</label>
-                                            <input type="text" className="form-control" value={employeeData.HMOProvider} placeholder="Enter HMO Provider" name="HMOProvider" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                              <div className="form-group">
-                                              <label >HMO Policy Number</label>
-                                              <input type="text" className="form-control" value={employeeData.HMOPolicyNumber} placeholder="Enter HMO Policy Number" name="HMOPolicyNumber" onChange={handleInputChange} />
-                                              </div>
-                                            </div>
-                                </div>
-                                <br/>
-                 </form>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleCloseAddModal}>
-                    Close
-                </Button>
-                <Button variant="primary" onClick={handleAddDependent}>
-                    Add Dependent
-                </Button>
-            </Modal.Footer>
-        </Modal>
-        {/* Edit Dependent Modal */}
-         {/* Modal for editing dependent */}
-      <Modal show={!!selectedDependent} onHide={handleCloseEditModal} dialogClassName="custom-modal">
-        <Modal.Header>
-          <Modal.Title>Update Dependent Records</Modal.Title>
-          <Button variant="default" onClick={handleCloseEditModal}> X </Button>
-        </Modal.Header>
-        <Modal.Body>
-                {/*  edit dependent form*/}
-                <form>
-                                <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >Full Name</label>
-                                            <input type="text" className="form-control" placeholder="enter dependent full name" value={selectedDependent?.FullName || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, FullName: e.target.value })} />
-                                            {/* <input type="text" className="form-control" value={employeeData.FullName} placeholder="enter dependent full name" name="FullName" onChange={handleInputChange} /> */}
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >Phone Number</label>
-                                            <input type="text" className="form-control" placeholder="Enter Phone Number" value={selectedDependent?.PhoneNum || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, PhoneNum: e.target.value })} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >Relationship</label>
-                                            <input type="text" className="form-control" placeholder="enter relationship" value={selectedDependent?.Relationship || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, Relationship: e.target.value })} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label>Date of Birth</label>
-                                            <input type="text" className="form-control" placeholder="enter date of birth" value={selectedDependent?.DateOfBirth || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, DateOfBirth: e.target.value })} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >Occupation</label>
-                                            <input type="text" className="form-control" placeholder="enter  occupation" value={selectedDependent?.Occupation || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, Occupation: e.target.value })} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >Address</label>
-                                            <input type="text" className="form-control" placeholder="Enter address" value={selectedDependent?.Address || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, Address: e.target.value })}/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label>City</label>
-                                            <input type="text" className="form-control" placeholder="Enter City" value={selectedDependent?.City || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, City: e.target.value })} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label>Province</label>
-                                            <input type="text" className="form-control" placeholder="Enter Province" value={selectedDependent?.DepProvince || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, DepProvince: e.target.value })} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                              <div className="form-group">
-                                              <label >Postal Code</label>
-                                              <input type="text" className="form-control" placeholder="Enter Postal Code" value={selectedDependent?.PostalCode || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, PostalCode: e.target.value })}/>
-                                              </div>
-                                            </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >Beneficiary</label>
-                                            <input type="text" className="form-control" placeholder="Enter Beneficiary" value={selectedDependent?.Beneficiary || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, Beneficiary: e.target.value })}/>
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                              <div className="form-group">
-                                              <label >Beneficiary Date</label>
-                                              <input type="text" className="form-control" placeholder="Enter Beneficiary Date" value={selectedDependent?.BeneficiaryDate || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, BeneficiaryDate: e.target.value })} />
-                                              </div>
-                                            </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >Type of coverage</label>
-                                            <input type="text" className="form-control" placeholder="Enter Type of coverage" value={selectedDependent?.TypeOfCoverage || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, TypeOfCoverage: e.target.value })} />
-                                    </div>
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >Insurance</label>
-                                            <input type="tel" className="form-control" placeholder="Enter Insurance" value={selectedDependent?.Insurance || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, Insurance: e.target.value })} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >Insurance Date</label>
-                                            <input type="text" className="form-control" placeholder="Enter Insurance Date" value={selectedDependent?.InsuranceDate || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, InsuranceDate: e.target.value })} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                              <div className="form-group">
-                                              <label >Remarks</label>
-                                              <input type="text" className="form-control" placeholder="Enter Remarks" value={selectedDependent?.Remarks || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, Remarks: e.target.value })}/>
-                                              </div>
-                                            </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >Company Paid</label>
-                                            <input type="text" className="form-control" placeholder="Enter Company Paid" value={selectedDependent?.CompanyPaid || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, CompanyPaid: e.target.value })} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label >HMO Provider</label>
-                                            <input type="text" className="form-control" placeholder="Enter HMO Provider" value={selectedDependent?.HMOProvider || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, HMOProvider: e.target.value })} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                              <div className="form-group">
-                                              <label >HMO Policy Number</label>
-                                              <input type="text" className="form-control" placeholder="Enter HMO Policy Number" value={selectedDependent?.HMOPolicyNumber || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, HMOPolicyNumber: e.target.value })} />
-                                              </div>
-                                            </div>
-                                </div>
-                                <br/>
-                 </form>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleCloseEditModal}>
-                    Close
-                </Button>
-                <Button variant="primary" onClick={handleDependentFormSubmit}>
-                    Save Changes
-                </Button>
-            </Modal.Footer>
-        </Modal>
-    {/* </div> */}
-                                      {/* Dependent Table */}
-          <div className="card-body">
-            <div className="table-responsive">
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th scope="col">Action</th>
-                    <th scope="col">Full Name</th>
-                    <th scope="col">Phone Number</th>
-                    <th scope="col">Relationship</th>
-                    <th scope="col">Date of Birth</th>
-                    <th scope="col">Occupation</th>
-                    <th scope="col">Address</th>
-                    <th scope="col">City</th>
-                    <th scope="col">Province</th>
-                    <th scope="col">Postal Code</th>
-                    <th scope="col">Beneficiary</th>
-                    <th scope="col">Beneficiary Date</th>
-                    <th scope="col">Type of Coverage</th>
-                    <th scope="col">Insurance</th>
-                    <th scope="col">Insurance Date</th>
-                    <th scope="col">Remarks</th>
-                    <th scope="col">Company Paid</th>
-                    <th scope="col">HMO Provider</th>
-                    <th scope="col">HMO Policy Number</th>
-                  </tr>
-                </thead>
-                <tbody>
-  {filteredDependents.length > 0 ? (
-    filteredDependents.map((dependent, index) => (
-      <tr key={index}>
-        <td>
-        <button className="btn btn-xs btn-primary mr-2" onClick={() => handleShowEditModal(dependent)}>
-                        <i className="fas fa-pencil-alt"></i>Edit
-                      </button>
-          {/* <button className="btn btn-xs btn-primary mr-2" onClick={handleShowEditModal}>
-            <i className="fas fa-pencil-alt"></i>Edit
-          </button> */}
-          </td>
-        <td>{dependent.FullName}</td>
-        <td>{dependent.PhoneNum}</td>
-        <td>{dependent.Relationship}</td>
-        <td>{dependent.DateOfBirth}</td>
-        <td>{dependent.Occupation}</td>
-        <td>{dependent.Address}</td>
-        <td>{dependent.City}</td>
-        <td>{dependent.DepProvince}</td>
-        <td>{dependent.PostalCode}</td>
-        <td>{dependent.Beneficiary}</td>
-        <td>{dependent.BeneficiaryDate}</td>
-        <td>{dependent.TypeOfCoverage}</td>
-        <td>{dependent.Insurance}</td>
-        <td>{dependent.InsuranceDate}</td>
-        <td>{dependent.Remarks}</td>
-        <td>{dependent.CompanyPaid}</td>
-        <td>{dependent.HMOProvider}</td>
-        <td>{dependent.HMOPolicyNumber}</td>
-      </tr>
-    ))
-  ) : (
-    <tr>
-      <td colSpan="19">No dependents data yet.</td>
-    </tr>
-  )}
-</tbody>
+                              </form>
+                            </div>
+                              {/* Add Dependent Modal */}
+                              <Modal show={showAddModal} onHide={handleCloseAddModal} dialogClassName="custom-modal">
+                                  <Modal.Header>
+                                      <Modal.Title>Add New Dependent</Modal.Title>
+                                      <Button variant="default" onClick={handleCloseAddModal}> X </Button>
+                                  </Modal.Header>
+                                  <Modal.Body>
+                                      {/*  adding new dependent form*/}
+                                      <form >
+                                                      <div className="row justify-content-center">
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >Full Name</label>
+                                                                  <input type="text" className="form-control" value={employeeData.FullName} placeholder="enter dependent full name" name="FullName" onChange={handleInputChange} />
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >Phone Number</label>
+                                                                  <input type="tel" className="form-control" value={employeeData.PhoneNum} placeholder="Enter Phone Number" name="PhoneNum" onChange={handleInputChange} />
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >Relationship</label>
+                                                                  <input type="text" className="form-control" value={employeeData.Relationship} placeholder="enter relationship" name="Relationship" onChange={handleInputChange} />
+                                                              </div>
+                                                          </div>
+                                                      </div>
+                                                      <div className="row justify-content-center">
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label>Date of Birth</label>
+                                                                  <input type="date" className="form-control" value={employeeData.DateOfBirth} placeholder="enter date of birth" name="DateOfBirth" onChange={handleInputChange} />
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >Occupation</label>
+                                                                  <input type="text" className="form-control" value={employeeData.Occupation} placeholder="enter  occupation" name="Occupation" onChange={handleInputChange} />
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >Address</label>
+                                                                  <input type="text" className="form-control" value={employeeData.Address} placeholder="Enter address" name="Address" onChange={handleInputChange} />
+                                                              </div>
+                                                          </div>
+                                                      </div>
+                                                      <div className="row justify-content-center">
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label>City</label>
+                                                                  <input type="text" className="form-control" value={employeeData.City} placeholder="Enter City" name="City" onChange={handleInputChange} />
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label>Province</label>
+                                                                  <input type="text" className="form-control" value={employeeData.DepProvince} placeholder="Enter Province" name="DepProvince" onChange={handleInputChange} />
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                                    <div className="form-group">
+                                                                    <label >Postal Code</label>
+                                                                    <input type="text" className="form-control" value={employeeData.PostalCode} placeholder="Enter Postal Code" name="PostalCode" onChange={handleInputChange} />
+                                                                    </div>
+                                                                  </div>
+                                                      </div>
+                                                      <div className="row justify-content-center">
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >Beneficiary</label>
+                                                                  <input type="text" className="form-control" value={employeeData.Beneficiary} placeholder="Enter Beneficiary" name="Beneficiary" onChange={handleInputChange} />
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                                    <div className="form-group">
+                                                                    <label >Beneficiary Date</label>
+                                                                    <input type="date" className="form-control" value={employeeData.BeneficiaryDate} placeholder="Enter Beneficiary Date" name="BeneficiaryDate" onChange={handleInputChange} />
+                                                                    </div>
+                                                                  </div>
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >Type of coverage</label>
+                                                                  <input type="text" className="form-control" value={employeeData.TypeOfCoverage} placeholder="Enter Type of coverage" name="TypeOfCoverage" onChange={handleInputChange} />
+                                                          </div>
+                                                          </div>
+                                                      </div>
+                                                      <div className="row justify-content-center">
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >Insurance</label>
+                                                                  <input type="text" className="form-control" value={employeeData.Insurance} placeholder="Enter Insurance" name="Insurance" onChange={handleInputChange} />
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >Insurance Date</label>
+                                                                  <input type="date" className="form-control" value={employeeData.InsuranceDate} placeholder="Enter Insurance Date" name="InsuranceDate" onChange={handleInputChange} />
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                                    <div className="form-group">
+                                                                    <label >Remarks</label>
+                                                                    <input type="text" className="form-control" value={employeeData.Remarks} placeholder="Enter Remarks" name="Remarks" onChange={handleInputChange} />
+                                                                    </div>
+                                                                  </div>
+                                                      </div>
+                                                      <div className="row justify-content-center">
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >Company Paid</label>
+                                                                  <input type="text" className="form-control" value={employeeData.CompanyPaid} placeholder="Enter Company Paid" name="CompanyPaid" onChange={handleInputChange} />
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >HMO Provider</label>
+                                                                  <input type="text" className="form-control" value={employeeData.HMOProvider} placeholder="Enter HMO Provider" name="HMOProvider" onChange={handleInputChange} />
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                                    <div className="form-group">
+                                                                    <label >HMO Policy Number</label>
+                                                                    <input type="text" className="form-control" value={employeeData.HMOPolicyNumber} placeholder="Enter HMO Policy Number" name="HMOPolicyNumber" onChange={handleInputChange} />
+                                                                    </div>
+                                                                  </div>
+                                                      </div>
+                                                      <br/>
+                                      </form>
+                                  </Modal.Body>
+                                  <Modal.Footer>
+                                      <Button variant="secondary" onClick={handleCloseAddModal}>
+                                          Close
+                                      </Button>
+                                      <Button variant="primary" onClick={handleAddDependent}>
+                                          Add Dependent
+                                      </Button>
+                                  </Modal.Footer>
+                              </Modal>
+                              {/* Edit Dependent Modal */}
+                            <Modal show={!!selectedDependent} onHide={handleCloseEditModal} dialogClassName="custom-modal">
+                              <Modal.Header>
+                                <Modal.Title>Update Dependent Records</Modal.Title>
+                                <Button variant="default" onClick={handleCloseEditModal}> X </Button>
+                              </Modal.Header>
+                              <Modal.Body>
+                                      {/*  edit dependent form*/}
+                                      <form>
+                                                      <div className="row justify-content-center">
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >Full Name</label>
+                                                                  <input type="text" className="form-control" placeholder="enter dependent full name" value={selectedDependent?.FullName || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, FullName: e.target.value })} />
+                                                                  {/* <input type="text" className="form-control" value={employeeData.FullName} placeholder="enter dependent full name" name="FullName" onChange={handleInputChange} /> */}
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >Phone Number</label>
+                                                                  <input type="text" className="form-control" placeholder="Enter Phone Number" value={selectedDependent?.PhoneNum || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, PhoneNum: e.target.value })} />
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >Relationship</label>
+                                                                  <input type="text" className="form-control" placeholder="enter relationship" value={selectedDependent?.Relationship || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, Relationship: e.target.value })} />
+                                                              </div>
+                                                          </div>
+                                                      </div>
+                                                      <div className="row justify-content-center">
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label>Date of Birth</label>
+                                                                  <input type="text" className="form-control" placeholder="enter date of birth" value={selectedDependent?.DateOfBirth || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, DateOfBirth: e.target.value })} />
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >Occupation</label>
+                                                                  <input type="text" className="form-control" placeholder="enter  occupation" value={selectedDependent?.Occupation || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, Occupation: e.target.value })} />
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >Address</label>
+                                                                  <input type="text" className="form-control" placeholder="Enter address" value={selectedDependent?.Address || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, Address: e.target.value })}/>
+                                                              </div>
+                                                          </div>
+                                                      </div>
+                                                      <div className="row justify-content-center">
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label>City</label>
+                                                                  <input type="text" className="form-control" placeholder="Enter City" value={selectedDependent?.City || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, City: e.target.value })} />
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label>Province</label>
+                                                                  <input type="text" className="form-control" placeholder="Enter Province" value={selectedDependent?.DepProvince || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, DepProvince: e.target.value })} />
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                                    <div className="form-group">
+                                                                    <label >Postal Code</label>
+                                                                    <input type="text" className="form-control" placeholder="Enter Postal Code" value={selectedDependent?.PostalCode || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, PostalCode: e.target.value })}/>
+                                                                    </div>
+                                                                  </div>
+                                                      </div>
+                                                      <div className="row justify-content-center">
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >Beneficiary</label>
+                                                                  <input type="text" className="form-control" placeholder="Enter Beneficiary" value={selectedDependent?.Beneficiary || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, Beneficiary: e.target.value })}/>
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                                    <div className="form-group">
+                                                                    <label >Beneficiary Date</label>
+                                                                    <input type="text" className="form-control" placeholder="Enter Beneficiary Date" value={selectedDependent?.BeneficiaryDate || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, BeneficiaryDate: e.target.value })} />
+                                                                    </div>
+                                                                  </div>
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >Type of coverage</label>
+                                                                  <input type="text" className="form-control" placeholder="Enter Type of coverage" value={selectedDependent?.TypeOfCoverage || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, TypeOfCoverage: e.target.value })} />
+                                                          </div>
+                                                          </div>
+                                                      </div>
+                                                      <div className="row justify-content-center">
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >Insurance</label>
+                                                                  <input type="tel" className="form-control" placeholder="Enter Insurance" value={selectedDependent?.Insurance || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, Insurance: e.target.value })} />
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >Insurance Date</label>
+                                                                  <input type="text" className="form-control" placeholder="Enter Insurance Date" value={selectedDependent?.InsuranceDate || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, InsuranceDate: e.target.value })} />
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                                    <div className="form-group">
+                                                                    <label >Remarks</label>
+                                                                    <input type="text" className="form-control" placeholder="Enter Remarks" value={selectedDependent?.Remarks || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, Remarks: e.target.value })}/>
+                                                                    </div>
+                                                                  </div>
+                                                      </div>
+                                                      <div className="row justify-content-center">
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >Company Paid</label>
+                                                                  <input type="text" className="form-control" placeholder="Enter Company Paid" value={selectedDependent?.CompanyPaid || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, CompanyPaid: e.target.value })} />
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                              <div className="form-group">
+                                                                  <label >HMO Provider</label>
+                                                                  <input type="text" className="form-control" placeholder="Enter HMO Provider" value={selectedDependent?.HMOProvider || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, HMOProvider: e.target.value })} />
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-md-4">
+                                                                    <div className="form-group">
+                                                                    <label >HMO Policy Number</label>
+                                                                    <input type="text" className="form-control" placeholder="Enter HMO Policy Number" value={selectedDependent?.HMOPolicyNumber || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, HMOPolicyNumber: e.target.value })} />
+                                                                    </div>
+                                                                  </div>
+                                                      </div>
+                                                      <br/>
+                                      </form>
+                                  </Modal.Body>
+                                  <Modal.Footer>
+                                      <Button variant="secondary" onClick={handleCloseEditModal}>
+                                          Close
+                                      </Button>
+                                      <Button variant="primary" onClick={handleDependentFormSubmit}>
+                                          Save Changes
+                                      </Button>
+                                  </Modal.Footer>
+                              </Modal>
+                          {/* </div> */}
+                                 {/* Dependent Table */}
+                                <div className="card-body">
+                                  <div className="table-responsive">
+                                    <table className="table">
+                                      <thead>
+                                        <tr>
+                                          <th scope="col">Action</th>
+                                          <th scope="col">Full Name</th>
+                                          <th scope="col">Phone Number</th>
+                                          <th scope="col">Relationship</th>
+                                          <th scope="col">Date of Birth</th>
+                                          <th scope="col">Occupation</th>
+                                          <th scope="col">Address</th>
+                                          <th scope="col">City</th>
+                                          <th scope="col">Province</th>
+                                          <th scope="col">Postal Code</th>
+                                          <th scope="col">Beneficiary</th>
+                                          <th scope="col">Beneficiary Date</th>
+                                          <th scope="col">Type of Coverage</th>
+                                          <th scope="col">Insurance</th>
+                                          <th scope="col">Insurance Date</th>
+                                          <th scope="col">Remarks</th>
+                                          <th scope="col">Company Paid</th>
+                                          <th scope="col">HMO Provider</th>
+                                          <th scope="col">HMO Policy Number</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                        {filteredDependents.length > 0 ? (
+                          filteredDependents.map((dependent, index) => (
+                            <tr key={index}>
+                              <td>
+                              <button className="btn btn-xs btn-primary mr-2" onClick={() => handleShowEditModal(dependent)}>
+                                              <i className="fas fa-pencil-alt"></i>Edit
+                                            </button>
+                                {/* <button className="btn btn-xs btn-primary mr-2" onClick={handleShowEditModal}>
+                                  <i className="fas fa-pencil-alt"></i>Edit
+                                </button> */}
+                                </td>
+                              <td>{dependent.FullName}</td>
+                              <td>{dependent.PhoneNum}</td>
+                              <td>{dependent.Relationship}</td>
+                              <td>{dependent.DateOfBirth}</td>
+                              <td>{dependent.Occupation}</td>
+                              <td>{dependent.Address}</td>
+                              <td>{dependent.City}</td>
+                              <td>{dependent.DepProvince}</td>
+                              <td>{dependent.PostalCode}</td>
+                              <td>{dependent.Beneficiary}</td>
+                              <td>{dependent.BeneficiaryDate}</td>
+                              <td>{dependent.TypeOfCoverage}</td>
+                              <td>{dependent.Insurance}</td>
+                              <td>{dependent.InsuranceDate}</td>
+                              <td>{dependent.Remarks}</td>
+                              <td>{dependent.CompanyPaid}</td>
+                              <td>{dependent.HMOProvider}</td>
+                              <td>{dependent.HMOPolicyNumber}</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan="19">No dependents data yet.</td>
+                          </tr>
+                        )}
+                      </tbody>
 
-              </table>
-            </div>
-          </div>
-          </div>
+                                    </table>
+                                  </div>
+                           </div>
+                        </div>
                         {/* </div>  */}
                       <br/>
                       </div>
