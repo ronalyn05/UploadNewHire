@@ -3,10 +3,7 @@ const Employee = require('./dbFiles/employee');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const xlsx = require('xlsx');
-const NewHireEmp = require('./dbFiles/newHireEmp');
 const multer = require('multer');
-const path = require('path');
 const crypto = require('crypto');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
@@ -115,7 +112,7 @@ app.post('/login', async (req, res) => {
         
       }
     } else {
-      res.status(401).json({ error: 'User not found or invalid credentials' });
+      res.status(401).json({ error: 'User not found or invalid credentials. Register your account!' });
     }
   } catch (error) {
     console.error('Login Failed:', error);
@@ -395,28 +392,57 @@ app.post('/addDependent/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
   const newDependentData = req.body;
   try {
-    const result = await dbOperation.insertDependent(employeeId, newDependentData);
+    // const result = await dbOperation.insertDependent(employeeId, newDependentData);
+    await dbOperation.insertDependent(employeeId, newDependentData); // No need to assign to result if not used
     res.json({ message: 'Dependent record added successfully' });
   } catch (error) {
     console.error('Error adding dependent record:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-//api endpoint for updating department details
-app.put('/updateDependent/:employeeId', async (req, res) => {
+// Endpoint to retrieve dependents by Employee ID
+app.get('/retrieve/dependents/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
-  const updatedEmployeeData = req.body;
   try {
-    const result = await dbOperation.updateEmployeeDependentById(employeeId, updatedEmployeeData);
-    if (!result) {
-      return res.status(404).json({ message: 'Employee department details not found' });
-    }
-    res.json({ message: 'Employee department details updated successfully' });
+    const dependents = await dbOperation.getDependentsByEmployeeId(employeeId);
+    res.json(dependents);
   } catch (error) {
-    console.error('Error updating department details:', error);
+    console.error('Error fetching dependents:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+// Endpoint to update dependent details by DependentId
+app.put('/updateDependent/:dependentId', async (req, res) => {
+  const { dependentId } = req.params;
+  const updatedDependentData = req.body;
+
+  try {
+    const result = await dbOperation.updateDependentById(dependentId, updatedDependentData);
+
+    if (!result) {
+      return res.status(404).json({ message: 'Dependent not found' });
+    }
+
+    res.json({ message: 'Dependent details updated successfully' });
+  } catch (error) {
+    console.error('Error updating dependent:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+// app.put('/updateDependent/:employeeId', async (req, res) => {
+//   const { employeeId } = req.params;
+//   const updatedEmployeeData = req.body;
+//   try {
+//     const result = await dbOperation.updateEmployeeDependentById(employeeId, updatedEmployeeData);
+//     if (!result) {
+//       return res.status(404).json({ message: 'Employee department details not found' });
+//     }
+//     res.json({ message: 'Employee department details updated successfully' });
+//   } catch (error) {
+//     console.error('Error updating department details:', error);
+//     res.status(500).json({ message: 'Internal server error' });
+//   }
+// });
 // API endpoint for updating emergency contact details
 app.put('/updateEmerContact/:employeeId', async (req, res) => {
   const { employeeId } = req.params;

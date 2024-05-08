@@ -26,7 +26,7 @@ const Reports = () => {
 //     alert('Failed to delete all employee data. Please try again.');
 //   }
 // };
-
+// Effect to filter employee data based on search query
   const handleSearchChange = (event) => {
     const { value } = event.target;
     setSearchQuery(value);

@@ -93,7 +93,10 @@
  .table th.center {
   text-align: center;
 }
-
+/* button inside the table */
+  .button-cell button {
+    margin-right: 5px; /* Adjust this value to increase or decrease the spacing */
+  }
 /* NewHireUpload css */
 /* App.css */
 

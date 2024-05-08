@@ -4,12 +4,14 @@ import Navbar from './navbar';
 import TopNavbar from './topnavbar';
 import Footer from './footer';
 import '../App.css';
+import { Modal, Button } from 'react-bootstrap';
 
  function UpdateEmployeeInfo() {
   const navigate = useNavigate();
   const { employeeId } = useParams();
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [showAddModal, setShowAddModal] = useState(false);
   const [employeeData, setEmployeeData] = useState({
     EmployeeId: '',
     EmployeeName: '',
@@ -27,7 +29,6 @@ import '../App.css';
     PHIC: '',
     HDMF: '',
     TIN: '',
-    // HRANID: '',
     ContactNumber: '',
     EmailAddress: '',
     is_Active: false,
@@ -43,6 +44,42 @@ import '../App.css';
     Is_Permanent: false
   });
   const [initialEmployeeData, setInitialEmployeeData] = useState({});
+  const [dependents, setDependents] = useState([]);
+  const [selectedDependent, setSelectedDependent] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredDependents, setFilteredDependents] = useState([]);
+
+    // Function to handle input change in the search field
+    const handleSearchChange = (e) => {
+      setSearchQuery(e.target.value);
+    };
+  
+    // Effect to filter dependents based on search query
+    useEffect(() => {
+      const filtered = dependents.filter((dependent) =>
+        dependent.FullName.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredDependents(filtered);
+    }, [searchQuery, dependents]);
+ // Define the fetchDependents function
+ const fetchDependents = async () => {
+  try {
+    const response = await fetch(`http://localhost:5000/retrieve/dependents/${employeeId}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch dependents');
+    }
+    const data = await response.json();
+    setDependents(data);
+  } catch (error) {
+    console.error('Error fetching dependents:', error);
+  }
+};
+
+// Call fetchDependents whenever employeeId changes
+useEffect(() => {
+  fetchDependents();
+  fetchEmployeeData();
+}, [employeeId]);
 
 // Function to format date as 'MM/DD/YYYY'
 const formatDate = (date) => {
@@ -52,56 +89,92 @@ const formatDate = (date) => {
   const day = `${d.getDate()}`.padStart(2, '0');
   return `${month}/${day}/${year}`;
 };
-//FETCHING EMPLOYEE DATA
-useEffect(() => {
-    // Fetch employee data based on employeeId
-    const fetchEmployeeData = async () => {
-      try {
-        const response = await fetch(`http://localhost:5000/retrieve/${employeeId}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch employee data');
-        }
-        const data = await response.json();
-      
-        // Store the initial employee data
-        setInitialEmployeeData(data);
-  
-        // Convert birthdate string to formatted date
-        data.Birthdate = formatDate(data.Birthdate);
-        data.DateHired = formatDate(data.DateHired);
-        data.DateFrom = formatDate(data.DateFrom);
-        data.DateTo = formatDate(data.DateFrom);
-        data.DateOfBirth = formatDate(data.DateOfBirth);
-
-        // To convert all the capital letters in a string to title case (capitalize the first letter of each word)
-        function convertToTitleCase(str) {
-          return str.toLowerCase().replace(/\b\w/g, function (char) {
-            return char.toUpperCase();
-          });
-        }
-  
-        // Convert names to title case before setting in state
-        const formattedData = {
-          ...data,
-          EmployeeName: convertToTitleCase(data.EmployeeName),
-          FirstName: convertToTitleCase(data.FirstName),
-          MiddleName: convertToTitleCase(data.MiddleName),
-          LastName: convertToTitleCase(data.LastName),
-          BirthMonth: convertToTitleCase(data.BirthMonth),
-          MaritalStatus: convertToTitleCase(data.MaritalStatus),
-          Gender: convertToTitleCase(data.Gender),
-        };
-  
-        setEmployeeData(formattedData);
-      } catch (error) {
-        console.error('Error fetching employee data:', error);
-        setErrorMessage('Error fetching employee data');
+  // Function to reset form data
+  const resetFormData = () => {
+    setEmployeeData({
+      FullName: '',
+      PhoneNum: '',
+      Relationship: '',
+      DateOfBirth: '',
+      Occupation: '',
+      Address: '',
+      City: '',
+      DepProvince: '',
+      PostalCode: '',
+      Beneficiary: '',
+      BeneficiaryDate: '',
+      TypeOfCoverage: '',
+      Insurance: '',
+      InsuranceDate: '',
+      Remarks: '',
+      CompanyPaid: '',
+      HMOProvider: '',
+      HMOPolicyNumber: ''
+    });
+  };
+  //Function to handle opening add modal for new dependent records
+const handleShowAddModal = () => {
+  resetFormData(); // Clear form data
+  setShowAddModal(true);
+};
+//Function to handle closing add modal for new dependent records
+const handleCloseAddModal = () => {
+  setShowAddModal(false);
+};
+  // Function to handle opening edit modal and set selected dependent
+  const handleShowEditModal = (dependent) => {
+    // setShowEditModal(true);
+    setSelectedDependent(dependent);
+  };
+  // Function to handle closing edit modal
+  const handleCloseEditModal = () => {
+    // setShowEditModal(false);
+    setSelectedDependent(null);
+  };
+//FETCHING ALL EMPLOYEE DATA EXCLUDING THE DEPENDENT RECORDS BASED ON EMPLOYEE ID
+  const fetchEmployeeData = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/retrieve/${employeeId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch employee data');
       }
-    };
-  
-    fetchEmployeeData();
-  }, [employeeId]);
+      const data = await response.json();
+    
+      // Store the initial employee data
+      setInitialEmployeeData(data);
 
+      // Convert birthdate string to formatted date
+      data.Birthdate = formatDate(data.Birthdate);
+      data.DateHired = formatDate(data.DateHired);
+      data.DateFrom = formatDate(data.DateFrom);
+      data.DateTo = formatDate(data.DateFrom);
+      data.DateOfBirth = formatDate(data.DateOfBirth);
+
+      // To convert all the capital letters in a string to title case (capitalize the first letter of each word)
+      function convertToTitleCase(str) {
+        return str.toLowerCase().replace(/\b\w/g, function (char) {
+          return char.toUpperCase();
+        });
+      }
+
+      // Convert names to title case before setting in state
+      const formattedData = {
+        ...data,
+        EmployeeName: convertToTitleCase(data.EmployeeName),
+        FirstName: convertToTitleCase(data.FirstName),
+        MiddleName: convertToTitleCase(data.MiddleName),
+        LastName: convertToTitleCase(data.LastName),
+        BirthMonth: convertToTitleCase(data.BirthMonth),
+        MaritalStatus: convertToTitleCase(data.MaritalStatus),
+        Gender: convertToTitleCase(data.Gender),
+      };
+
+      setEmployeeData(formattedData);
+    } catch (error) {
+      console.error('Error fetching employee data:', error);
+      setErrorMessage('Error fetching employee data');
+    }
+  };
 //HANDLES INPUT TO UPDATE DATA
 const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -131,7 +204,6 @@ const handleInputChange = (e) => {
       [name]: newValue
     });
   };
-
   //UPDATE EMPLOYEE PERSONAL DETAILS
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -222,7 +294,6 @@ const handleInputChange = (e) => {
     } else {
       successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
     }
-
   
       // Display the success message
       alert(successMessage);
@@ -237,7 +308,7 @@ const handleInputChange = (e) => {
       }
     };
       //UPDATE ADDRESS DETAILS
-      const handleAddressFormSubmit = async (e) => {
+    const handleAddressFormSubmit = async (e) => {
         e.preventDefault(); // Prevent the default form submission
         
         try {
@@ -385,7 +456,8 @@ const handleInputChange = (e) => {
         //   // Navigate to report.js
         //   navigate("/reports");
          // Reload the page after showing the alert
-      window.location.reload();
+        window.location.reload();
+
         } catch (error) {
           console.error('Error updating employee:', error);
         }
@@ -546,58 +618,67 @@ const handleInputChange = (e) => {
                 alert('Failed to update department details. Please try again later.');
               }
           }; 
-        //UPDATE DEPENDENT DETAILS
-        const handleDependentFormSubmit = async (e) => {
-            e.preventDefault();
-            console.log(employeeData);
-            try {
-              const response = await fetch(`http://localhost:5000/updateDependent/${employeeId}`, {
-                method: 'PUT',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(employeeData)
-              });
-              if (!response.ok) {
-                throw new Error('Failed to update dependent details');
-              }
-          
-            // Retrieve the name of the employee from employeeData
-            const { FirstName, LastName } = employeeData;
-            const employeeName = `${FirstName} ${LastName}`;
-        
-            // Compare initial employeeData with updated employeeData
-            const updatedFields = [];
-            Object.entries(employeeData).forEach(([key, value]) => {
-              if (value !== initialEmployeeData[key]) {
-                updatedFields.push(key);
-              }
-            });
-        
-            // Filter out fields that contain EmployeeName, FirstName, MiddleName, LastName
-            const filteredFields = updatedFields.filter(field => !['EmployeeName', 'FirstName', 'MiddleName', 'LastName'].includes(field));
-        
-            // Generate success message based on updated fields
-            let successMessage;
-            if (filteredFields.length === 0) {
-              successMessage = `No dependent details has been updated for ${employeeName}.`;
-            } else {
-              successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
-            }
-        
-          
-              // Display the success message
-              alert(successMessage);
-        
-               // Reload the tab
-               window.location.reload();
-          
-              } catch (error) {
-                console.error('Error updating dependent details:', error);
-                // Send alert message for failure
-                alert('Failed to update dependent details. Please try again later.');
-              }
-          };
+  // Function to handle dependent form submission for update
+  const handleDependentFormSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedDependent || !selectedDependent.DependentID) return;
+      console.log(selectedDependent);
+    try {
+      const response = await fetch(`http://localhost:5000/updateDependent/${selectedDependent.DependentID}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(selectedDependent) // Send updated dependent data
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update dependent details');
+      }
+
+      const data = await response.json();
+      alert(data.message); // Display success message from backend
+      handleCloseEditModal(); // Close modal after successful update
+      fetchDependents(); // Refresh dependents data after update
+
+    } catch (error) {
+      console.error('Error updating dependent details:', error);
+      alert('Failed to update dependent details. Please try again later.');
+    }
+  };
+              //ADD DEPENDENT DETAILS       
+  const handleAddDependent = async (e) => {
+    e.preventDefault();
+
+    try {
+      console.log(employeeData);
+      const response = await fetch(`http://localhost:5000/addDependent/${employeeId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(employeeData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add dependent details');
+      }
+
+      const data = await response.json();
+      alert(data.message); // Display success message from backend
+      handleCloseAddModal(); // Close modal after successful addition
+
+       // Fetch updated dependents data after adding a new dependent
+    fetchDependents(); 
+
+     // Refresh employee data after successful addition
+     fetchEmployeeData();
+
+    } catch (error) {
+      console.error('Error adding dependent:', error);
+      alert('Failed to add dependent. Please try again.');
+    }
+  };
            //UPDATE PRODUCT DETAILS
         const handleProductFormSubmit = async (e) => {
             e.preventDefault();
@@ -655,7 +736,7 @@ const handleInputChange = (e) => {
     try {
       //to be removed
       console.log(this);
-  console.log(employeeData.AddressID);
+  // console.log(employeeData.AddressID);
 
       const response = await fetch(`http://localhost:5000/updateEmerContact/${employeeId}`, {
         method: 'PUT',
@@ -1627,9 +1708,44 @@ const handleInputChange = (e) => {
                       <br/>
                       </div>
                       <div className="tab-pane fade" id="dependent" role="tabpanel" aria-labelledby="dependent-tab">
-                          {/* Dependent Form */}
-                          <div className="container">
-                            <form onSubmit={handleDependentFormSubmit}>
+                        {/* Dependent Form */}
+                        
+                           {/* <div className="container">  */}
+                           <div className="card">
+      <div className="card-body d-flex justify-content-between align-items-center">
+        {/* New Record button */}
+        <button className="btn btn-xs btn-success mr-2" onClick={handleShowAddModal}>
+          <i className="fas fa-plus"></i> New Record
+        </button>
+
+        {/* Search form */}
+        <form className="form-inline ml-auto">
+          <div className="input-group">
+            <input
+              type="text"
+              className="form-control bg-light border-0 small"
+              placeholder="Search by Name"
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
+            <div className="input-group-append">
+              <button className="btn btn-primary" type="button">
+                <i className="fas fa-search fa-sm"></i>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+         
+        {/* Add Dependent Modal */}
+        <Modal show={showAddModal} onHide={handleCloseAddModal} dialogClassName="custom-modal">
+            <Modal.Header>
+                <Modal.Title>Add New Dependent</Modal.Title>
+                <Button variant="default" onClick={handleCloseAddModal}> X </Button>
+            </Modal.Header>
+            <Modal.Body>
+                {/*  adding new dependent form*/}
+                <form >
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
@@ -1640,7 +1756,7 @@ const handleInputChange = (e) => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label >Phone Number</label>
-                                            <input type="text" className="form-control" value={employeeData.PhoneNum} placeholder="Enter Phone Number" name="PhoneNum" onChange={handleInputChange} />
+                                            <input type="tel" className="form-control" value={employeeData.PhoneNum} placeholder="Enter Phone Number" name="PhoneNum" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
@@ -1654,7 +1770,7 @@ const handleInputChange = (e) => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Date of Birth</label>
-                                            <input type="text" className="form-control" value={employeeData.DateOfBirth} placeholder="enter date of birth" name="DateOfBirth" onChange={handleInputChange} />
+                                            <input type="date" className="form-control" value={employeeData.DateOfBirth} placeholder="enter date of birth" name="DateOfBirth" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
@@ -1700,7 +1816,7 @@ const handleInputChange = (e) => {
                                     <div className="col-md-4">
                                               <div className="form-group">
                                               <label >Beneficiary Date</label>
-                                              <input type="text" className="form-control" value={employeeData.BeneficiaryDate} placeholder="Enter Beneficiary Date" name="BeneficiaryDate" onChange={handleInputChange} />
+                                              <input type="date" className="form-control" value={employeeData.BeneficiaryDate} placeholder="Enter Beneficiary Date" name="BeneficiaryDate" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                     <div className="col-md-4">
@@ -1714,13 +1830,13 @@ const handleInputChange = (e) => {
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label >Insurance</label>
-                                            <input type="tel" className="form-control" value={employeeData.Insurance} placeholder="Enter Insurance" name="Insurance" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" value={employeeData.Insurance} placeholder="Enter Insurance" name="Insurance" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label >Insurance Date</label>
-                                            <input type="text" className="form-control" value={employeeData.InsuranceDate} placeholder="Enter Insurance Date" name="InsuranceDate" onChange={handleInputChange} />
+                                            <input type="date" className="form-control" value={employeeData.InsuranceDate} placeholder="Enter Insurance Date" name="InsuranceDate" onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="col-md-4">
@@ -1751,17 +1867,232 @@ const handleInputChange = (e) => {
                                             </div>
                                 </div>
                                 <br/>
-                                  <div className="row justify-content-center">
-                                      <div className="col-md-3">
-                                          <button type="submit" className="btn btn-primary d-block mx-auto ">Save Changes</button>
-                                      </div>
-                                      <div className="col-md-3">
-                                          <button type="submit" className="btn btn-success d-block mx-auto ">Add New Dependent</button>
-                                      </div>
-                                  </div>
+                 </form>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={handleCloseAddModal}>
+                    Close
+                </Button>
+                <Button variant="primary" onClick={handleAddDependent}>
+                    Add Dependent
+                </Button>
+            </Modal.Footer>
+        </Modal>
+        {/* Edit Dependent Modal */}
+         {/* Modal for editing dependent */}
+      <Modal show={!!selectedDependent} onHide={handleCloseEditModal} dialogClassName="custom-modal">
+        <Modal.Header>
+          <Modal.Title>Update Dependent Records</Modal.Title>
+          <Button variant="default" onClick={handleCloseEditModal}> X </Button>
+        </Modal.Header>
+        <Modal.Body>
+                {/*  edit dependent form*/}
+                <form>
+                                <div className="row justify-content-center">
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label >Full Name</label>
+                                            <input type="text" className="form-control" placeholder="enter dependent full name" value={selectedDependent?.FullName || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, FullName: e.target.value })} />
+                                            {/* <input type="text" className="form-control" value={employeeData.FullName} placeholder="enter dependent full name" name="FullName" onChange={handleInputChange} /> */}
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label >Phone Number</label>
+                                            <input type="text" className="form-control" placeholder="Enter Phone Number" value={selectedDependent?.PhoneNum || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, PhoneNum: e.target.value })} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label >Relationship</label>
+                                            <input type="text" className="form-control" placeholder="enter relationship" value={selectedDependent?.Relationship || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, Relationship: e.target.value })} />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="row justify-content-center">
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label>Date of Birth</label>
+                                            <input type="text" className="form-control" placeholder="enter date of birth" value={selectedDependent?.DateOfBirth || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, DateOfBirth: e.target.value })} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label >Occupation</label>
+                                            <input type="text" className="form-control" placeholder="enter  occupation" value={selectedDependent?.Occupation || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, Occupation: e.target.value })} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label >Address</label>
+                                            <input type="text" className="form-control" placeholder="Enter address" value={selectedDependent?.Address || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, Address: e.target.value })}/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="row justify-content-center">
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label>City</label>
+                                            <input type="text" className="form-control" placeholder="Enter City" value={selectedDependent?.City || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, City: e.target.value })} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label>Province</label>
+                                            <input type="text" className="form-control" placeholder="Enter Province" value={selectedDependent?.DepProvince || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, DepProvince: e.target.value })} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                              <div className="form-group">
+                                              <label >Postal Code</label>
+                                              <input type="text" className="form-control" placeholder="Enter Postal Code" value={selectedDependent?.PostalCode || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, PostalCode: e.target.value })}/>
+                                              </div>
+                                            </div>
+                                </div>
+                                <div className="row justify-content-center">
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label >Beneficiary</label>
+                                            <input type="text" className="form-control" placeholder="Enter Beneficiary" value={selectedDependent?.Beneficiary || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, Beneficiary: e.target.value })}/>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                              <div className="form-group">
+                                              <label >Beneficiary Date</label>
+                                              <input type="text" className="form-control" placeholder="Enter Beneficiary Date" value={selectedDependent?.BeneficiaryDate || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, BeneficiaryDate: e.target.value })} />
+                                              </div>
+                                            </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label >Type of coverage</label>
+                                            <input type="text" className="form-control" placeholder="Enter Type of coverage" value={selectedDependent?.TypeOfCoverage || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, TypeOfCoverage: e.target.value })} />
+                                    </div>
+                                    </div>
+                                </div>
+                                <div className="row justify-content-center">
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label >Insurance</label>
+                                            <input type="tel" className="form-control" placeholder="Enter Insurance" value={selectedDependent?.Insurance || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, Insurance: e.target.value })} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label >Insurance Date</label>
+                                            <input type="text" className="form-control" placeholder="Enter Insurance Date" value={selectedDependent?.InsuranceDate || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, InsuranceDate: e.target.value })} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                              <div className="form-group">
+                                              <label >Remarks</label>
+                                              <input type="text" className="form-control" placeholder="Enter Remarks" value={selectedDependent?.Remarks || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, Remarks: e.target.value })}/>
+                                              </div>
+                                            </div>
+                                </div>
+                                <div className="row justify-content-center">
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label >Company Paid</label>
+                                            <input type="text" className="form-control" placeholder="Enter Company Paid" value={selectedDependent?.CompanyPaid || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, CompanyPaid: e.target.value })} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label >HMO Provider</label>
+                                            <input type="text" className="form-control" placeholder="Enter HMO Provider" value={selectedDependent?.HMOProvider || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, HMOProvider: e.target.value })} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                              <div className="form-group">
+                                              <label >HMO Policy Number</label>
+                                              <input type="text" className="form-control" placeholder="Enter HMO Policy Number" value={selectedDependent?.HMOPolicyNumber || ''} onChange={(e) => setSelectedDependent({ ...selectedDependent, HMOPolicyNumber: e.target.value })} />
+                                              </div>
+                                            </div>
+                                </div>
+                                <br/>
+                 </form>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={handleCloseEditModal}>
+                    Close
+                </Button>
+                <Button variant="primary" onClick={handleDependentFormSubmit}>
+                    Save Changes
+                </Button>
+            </Modal.Footer>
+        </Modal>
+    {/* </div> */}
+                                      {/* Dependent Table */}
+          <div className="card-body">
+            <div className="table-responsive">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Action</th>
+                    <th scope="col">Full Name</th>
+                    <th scope="col">Phone Number</th>
+                    <th scope="col">Relationship</th>
+                    <th scope="col">Date of Birth</th>
+                    <th scope="col">Occupation</th>
+                    <th scope="col">Address</th>
+                    <th scope="col">City</th>
+                    <th scope="col">Province</th>
+                    <th scope="col">Postal Code</th>
+                    <th scope="col">Beneficiary</th>
+                    <th scope="col">Beneficiary Date</th>
+                    <th scope="col">Type of Coverage</th>
+                    <th scope="col">Insurance</th>
+                    <th scope="col">Insurance Date</th>
+                    <th scope="col">Remarks</th>
+                    <th scope="col">Company Paid</th>
+                    <th scope="col">HMO Provider</th>
+                    <th scope="col">HMO Policy Number</th>
+                  </tr>
+                </thead>
+                <tbody>
+  {filteredDependents.length > 0 ? (
+    filteredDependents.map((dependent, index) => (
+      <tr key={index}>
+        <td>
+        <button className="btn btn-xs btn-primary mr-2" onClick={() => handleShowEditModal(dependent)}>
+                        <i className="fas fa-pencil-alt"></i>Edit
+                      </button>
+          {/* <button className="btn btn-xs btn-primary mr-2" onClick={handleShowEditModal}>
+            <i className="fas fa-pencil-alt"></i>Edit
+          </button> */}
+          </td>
+        <td>{dependent.FullName}</td>
+        <td>{dependent.PhoneNum}</td>
+        <td>{dependent.Relationship}</td>
+        <td>{dependent.DateOfBirth}</td>
+        <td>{dependent.Occupation}</td>
+        <td>{dependent.Address}</td>
+        <td>{dependent.City}</td>
+        <td>{dependent.DepProvince}</td>
+        <td>{dependent.PostalCode}</td>
+        <td>{dependent.Beneficiary}</td>
+        <td>{dependent.BeneficiaryDate}</td>
+        <td>{dependent.TypeOfCoverage}</td>
+        <td>{dependent.Insurance}</td>
+        <td>{dependent.InsuranceDate}</td>
+        <td>{dependent.Remarks}</td>
+        <td>{dependent.CompanyPaid}</td>
+        <td>{dependent.HMOProvider}</td>
+        <td>{dependent.HMOPolicyNumber}</td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan="19">No dependents data yet.</td>
+    </tr>
+  )}
+</tbody>
 
-                            </form>
-                        </div>
+              </table>
+            </div>
+          </div>
+          </div>
+                        {/* </div>  */}
                       <br/>
                       </div>
                       <div className="tab-pane fade" id="product" role="tabpanel" aria-labelledby="product-tab">

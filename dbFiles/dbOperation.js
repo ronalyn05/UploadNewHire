@@ -413,7 +413,7 @@ const getEmployeeById = async (employeeId) => {
           PROJ.ProjectName, PROJ.is_Active,
           DU.DUID AS DUID, DU.DUCode, DU.DUName AS DUName, DU.Is_Active,
           DEPT.DepartmentId, DEPT.DepartmentName, DEPT.DUID AS DeptDUID,
-          PROD.*, DEPN.*, SHFT.*,
+          PROD.*, SHFT.*,
           C.ContactNumber AS EmContactPhoneNumber,
           A.CompleteAddress AS EmContactCompleteAddress,
           A.HouseNumber AS EmContactHouseNo,
@@ -438,7 +438,6 @@ const getEmployeeById = async (employeeId) => {
         LEFT JOIN Shift AS SHFT ON PD.EmployeeId = SHFT.EmployeeId
         LEFT JOIN DeliveryUnit AS DU ON PD.EmployeeId = DU.EmployeeId
         LEFT JOIN Department AS DEPT ON PD.EmployeeId = DEPT.EmployeeId
-        LEFT JOIN Dependent AS DEPN ON PD.EmployeeId = DEPN.EmployeeId
         LEFT JOIN Product AS PROD ON PD.EmployeeId = PROD.EmployeeId
         WHERE PD.EmployeeId = @EmployeeId;
       `);
@@ -447,6 +446,7 @@ const getEmployeeById = async (employeeId) => {
     }
 
     return result.recordset[0]; // Return the first employee found with the given ID
+
   } catch (error) {
     console.error("Error fetching employee by ID:", error);
     throw error;
@@ -772,60 +772,114 @@ const updateEmployeeDepartmentById = async (employeeId, updatedEmployeeData) => 
     throw error;
   }
 };
-//update employee dependent details
-const updateEmployeeDependentById = async (employeeId, updatedEmployeeData) => {
+// //update employee dependent details
+// const updateEmployeeDependentById = async (employeeId, updatedEmployeeData) => {
+//   try {
+//     let pool = await sql.connect(config);
+//     let result = await pool
+//       .request()
+//       .input("EmployeeId", sql.VarChar, employeeId)
+//       .input("FullName", sql.VarChar(255), updatedEmployeeData.FullName)
+//       .input("PhoneNum", sql.VarChar(255), updatedEmployeeData.PhoneNum)
+//       .input("Relationship", sql.VarChar(255), updatedEmployeeData.Relationship)
+//       .input("DateOfBirth", sql.VarChar(255), updatedEmployeeData.DateOfBirth)
+//       .input("Occupation", sql.VarChar(255), updatedEmployeeData.Occupation)
+//       .input("Address", sql.VarChar(255), updatedEmployeeData.Address)
+//       .input("City", sql.VarChar(255), updatedEmployeeData.City)
+//       .input("DepProvince", sql.VarChar(255), updatedEmployeeData.DepProvince)
+//       .input("PostalCode", sql.VarChar(255), updatedEmployeeData.PostalCode)
+//       .input("Beneficiary", sql.VarChar(255), updatedEmployeeData.Beneficiary)
+//       .input("BeneficiaryDate", sql.VarChar(255), updatedEmployeeData.BeneficiaryDate)
+//       .input("TypeOfCoverage", sql.VarChar(255), updatedEmployeeData.TypeOfCoverage)
+//       .input("Insurance", sql.VarChar(255), updatedEmployeeData.Insurance)
+//       .input("InsuranceDate", sql.VarChar(255), updatedEmployeeData.InsuranceDate)
+//       .input("Remarks", sql.VarChar(255), updatedEmployeeData.Remarks)
+//       .input("CompanyPaid", sql.VarChar(255), updatedEmployeeData.CompanyPaid)
+//       .input("HMOProvider", sql.VarChar(255), updatedEmployeeData.HMOProvider)
+//       .input("HMOPolicyNumber", sql.VarChar(255), updatedEmployeeData.HMOPolicyNumber)
+//       .query(`
+//           UPDATE Dependent 
+//           SET FullName = @FullName,
+//           PhoneNum = @PhoneNum,
+//           Relationship = @Relationship,
+//           DateOfBirth = @DateOfBirth,
+//           Occupation = @Occupation,
+//           Address = @Address,
+//           City = @City,
+//           DepProvince = @DepProvince,
+//           PostalCode = @PostalCode,
+//           Beneficiary = @Beneficiary,
+//           BeneficiaryDate = @BeneficiaryDate,
+//           TypeOfCoverage = @TypeOfCoverage,
+//           Insurance = @Insurance,
+//           InsuranceDate = @InsuranceDate,
+//           Remarks = @Remarks,
+//           CompanyPaid = @CompanyPaid,
+//           HMOProvider = @HMOProvider,
+//           HMOPolicyNumber = @HMOPolicyNumber
+//           WHERE EmployeeId = @EmployeeId
+//         `);
+
+//     return result;
+//   } catch (error) {
+//     console.error("Error updating employee delivery unit by ID:", error);
+//     throw error;
+//   }
+// };
+const updateDependentById = async (dependentId, updatedDependentData) => {
   try {
     let pool = await sql.connect(config);
     let result = await pool
       .request()
-      .input("EmployeeId", sql.VarChar, employeeId)
-      .input("FullName", sql.VarChar(255), updatedEmployeeData.FullName)
-      .input("PhoneNum", sql.VarChar(255), updatedEmployeeData.PhoneNum)
-      .input("Relationship", sql.VarChar(255), updatedEmployeeData.Relationship)
-      .input("DateOfBirth", sql.VarChar(255), updatedEmployeeData.DateOfBirth)
-      .input("Occupation", sql.VarChar(255), updatedEmployeeData.Occupation)
-      .input("Address", sql.VarChar(255), updatedEmployeeData.Address)
-      .input("City", sql.VarChar(255), updatedEmployeeData.City)
-      .input("DepProvince", sql.VarChar(255), updatedEmployeeData.DepProvince)
-      .input("PostalCode", sql.VarChar(255), updatedEmployeeData.PostalCode)
-      .input("Beneficiary", sql.VarChar(255), updatedEmployeeData.Beneficiary)
-      .input("BeneficiaryDate", sql.VarChar(255), updatedEmployeeData.BeneficiaryDate)
-      .input("TypeOfCoverage", sql.VarChar(255), updatedEmployeeData.TypeOfCoverage)
-      .input("Insurance", sql.VarChar(255), updatedEmployeeData.Insurance)
-      .input("InsuranceDate", sql.VarChar(255), updatedEmployeeData.InsuranceDate)
-      .input("Remarks", sql.VarChar(255), updatedEmployeeData.Remarks)
-      .input("CompanyPaid", sql.VarChar(255), updatedEmployeeData.CompanyPaid)
-      .input("HMOProvider", sql.VarChar(255), updatedEmployeeData.HMOProvider)
-      .input("HMOPolicyNumber", sql.VarChar(255), updatedEmployeeData.HMOPolicyNumber)
+      .input("DependentId", sql.Int, dependentId)
+      .input("FullName", sql.VarChar(255), updatedDependentData.FullName)
+      .input("PhoneNum", sql.VarChar(255), updatedDependentData.PhoneNum)
+      .input("Relationship", sql.VarChar(255), updatedDependentData.Relationship)
+      .input("DateOfBirth", sql.VarChar(255), updatedDependentData.DateOfBirth)
+      .input("Occupation", sql.VarChar(255), updatedDependentData.Occupation)
+      .input("Address", sql.VarChar(255), updatedDependentData.Address)
+      .input("City", sql.VarChar(255), updatedDependentData.City)
+      .input("DepProvince", sql.VarChar(255), updatedDependentData.DepProvince)
+      .input("PostalCode", sql.VarChar(255), updatedDependentData.PostalCode)
+      .input("Beneficiary", sql.VarChar(255), updatedDependentData.Beneficiary)
+      .input("BeneficiaryDate", sql.VarChar(255), updatedDependentData.BeneficiaryDate)
+      .input("TypeOfCoverage", sql.VarChar(255), updatedDependentData.TypeOfCoverage)
+      .input("Insurance", sql.VarChar(255), updatedDependentData.Insurance)
+      .input("InsuranceDate", sql.VarChar(255), updatedDependentData.InsuranceDate)
+      .input("Remarks", sql.VarChar(255), updatedDependentData.Remarks)
+      .input("CompanyPaid", sql.VarChar(255), updatedDependentData.CompanyPaid)
+      .input("HMOProvider", sql.VarChar(255), updatedDependentData.HMOProvider)
+      .input("HMOPolicyNumber", sql.VarChar(255), updatedDependentData.HMOPolicyNumber)
       .query(`
           UPDATE Dependent 
           SET FullName = @FullName,
-          PhoneNum = @PhoneNum,
-          Relationship = @Relationship,
-          DateOfBirth = @DateOfBirth,
-          Occupation = @Occupation,
-          Address = @Address,
-          City = @City,
-          DepProvince = @DepProvince,
-          PostalCode = @PostalCode,
-          Beneficiary = @Beneficiary,
-          BeneficiaryDate = @BeneficiaryDate,
-          TypeOfCoverage = @TypeOfCoverage,
-          Insurance = @Insurance,
-          InsuranceDate = @InsuranceDate,
-          Remarks = @Remarks,
-          CompanyPaid = @CompanyPaid,
-          HMOProvider = @HMOProvider,
-          HMOPolicyNumber = @HMOPolicyNumber
-          WHERE EmployeeId = @EmployeeId
+              PhoneNum = @PhoneNum,
+              Relationship = @Relationship,
+              DateOfBirth = @DateOfBirth,
+              Occupation = @Occupation,
+              Address = @Address,
+              City = @City,
+              DepProvince = @DepProvince,
+              PostalCode = @PostalCode,
+              Beneficiary = @Beneficiary,
+              BeneficiaryDate = @BeneficiaryDate,
+              TypeOfCoverage = @TypeOfCoverage,
+              Insurance = @Insurance,
+              InsuranceDate = @InsuranceDate,
+              Remarks = @Remarks,
+              CompanyPaid = @CompanyPaid,
+              HMOProvider = @HMOProvider,
+              HMOPolicyNumber = @HMOPolicyNumber
+          WHERE DependentId = @DependentId
         `);
 
     return result;
   } catch (error) {
-    console.error("Error updating employee delivery unit by ID:", error);
+    console.error("Error updating dependent by ID:", error);
     throw error;
   }
 };
+
 // Function to insert a new dependent record into the database
 const insertDependent = async (employeeId, newDependentData) => {
   try {
@@ -852,8 +906,8 @@ const insertDependent = async (employeeId, newDependentData) => {
       .input("HMOProvider", sql.VarChar(255), newDependentData.HMOProvider)
       .input("HMOPolicyNumber", sql.VarChar(255), newDependentData.HMOPolicyNumber)
       .query(`
-          INSERT INTO Dependent (FullName, PhoneNum, Relationship, DateOfBirth, Occupation, Address, City, DepProvince, PostalCode, Beneficiary, BeneficiaryDate, TypeOfCoverage, Insurance, InsuranceDate, Remarks, CompanyPaid, HMOProvider, HMOPolicyNumber)
-          VALUES (@FullName, @PhoneNum, @Relationship, @DateOfBirth, @Occupation, @Address, @City, @DepProvince, @PostalCode, @Beneficiary, @BeneficiaryDate, @TypeOfCoverage, @Insurance, @InsuranceDate, @Remarks, @CompanyPaid, @HMOProvider, @HMOPolicyNumber)
+          INSERT INTO Dependent (EmployeeId, FullName, PhoneNum, Relationship, DateOfBirth, Occupation, Address, City, DepProvince, PostalCode, Beneficiary, BeneficiaryDate, TypeOfCoverage, Insurance, InsuranceDate, Remarks, CompanyPaid, HMOProvider, HMOPolicyNumber)
+          VALUES (@EmployeeId, @FullName, @PhoneNum, @Relationship, @DateOfBirth, @Occupation, @Address, @City, @DepProvince, @PostalCode, @Beneficiary, @BeneficiaryDate, @TypeOfCoverage, @Insurance, @InsuranceDate, @Remarks, @CompanyPaid, @HMOProvider, @HMOPolicyNumber)
         `);
 
     return result;
@@ -862,6 +916,27 @@ const insertDependent = async (employeeId, newDependentData) => {
     throw error;
   }
 };
+// Retrieve dependents by Employee ID from the database
+const getDependentsByEmployeeId = async (employeeId) => {
+  try {
+    let pool = await sql.connect(config);
+    let result = await pool
+      .request()
+      .input("EmployeeId", sql.VarChar, employeeId)
+      .query(`
+        SELECT *
+        FROM Dependent
+        WHERE EmployeeId = @EmployeeId;
+      `);
+
+    return result.recordset; // Return dependents found with the given EmployeeId
+
+  } catch (error) {
+    console.error("Error fetching dependents by Employee ID:", error);
+    throw error;
+  }
+}
+
 //update employee product details
 const updateProductById = async (employeeId, updatedEmployeeData) => {
   try {
@@ -1267,12 +1342,14 @@ module.exports = {
   updateEmployeeShiftById,
   updateEmployeeDUById,
   updateEmployeeDepartmentById,
-  updateEmployeeDependentById,
+  // updateEmployeeDependentById,
   updateProductById, 
   deleteEmContactById,
   updateEmergencyContactById,
   getUserEmpId,
   getUserById,
   insertDependent,
-  deleteAllEmployeeData
+  deleteAllEmployeeData,
+  getDependentsByEmployeeId,
+  updateDependentById
 };
