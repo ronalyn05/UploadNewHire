@@ -54,9 +54,16 @@
 }
 /* label spacing for reports */
 /* Custom CSS for label and span spacing */
-.form-group label {
-  margin-right: 10px; 
+.blueLabel {
+  color: blue ;
 }
+.labelWithSpacing {
+  margin-right: 10px;
+}
+.valueCenter {
+  text-align: center;
+}
+
 
 /* WELCOME MESSAGE */
 .welcome-message {

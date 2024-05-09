@@ -374,20 +374,21 @@ await pool
 };
 //retrieve personal details
 const getAllNewHireEmployees = async () => {
-try {
-  let pool = await sql.connect(config);
-  let result = await pool.request().query(`
-      SELECT EP.*, C.ContactNumber 
-      FROM EmpPersonalDetails AS EP
-      INNER JOIN Contact AS C ON EP.EmployeeId = C.EmployeeId
-      WHERE C.ContactId NOT IN (SELECT ContactId FROM EmergencyContactNumber);
-  `);
-  return result.recordset;
-} catch (error) {
-  console.error("Error fetching new hire employees:", error);
-  throw error;
-}
-};
+  try {
+    let pool = await sql.connect(config);
+    let result = await pool.request()
+    .query(`
+        SELECT EP.*, C.ContactNumber 
+        FROM EmpPersonalDetails AS EP
+        INNER JOIN Contact AS C ON EP.EmployeeId = C.EmployeeId
+        WHERE C.ContactId NOT IN (SELECT ContactId FROM EmergencyContactNumber);
+    `);
+    return result.recordset;
+  } catch (error) {
+    console.error("Error fetching new hire employees:", error);
+    throw error;
+  }
+  };
 // Retrieve all users account from the database
 const getAllUserAccount = async () => {
   try {
@@ -586,9 +587,6 @@ const updateEmployeeInfoById = async (employeeId, updatedEmployeeData) => {
               PositionLevel = @PositionLevel
           WHERE EmployeeId = @EmployeeId
         `);
-
-        
-
     return result;
   } catch (error) {
     console.error("Error updating employee information by ID:", error);

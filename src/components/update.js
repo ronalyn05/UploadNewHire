@@ -5,6 +5,7 @@ import TopNavbar from './topnavbar';
 import Footer from './footer';
 import '../App.css';
 import { Modal, Button } from 'react-bootstrap';
+import jsPDF from "jspdf";
 
  function UpdateEmployeeInfo() {
   const navigate = useNavigate();
@@ -48,10 +49,15 @@ import { Modal, Button } from 'react-bootstrap';
   const [selectedDependent, setSelectedDependent] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredDependents, setFilteredDependents] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
 
     // Function to handle input change in the search field
     const handleSearchChange = (e) => {
       setSearchQuery(e.target.value);
+    };
+    const handleCloseModal = () => {
+      setIsModalOpen(false);
     };
   
     // Effect to filter dependents based on search query
@@ -783,6 +789,65 @@ const handleInputChange = (e) => {
       alert('Failed to update employee emergency contact. Please try again later.');
     }
   };
+  const handleViewDetails = (employeeData) => {
+    setSelectedEmployee(employeeData);
+    setIsModalOpen(true);
+  };
+
+  
+  //handles the downloaf of pdf file
+  const handleDownloadPDF = () => {
+    if (!selectedEmployee) return;
+
+    const doc = new jsPDF();
+    let y = 20;
+
+    doc.setFillColor(65, 105, 225); // background color (royal blue)
+    doc.setTextColor(255); // White text color
+    doc.setFontSize(16);
+
+    const rectWidth = 190; // Width of the rectangle
+    const textWidth = doc.getStringUnitWidth("PERSONAL DETAILS") * 16; // Calculate text width based on font size
+    const xPosition = (rectWidth - textWidth) / 2 + 4; // Calculate x-coordinate to center the text within the rectangle
+
+    doc.rect(4, y - 10, rectWidth, 15, "F"); // Draw a filled rectangle for the background
+    doc.text("PERSONAL DETAILS", xPosition, y); // Centered text
+    y += 20;
+
+    const employeeInfo = [
+      { label: "Employee ID:", value: selectedEmployee.EmployeeId },
+      { label: "Name:", value: selectedEmployee.EmployeeName },
+      { label: "First Name:", value: selectedEmployee.FirstName },
+      { label: "Middle Name:", value: selectedEmployee.MiddleName },
+      { label: "Last Name:", value: selectedEmployee.LastName },
+      { label: "Maiden Name:", value: selectedEmployee.MaidenName },
+      { label: "Birthdate:", value: selectedEmployee.Birthdate },
+      { label: "Age:", value: selectedEmployee.Age },
+      { label: "Birth Month:", value: selectedEmployee.BirthMonth },
+      { label: "Age Bracket:", value: selectedEmployee.AgeBracket },
+      { label: "Gender:", value: selectedEmployee.Gender },
+      { label: "Marital Status:", value: selectedEmployee.MaritalStatus },
+      { label: "SSS:", value: selectedEmployee.SSS },
+      { label: "PHIC:", value: selectedEmployee.PHIC },
+      { label: "HDMF:", value: selectedEmployee.HDMF },
+      { label: "TIN:", value: selectedEmployee.TIN },
+      { label: "Contact Number:", value: selectedEmployee.ContactNumber },
+      { label: "Email Address:", value: selectedEmployee.EmailAddress },
+    ];
+
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+
+    employeeInfo.forEach(({ label, value }) => {
+      doc.setFont("helvetica", "bold");
+      doc.text(label, 20, y);
+      doc.setFont("helvetica", "normal");
+      doc.text(value, 80, y);
+      y += 10;
+    });
+
+    doc.save("employee_details.pdf");
+  };
   
   if (!employeeData) {
     return <div>Loading...</div>;
@@ -798,6 +863,16 @@ const handleInputChange = (e) => {
           <div className="row justify-content-center">
             <div className="col-xl-12 col-xl-9">
               <div className="card shadow mb-4">
+                <div className='card-body'>
+              <button
+                                      className="btn btn-xs btn-primary "
+                                      onClick={() =>
+                                        handleViewDetails(employeeData)
+                                      }
+                                    >
+                                      <i className="far fa-eye"></i> View Profile
+                                    </button>
+                                    </div>
               <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                   <ul className="nav nav-tabs nav-fill">
                       <li className="nav-item">
@@ -2134,7 +2209,418 @@ const handleInputChange = (e) => {
               </div>
               <Footer />
           </div>
+          <Modal
+        show={isModalOpen}
+        onHide={handleCloseModal}
+        dialogClassName="custom-modal"
+      >
+        <Modal.Header>
+          <Modal.Title>Employee Information</Modal.Title>
+          <Button variant="default" onClick={handleCloseModal}>
+            {" "}
+            X{" "}
+          </Button>
+        </Modal.Header>
+        <Modal.Body>
+          <form>
+            {selectedEmployee && (
+              <div>
+                <div className="text-center mb-3 bg-primary text-white p-2">
+                  <h5>PERSONAL DETAILS</h5>
+                </div>
+                <div className="row justify-content-center">
+                <div className="col-md-4">
+                  <div className="form-group">
+                    <label className="blueLabel labelWithSpacing">Employee ID/BADGE NO:</label>
+                    <span className="valueCenter">{Array.isArray(selectedEmployee.EmployeeId) ? selectedEmployee.EmployeeId[0] : selectedEmployee.EmployeeId}</span>
+                    <br />
+                  </div>
+                </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Name:</label>
+                      <span className="valueCenter">{selectedEmployee.EmployeeName}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">First Name:</label>
+                      <span className="valueCenter">{selectedEmployee.FirstName}</span>
+                      <br />
+                    </div>
+                  </div>
+                </div>
+                <div className="row justify-content-center">
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Middle Name:</label>
+                      <span className="valueCenter">{selectedEmployee.MiddleName}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Last Name:</label>
+                      <span className="valueCenter">{selectedEmployee.LastName}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Maiden Name:</label>
+                      <span className="valueCenter">{selectedEmployee.MaidenName}</span>
+                      <br />
+                    </div>
+                  </div>
+                </div>
+                <div className="row justify-content-center">
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Birthdate:</label>
+                      <span className="valueCenter">{selectedEmployee.Birthdate}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Age:</label>
+                      <span>{selectedEmployee.Age}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Birth Month:</label>
+                      <span className="valueCenter">{selectedEmployee.BirthMonth}</span>
+                      <br />
+                    </div>
+                  </div>
+                </div>
+                <div className="row justify-content-center">
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Age Bracket:</label>
+                      <span>{selectedEmployee.AgeBracket}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Gender:</label>
+                      <span className="valueCenter">{selectedEmployee.Gender}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Marital Status:</label>
+                      <span className="valueCenter">{selectedEmployee.MaritalStatus}</span>
+                      <br />
+                    </div>
+                  </div>
+                </div>
+                <div className="row justify-content-center">
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">SSS:</label>
+                      <span className="valueCenter">{selectedEmployee.SSS}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">PHIC:</label>
+                      <span className="valueCenter">{selectedEmployee.PHIC}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">HDMF:</label>
+                      <span className="valueCenter">{selectedEmployee.HDMF}</span>
+                      <br />
+                    </div>
+                  </div>
+                </div>
+                <div className="row justify-content-center">
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">TIN:</label>
+                      <span className="valueCenter">{selectedEmployee.TIN}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Contact Number:</label>
+                      <span className="valueCenter">{selectedEmployee.ContactNumber}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Email Address:</label>
+                      <span className="valueCenter">{selectedEmployee.EmailAddress}</span>
+                      <br />
+                    </div>
+                  </div>
+                </div>
+              {/* EMPLOYEE INFORMATION */}
+            <div className="text-center mb-3 bg-primary text-white p-2">
+              <h5>EMPLOYEE INFORMATION</h5>
+            </div>
+            <div className="row justify-content-center">
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Date Hired:</label>
+                  <span className="valueCenter">{selectedEmployee.DateHired}</span>
+                  <br />
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">HRAN ID:</label>
+                  <span className="valueCenter">{selectedEmployee.HRANID}</span>
+                  <br />
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Tenure:</label>
+                  <span className="valueCenter">{selectedEmployee.Tenure}</span>
+                  <br />
+                </div>
+              </div>
+            </div>
+            <div className="row justify-content-center">
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Employee Level:</label>
+                  <span className="valueCenter">{selectedEmployee.EmployeeLevel}</span>
+                  <br />
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Project Code:</label>
+                  <span className="valueCenter">{selectedEmployee.ProjectCode}</span>
+                  <br />
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Project Name:</label>
+                  <span className="valueCenter">{selectedEmployee.ProjectName}</span>
+                  <br />
+                </div>
+              </div>
+            </div>
+            <div className="row justify-content-center">
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Designation:</label>
+                  <span className="valueCenter">{selectedEmployee.Designation}</span>
+                  <br />
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Department:</label>
+                  <span className="valueCenter">{selectedEmployee.DepartmentName}</span>
+                  <br />
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel">Product Code:</label>
+                  <span className="valueCenter labelWithSpacing">{selectedEmployee.ProdCode}</span>
+                  <br />
+                </div>
+              </div>
+            </div>
+            <div className="row justify-content-center">
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Product Description:</label>
+                  <span className="valueCenter">{selectedEmployee.ProdDesc}</span>
+                  <br />
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Employment Status:</label>
+                  <span className="valueCenter">{selectedEmployee.EmploymentStatus}</span>
+                  <br />
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Employee Status:</label>
+                  <span className="valueCenter">{selectedEmployee.EmployeeStatus}</span>
+                  <br />
+                </div>
+              </div>
+            </div>
+            <div className="row justify-content-center">
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">HRAN Type:</label>
+                  <span className="valueCenter">{selectedEmployee.HRANType}</span>
+                  <br />
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing"> Work week type:</label>
+                  <span className="valueCenter">{selectedEmployee.WorkWeekType}</span>
+                  <br />
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Shift:</label>
+                  <span className="valueCenter">{selectedEmployee.ShiftName}</span>
+                </div>
+              </div>
+            </div>
+            <div className="row justify-content-center">
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Work Arrangement:</label>
+                  <span className="valueCenter">{selectedEmployee.WorkArrangement}</span>
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Rate Class:</label>
+                  <span className="valueCenter">{selectedEmployee.RateClass}</span>
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Rate:</label>
+                  <span className="valueCenter">{selectedEmployee.Rate}</span>
+                </div>
+              </div>
+            </div>
+            <div className="row justify-content-center">
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Manager Id:</label>
+                  <span className="valueCenter">{selectedEmployee.ManagerID}</span>
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Manager Name</label>
+                  <span className="valueCenter">{selectedEmployee.ManagerName}</span>
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">PMPICID:</label>
+                  <span className="valueCenter">{selectedEmployee.PMPICID}</span>
+                </div>
+              </div>
+            </div>
+            <div className="row justify-content-center">
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">PMPICID Name:</label>
+                  <span className="valueCenter">{selectedEmployee.PMPICIDName}</span>
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Delivery Unit:</label>
+                  <span className="valueCenter">{selectedEmployee.DUName}</span>
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">DUHID:</label>
+                  <span className="valueCenter">{selectedEmployee.DUHID}</span>
+                </div>
+              </div>
+            </div>
+            <div className="row justify-content-center">
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">DUH Name:</label>
+                  <span className="valueCenter">{selectedEmployee.DUHName}</span>
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Is Manager:</label>
+                  <span className="valueCenter">{selectedEmployee.IsManager === 1 ? 'Yes' : 'No'}</span>
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Is PMPIC:</label>
+                  <span className="valueCenter">{selectedEmployee.IsPMPIC === 1 ? 'Yes' : 'No'}</span>
+                </div>
+              </div>
+            </div>
+            <div className="row justify-content-center">
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">
+                    Is Individual Contributor:
+                  </label>
+                  <span className="valueCenter">{selectedEmployee.IsIndividualContributor === 1 ? 'Yes' : 'No'}</span>
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Is Active:</label>
+                  <span className="valueCenter">{selectedEmployee.IsActive === 1 ? 'Yes' : 'No'}</span>
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Is DU Head:</label>
+                  <span className="valueCenter">{selectedEmployee.IsDUHead === 1 ? 'Yes' : 'No'}</span>
+                </div>
+              </div>
+            </div>
+            <div className="row justify-content-center">
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">TITO Type:</label>
+                  <span className="valueCenter">{selectedEmployee.TITOType}</span>
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing">Position:</label>
+                  <span className="valueCenter">{selectedEmployee.Position}</span>
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="form-group">
+                  <label className="blueLabel labelWithSpacing ">Position Level:</label>
+                  <span className="valueCenter">{selectedEmployee.PositionLevel}</span>
+                </div>
+              </div>
+            </div>
+            </div>
+            )}
+          </form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleDownloadPDF}>
+            Download PDF
+          </Button>
+        </Modal.Footer>
+      </Modal>
       </div>
+      
   );
 }
 
