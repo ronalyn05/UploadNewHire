@@ -789,11 +789,14 @@ const handleInputChange = (e) => {
       alert('Failed to update employee emergency contact. Please try again later.');
     }
   };
-  const handleViewDetails = (employeeData) => {
-    setSelectedEmployee(employeeData);
-    setIsModalOpen(true);
-  };
+  // const handleViewDetails = (employeeData) => {
+  //   setSelectedEmployee(employeeData);
+  //   setIsModalOpen(true);
+  // };
 
+  const handleView = (employeeData) => {
+    navigate(`/employeeProfile`, { state: { employeeData } });
+  };
   
   //handles the downloaf of pdf file
   const handleDownloadPDF = () => {
@@ -864,14 +867,22 @@ const handleInputChange = (e) => {
             <div className="col-xl-12 col-xl-9">
               <div className="card shadow mb-4">
                 <div className='card-body'>
-              <button
+                <button
+                                      className="seeProfile btn btn-xs mr-2"
+                                      onClick={() =>
+                                        handleView(employeeData)
+                                      } // Call handleUpdate with employee ID
+                                    >
+                                      <i className="fas fa-eye"></i> See Profile
+                                    </button>
+              {/* <button
                                       className="btn btn-xs btn-primary "
                                       onClick={() =>
                                         handleViewDetails(employeeData)
                                       }
                                     >
                                       <i className="far fa-eye"></i> View Profile
-                                    </button>
+                                    </button> */}
                                     </div>
               <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                   <ul className="nav nav-tabs nav-fill">
@@ -1785,31 +1796,31 @@ const handleInputChange = (e) => {
                       <div className="tab-pane fade" id="dependent" role="tabpanel" aria-labelledby="dependent-tab">
                         {/* Dependent Form */}
                            {/* <div className="container">  */}
-                           <div className="card">
-                            <div className="card-body d-flex justify-content-between align-items-center">
-                              {/* New Record button */}
-                              <button className="btn btn-xs btn-success mr-2" onClick={handleShowAddModal}>
-                                <i className="fas fa-plus"></i> New Record
-                              </button>
+                           {/* <div className="card"> */}
+                                <div className="card-body d-flex justify-content-between align-items-center">
+                                  {/* New Record button */}
+                                  <button className="btn btn-xs btn-success mr-2" onClick={handleShowAddModal}>
+                                    <i className="fas fa-plus"></i> New Record
+                                  </button>
 
-                              {/* Search form */}
-                              <form className="form-inline ml-auto">
-                                <div className="input-group">
-                                  <input
-                                    type="text"
-                                    className="form-control bg-light border-0 small"
-                                    placeholder="Search by Name"
-                                    value={searchQuery}
-                                    onChange={handleSearchChange}
-                                  />
-                                  <div className="input-group-append">
-                                    <button className="btn btn-primary" type="button">
-                                      <i className="fas fa-search fa-sm"></i>
-                                    </button>
-                                  </div>
+                                  {/* Search form */}
+                                  <form className="form-inline ml-auto">
+                                    <div className="input-group">
+                                      <input
+                                        type="text"
+                                        className="form-control bg-light border-0 small"
+                                        placeholder="Search by Name"
+                                        value={searchQuery}
+                                        onChange={handleSearchChange}
+                                      />
+                                      <div className="input-group-append">
+                                        <button className="btn btn-primary" type="button">
+                                          <i className="fas fa-search fa-sm"></i>
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </form>
                                 </div>
-                              </form>
-                            </div>
                               {/* Add Dependent Modal */}
                               <Modal show={showAddModal} onHide={handleCloseAddModal} dialogClassName="custom-modal">
                                   <Modal.Header>
@@ -2127,7 +2138,7 @@ const handleInputChange = (e) => {
                             <tr key={index}>
                               <td>
                               <button className="btn btn-xs btn-primary mr-2" onClick={() => handleShowEditModal(dependent)}>
-                                              <i className="fas fa-pencil-alt"></i>Edit
+                                              <i className="fas fa-pencil-alt"></i>
                                             </button>
                                 {/* <button className="btn btn-xs btn-primary mr-2" onClick={handleShowEditModal}>
                                   <i className="fas fa-pencil-alt"></i>Edit
@@ -2163,7 +2174,7 @@ const handleInputChange = (e) => {
                                     </table>
                                   </div>
                            </div>
-                        </div>
+                        {/* </div> */}
                         {/* </div>  */}
                       <br/>
                       </div>
@@ -2209,13 +2220,13 @@ const handleInputChange = (e) => {
               </div>
               <Footer />
           </div>
-          <Modal
+          {/* <Modal
         show={isModalOpen}
         onHide={handleCloseModal}
         dialogClassName="custom-modal"
       >
         <Modal.Header>
-          <Modal.Title>Employee Information</Modal.Title>
+          <Modal.Title>Employee Profile</Modal.Title>
           <Button variant="default" onClick={handleCloseModal}>
             {" "}
             X{" "}
@@ -2226,151 +2237,9 @@ const handleInputChange = (e) => {
             {selectedEmployee && (
               <div>
                 <div className="text-center mb-3 bg-primary text-white p-2">
-                  <h5>PERSONAL DETAILS</h5>
-                </div>
-                <div className="row justify-content-center">
-                <div className="col-md-4">
-                  <div className="form-group">
-                    <label className="blueLabel labelWithSpacing">Employee ID/BADGE NO:</label>
-                    <span className="valueCenter">{Array.isArray(selectedEmployee.EmployeeId) ? selectedEmployee.EmployeeId[0] : selectedEmployee.EmployeeId}</span>
-                    <br />
-                  </div>
-                </div>
-                  <div className="col-md-4">
-                    <div className="form-group">
-                      <label className="blueLabel labelWithSpacing">Name:</label>
-                      <span className="valueCenter">{selectedEmployee.EmployeeName}</span>
-                      <br />
-                    </div>
-                  </div>
-                  <div className="col-md-4">
-                    <div className="form-group">
-                      <label className="blueLabel labelWithSpacing">First Name:</label>
-                      <span className="valueCenter">{selectedEmployee.FirstName}</span>
-                      <br />
-                    </div>
-                  </div>
-                </div>
-                <div className="row justify-content-center">
-                  <div className="col-md-4">
-                    <div className="form-group">
-                      <label className="blueLabel labelWithSpacing">Middle Name:</label>
-                      <span className="valueCenter">{selectedEmployee.MiddleName}</span>
-                      <br />
-                    </div>
-                  </div>
-                  <div className="col-md-4">
-                    <div className="form-group">
-                      <label className="blueLabel labelWithSpacing">Last Name:</label>
-                      <span className="valueCenter">{selectedEmployee.LastName}</span>
-                      <br />
-                    </div>
-                  </div>
-                  <div className="col-md-4">
-                    <div className="form-group">
-                      <label className="blueLabel labelWithSpacing">Maiden Name:</label>
-                      <span className="valueCenter">{selectedEmployee.MaidenName}</span>
-                      <br />
-                    </div>
-                  </div>
-                </div>
-                <div className="row justify-content-center">
-                  <div className="col-md-4">
-                    <div className="form-group">
-                      <label className="blueLabel labelWithSpacing">Birthdate:</label>
-                      <span className="valueCenter">{selectedEmployee.Birthdate}</span>
-                      <br />
-                    </div>
-                  </div>
-                  <div className="col-md-4">
-                    <div className="form-group">
-                      <label className="blueLabel labelWithSpacing">Age:</label>
-                      <span>{selectedEmployee.Age}</span>
-                      <br />
-                    </div>
-                  </div>
-                  <div className="col-md-4">
-                    <div className="form-group">
-                      <label className="blueLabel labelWithSpacing">Birth Month:</label>
-                      <span className="valueCenter">{selectedEmployee.BirthMonth}</span>
-                      <br />
-                    </div>
-                  </div>
-                </div>
-                <div className="row justify-content-center">
-                  <div className="col-md-4">
-                    <div className="form-group">
-                      <label className="blueLabel labelWithSpacing">Age Bracket:</label>
-                      <span>{selectedEmployee.AgeBracket}</span>
-                      <br />
-                    </div>
-                  </div>
-                  <div className="col-md-4">
-                    <div className="form-group">
-                      <label className="blueLabel labelWithSpacing">Gender:</label>
-                      <span className="valueCenter">{selectedEmployee.Gender}</span>
-                      <br />
-                    </div>
-                  </div>
-                  <div className="col-md-4">
-                    <div className="form-group">
-                      <label className="blueLabel labelWithSpacing">Marital Status:</label>
-                      <span className="valueCenter">{selectedEmployee.MaritalStatus}</span>
-                      <br />
-                    </div>
-                  </div>
-                </div>
-                <div className="row justify-content-center">
-                  <div className="col-md-4">
-                    <div className="form-group">
-                      <label className="blueLabel labelWithSpacing">SSS:</label>
-                      <span className="valueCenter">{selectedEmployee.SSS}</span>
-                      <br />
-                    </div>
-                  </div>
-                  <div className="col-md-4">
-                    <div className="form-group">
-                      <label className="blueLabel labelWithSpacing">PHIC:</label>
-                      <span className="valueCenter">{selectedEmployee.PHIC}</span>
-                      <br />
-                    </div>
-                  </div>
-                  <div className="col-md-4">
-                    <div className="form-group">
-                      <label className="blueLabel labelWithSpacing">HDMF:</label>
-                      <span className="valueCenter">{selectedEmployee.HDMF}</span>
-                      <br />
-                    </div>
-                  </div>
-                </div>
-                <div className="row justify-content-center">
-                  <div className="col-md-4">
-                    <div className="form-group">
-                      <label className="blueLabel labelWithSpacing">TIN:</label>
-                      <span className="valueCenter">{selectedEmployee.TIN}</span>
-                      <br />
-                    </div>
-                  </div>
-                  <div className="col-md-4">
-                    <div className="form-group">
-                      <label className="blueLabel labelWithSpacing">Contact Number:</label>
-                      <span className="valueCenter">{selectedEmployee.ContactNumber}</span>
-                      <br />
-                    </div>
-                  </div>
-                  <div className="col-md-4">
-                    <div className="form-group">
-                      <label className="blueLabel labelWithSpacing">Email Address:</label>
-                      <span className="valueCenter">{selectedEmployee.EmailAddress}</span>
-                      <br />
-                    </div>
-                  </div>
-                </div>
-              {/* EMPLOYEE INFORMATION */}
-            <div className="text-center mb-3 bg-primary text-white p-2">
               <h5>EMPLOYEE INFORMATION</h5>
             </div>
-            <div className="row justify-content-center">
+                <div className="row justify-content-center">
               <div className="col-md-4">
                 <div className="form-group">
                   <label className="blueLabel labelWithSpacing">Date Hired:</label>
@@ -2606,6 +2475,208 @@ const handleInputChange = (e) => {
                 </div>
               </div>
             </div>
+                <div className="text-center mb-3 bg-primary text-white p-2">
+                  <h5>PERSONAL DETAILS</h5>
+                </div>
+                <div className="row justify-content-center">
+                <div className="col-md-4">
+                  <div className="form-group">
+                    <label className="blueLabel labelWithSpacing">Employee ID/BADGE NO:</label>
+                    <span className="valueCenter">{Array.isArray(selectedEmployee.EmployeeId) ? selectedEmployee.EmployeeId[0] : selectedEmployee.EmployeeId}</span>
+                    <br />
+                  </div>
+                </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Name:</label>
+                      <span className="valueCenter">{selectedEmployee.EmployeeName}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">First Name:</label>
+                      <span className="valueCenter">{selectedEmployee.FirstName}</span>
+                      <br />
+                    </div>
+                  </div>
+                </div>
+                <div className="row justify-content-center">
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Middle Name:</label>
+                      <span className="valueCenter">{selectedEmployee.MiddleName}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Last Name:</label>
+                      <span className="valueCenter">{selectedEmployee.LastName}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Maiden Name:</label>
+                      <span className="valueCenter">{selectedEmployee.MaidenName}</span>
+                      <br />
+                    </div>
+                  </div>
+                </div>
+                <div className="row justify-content-center">
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Birthdate:</label>
+                      <span className="valueCenter">{selectedEmployee.Birthdate}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Age:</label>
+                      <span>{selectedEmployee.Age}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Birth Month:</label>
+                      <span className="valueCenter">{selectedEmployee.BirthMonth}</span>
+                      <br />
+                    </div>
+                  </div>
+                </div>
+                <div className="row justify-content-center">
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Age Bracket:</label>
+                      <span>{selectedEmployee.AgeBracket}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Gender:</label>
+                      <span className="valueCenter">{selectedEmployee.Gender}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Marital Status:</label>
+                      <span className="valueCenter">{selectedEmployee.MaritalStatus}</span>
+                      <br />
+                    </div>
+                  </div>
+                </div>
+                <div className="row justify-content-center">
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">SSS:</label>
+                      <span className="valueCenter">{selectedEmployee.SSS}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">PHIC:</label>
+                      <span className="valueCenter">{selectedEmployee.PHIC}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">HDMF:</label>
+                      <span className="valueCenter">{selectedEmployee.HDMF}</span>
+                      <br />
+                    </div>
+                  </div>
+                </div>
+                <div className="row justify-content-center">
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">TIN:</label>
+                      <span className="valueCenter">{selectedEmployee.TIN}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Contact Number:</label>
+                      <span className="valueCenter">{selectedEmployee.ContactNumber}</span>
+                      <br />
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="blueLabel labelWithSpacing">Email Address:</label>
+                      <span className="valueCenter">{selectedEmployee.EmailAddress}</span>
+                      <br />
+                    </div>
+                  </div>
+                </div>
+            <div className="text-center mb-3 bg-primary text-white p-2">
+              <h5>DEPENDENT DETAILS</h5>
+            </div>
+                                  <div className="table-responsive">
+                                    <table className="table">
+                                      <thead>
+                                        <tr>
+                                          <th scope="col">Full Name</th>
+                                          <th scope="col">Phone Number</th>
+                                          <th scope="col">Relationship</th>
+                                          <th scope="col">Date of Birth</th>
+                                          <th scope="col">Occupation</th>
+                                          <th scope="col">Address</th>
+                                          <th scope="col">City</th>
+                                          <th scope="col">Province</th>
+                                          <th scope="col">Postal Code</th>
+                                          <th scope="col">Beneficiary</th>
+                                          <th scope="col">Beneficiary Date</th>
+                                          <th scope="col">Type of Coverage</th>
+                                          <th scope="col">Insurance</th>
+                                          <th scope="col">Insurance Date</th>
+                                          <th scope="col">Remarks</th>
+                                          <th scope="col">Company Paid</th>
+                                          <th scope="col">HMO Provider</th>
+                                          <th scope="col">HMO Policy Number</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                        {filteredDependents.length > 0 ? (
+                          filteredDependents.map((dependent, index) => (
+                            <tr key={index}>
+                              <td>{dependent.FullName}</td>
+                              <td>{dependent.PhoneNum}</td>
+                              <td>{dependent.Relationship}</td>
+                              <td>{dependent.DateOfBirth}</td>
+                              <td>{dependent.Occupation}</td>
+                              <td>{dependent.Address}</td>
+                              <td>{dependent.City}</td>
+                              <td>{dependent.DepProvince}</td>
+                              <td>{dependent.PostalCode}</td>
+                              <td>{dependent.Beneficiary}</td>
+                              <td>{dependent.BeneficiaryDate}</td>
+                              <td>{dependent.TypeOfCoverage}</td>
+                              <td>{dependent.Insurance}</td>
+                              <td>{dependent.InsuranceDate}</td>
+                              <td>{dependent.Remarks}</td>
+                              <td>{dependent.CompanyPaid}</td>
+                              <td>{dependent.HMOProvider}</td>
+                              <td>{dependent.HMOPolicyNumber}</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan="19">No dependents data yet.</td>
+                          </tr>
+                        )}
+                      </tbody>
+
+                                    </table>
+                                  </div>
+                           
             </div>
             )}
           </form>
@@ -2618,7 +2689,7 @@ const handleInputChange = (e) => {
             Download PDF
           </Button>
         </Modal.Footer>
-      </Modal>
+      </Modal> */}
       </div>
       
   );

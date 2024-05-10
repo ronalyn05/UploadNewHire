@@ -9,6 +9,7 @@ import Footer from './components/footer';
 import UpdateEmployeeInfo from './components/update'; 
 import Profile from './components/profile';
 import Employee from './components/employee';
+import EmployeeProfile from './components/employeeProfile';
 
 function App() {
   
@@ -25,6 +26,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/update/:employeeId" element={<UpdateEmployeeInfo />} />
           <Route path="/employee" element={<Employee />} />
+          <Route path="/employeeProfile" element={<EmployeeProfile />} />
         </Routes>
       </div>
     </Router>

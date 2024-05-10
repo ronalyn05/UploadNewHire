@@ -3,8 +3,6 @@ import Navbar from "./navbar";
 import TopNavbar from "./topnavbar";
 import Footer from "./footer";
 import { useNavigate } from "react-router-dom";
-import { Modal, Button } from "react-bootstrap";
-import jsPDF from "jspdf";
 import "../App.css";
 // import axios from "axios";
 

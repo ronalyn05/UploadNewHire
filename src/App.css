@@ -55,13 +55,29 @@
 /* label spacing for reports */
 /* Custom CSS for label and span spacing */
 .blueLabel {
-  color: blue ;
+  color: grey ;
+}
+.seeProfile{
+  color: blue;
 }
 .labelWithSpacing {
   margin-right: 10px;
 }
 .valueCenter {
   text-align: center;
+  color: grey ;
+}
+.valueBadge{
+  text-align: center;
+  color: blue ;
+  text-decoration: underline;
+}
+.border {
+  border: 1px solid #ccc; /* Solid gray border */
+  padding: 10px; /* Optional padding for spacing */
+}
+.textDecorationUnderline {
+  text-decoration: underline;
 }
 
 

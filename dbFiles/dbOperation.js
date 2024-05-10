@@ -400,7 +400,7 @@ const getAllUserAccount = async () => {
     throw error;
   }
 };
- // Retrieve employee by ID from the database
+// Retrieve employee by ID from the database
 const getEmployeeById = async (employeeId) => {
   try {
     let pool = await sql.connect(config);
@@ -409,7 +409,7 @@ const getEmployeeById = async (employeeId) => {
       .input("EmployeeId", sql.VarChar, employeeId)
       .query(`
         SELECT 
-          PD.*, EI.*, ADDRESS.*, CONTACT.*, EDUC.*, EC.*, 
+          PD.*, EI.*, ADDRESS.*, CONTACT.*, EDUC.*, EC.*,
           PROJ.ProjectId AS ProjectId, PROJ.DUID AS ProjectDUID, PROJ.ProjectCode, 
           PROJ.ProjectName, PROJ.is_Active,
           DU.DUID AS DUID, DU.DUCode, DU.DUName AS DUName, DU.Is_Active,
@@ -426,7 +426,8 @@ const getEmployeeById = async (employeeId) => {
           A.ZipCode AS EmContactZipcode,
           A.LandMark AS EmContactLandMark,
           A.IsPermanent AS Is_Permanent,
-          A.IsEmergency AS Is_Emergency
+          A.IsEmergency AS Is_Emergency,
+          UA.ProfilePhoto -- Include ProfilePhoto from UserAccount table
         FROM EmpPersonalDetails AS PD
         INNER JOIN EmployeeInfo AS EI ON PD.EmployeeId = EI.EmployeeId
         INNER JOIN Address AS ADDRESS ON PD.EmployeeId = ADDRESS.EmployeeId
@@ -440,8 +441,10 @@ const getEmployeeById = async (employeeId) => {
         LEFT JOIN DeliveryUnit AS DU ON PD.EmployeeId = DU.EmployeeId
         LEFT JOIN Department AS DEPT ON PD.EmployeeId = DEPT.EmployeeId
         LEFT JOIN Product AS PROD ON PD.EmployeeId = PROD.EmployeeId
+        LEFT JOIN UserAccount AS UA ON PD.EmployeeId = UA.EmployeeId -- Join with UserAccount table
         WHERE PD.EmployeeId = @EmployeeId;
       `);
+
     if (result.recordset.length === 0) {
       return null; // Return null if employee with given ID is not found
     }
@@ -453,6 +456,7 @@ const getEmployeeById = async (employeeId) => {
     throw error;
   }
 }
+
 //update employee personal details  by id
 const updateEmployeeById = async (employeeId, updatedEmployeeData) => {
   try {
