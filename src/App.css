@@ -55,7 +55,7 @@
 /* label spacing for reports */
 /* Custom CSS for label and span spacing */
 .blueLabel {
-  color: grey ;
+  color: #1a43bf;
 }
 .seeProfile{
   color: blue;
@@ -65,8 +65,31 @@
 }
 .valueCenter {
   text-align: center;
-  color: grey ;
+  /* display: flex;
+  justify-content: center; */
 }
+
+.autoAdjustSpan {
+  display: inline-block;
+  word-wrap: break-word;
+  white-space: normal;
+  max-width: 100%; 
+  border: 1px solid #ccc;
+  padding: 8px;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  text-overflow: ellipsis;
+}
+/* .autoAdjustSpan {
+  display: block;
+  overflow-wrap: break-word; 
+  word-wrap: break-word;    
+  max-width: 100%;           
+  padding: 8px;             
+  border: 1px solid #ccc;    
+} */
+
+
 .valueBadge{
   text-align: center;
   color: blue ;
@@ -79,7 +102,6 @@
 .textDecorationUnderline {
   text-decoration: underline;
 }
-
 
 /* WELCOME MESSAGE */
 .welcome-message {

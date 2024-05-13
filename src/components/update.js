@@ -67,6 +67,7 @@ import jsPDF from "jspdf";
       );
       setFilteredDependents(filtered);
     }, [searchQuery, dependents]);
+    
  // Define the fetchDependents function
  const fetchDependents = async () => {
   try {
@@ -794,63 +795,207 @@ const handleInputChange = (e) => {
   //   setIsModalOpen(true);
   // };
 
-  const handleView = (employeeData) => {
-    navigate(`/employeeProfile`, { state: { employeeData } });
-  };
-  
-  //handles the downloaf of pdf file
-  const handleDownloadPDF = () => {
-    if (!selectedEmployee) return;
+  // const handleView = (employeeData) => {
+  //   navigate(`/employeeProfile`, { state: { employeeData } });
+  // };
+    // Handle navigation to employee profile page with employeeData and dependents
+    const handleView = () => {
+      navigate('/employeeProfile', { state: { employeeData, dependents } });
+    };
 
+  //handles the download of pdf file
+  // const handleDownloadPDF = () => {
+  //   if (!employeeData) return;
+  
+  //   const doc = new jsPDF();
+  //   let y = 20;
+  
+  //   doc.setFillColor(65, 105, 225); // background color (royal blue)
+  //   doc.setTextColor(255); // White text color
+  //   doc.setFontSize(16);
+  
+  //   const rectWidth = 190; // Width of the rectangle
+  //   const textWidth = doc.getStringUnitWidth("PERSONAL DETAILS") * 16; // Calculate text width based on font size
+  //   const xPosition = (rectWidth - textWidth) / 2 + 4; // Calculate x-coordinate to center the text within the rectangle
+  
+  //   doc.rect(4, y - 10, rectWidth, 15, "F"); // Draw a filled rectangle for the background
+  //   doc.text("PERSONAL DETAILS", xPosition, y); // Centered text
+  //   y += 20;
+  
+  //   // Display Employee ID
+  //   const employeeIdLabel = "Employee ID:";
+  //   const employeeIdValue = Array.isArray(employeeData.EmployeeId) ? employeeData.EmployeeId[0] : employeeData.EmployeeId;
+  //   doc.setFont("helvetica", "bold");
+  //   doc.text(employeeIdLabel, 20, y);
+  //   doc.setFont("helvetica", "normal");
+  //   doc.text(employeeIdValue, 80, y);
+  //   y += 10;
+  
+  //   // Other personal details
+  //   const personalDetails = [
+  //     { label: "Employee Id:", value: employeeIdValue },
+  //     { label: "Name:", value: employeeData.EmployeeName },
+  //     { label: "First Name:", value: employeeData.FirstName },
+  //     { label: "Middle Name:", value: employeeData.MiddleName },
+  //     { label: "Last Name:", value: employeeData.LastName },
+  //     { label: "Maiden Name:", value: employeeData.MaidenName },
+  //     { label: "Birthdate:", value: employeeData.Birthdate },
+  //     { label: "Age:", value: employeeData.Age },
+  //     { label: "Birth Month:", value: employeeData.BirthMonth },
+  //     { label: "Age Bracket:", value: employeeData.AgeBracket },
+  //     { label: "Gender:", value: employeeData.Gender },
+  //     { label: "Marital Status:", value: employeeData.MaritalStatus },
+  //     { label: "SSS:", value: employeeData.SSS },
+  //     { label: "PHIC:", value: employeeData.PHIC },
+  //     { label: "HDMF:", value: employeeData.HDMF },
+  //     { label: "TIN:", value: employeeData.TIN },
+  //     { label: "Contact Number:", value: employeeData.ContactNumber },
+  //     { label: "Email Address:", value: employeeData.EmailAddress },
+  //   ];
+  
+  //   doc.setFontSize(12);
+  //   doc.setTextColor(0);
+  
+  //   personalDetails.forEach(({ label, value }) => {
+  //     doc.setFont("helvetica", "bold");
+  //     doc.text(label, 20, y);
+  //     doc.setFont("helvetica", "normal");
+  //     doc.text(value, 80, y);
+  //     y += 10;
+  //   });
+  
+  //   doc.save("employee_details.pdf");
+  // };
+  const handleDownloadPDF = () => {
+    if (!employeeData) return;
+  
     const doc = new jsPDF();
     let y = 20;
-
+    const columnWidth = 90; // Width for each column
+    let leftColumnX = 20; // X-coordinate for left column
+    let rightColumnX = columnWidth + leftColumnX; // X-coordinate for right column
+  
     doc.setFillColor(65, 105, 225); // background color (royal blue)
     doc.setTextColor(255); // White text color
     doc.setFontSize(16);
-
+  
     const rectWidth = 190; // Width of the rectangle
     const textWidth = doc.getStringUnitWidth("PERSONAL DETAILS") * 16; // Calculate text width based on font size
     const xPosition = (rectWidth - textWidth) / 2 + 4; // Calculate x-coordinate to center the text within the rectangle
-
+  
     doc.rect(4, y - 10, rectWidth, 15, "F"); // Draw a filled rectangle for the background
     doc.text("PERSONAL DETAILS", xPosition, y); // Centered text
     y += 20;
-
-    const employeeInfo = [
-      { label: "Employee ID:", value: selectedEmployee.EmployeeId },
-      { label: "Name:", value: selectedEmployee.EmployeeName },
-      { label: "First Name:", value: selectedEmployee.FirstName },
-      { label: "Middle Name:", value: selectedEmployee.MiddleName },
-      { label: "Last Name:", value: selectedEmployee.LastName },
-      { label: "Maiden Name:", value: selectedEmployee.MaidenName },
-      { label: "Birthdate:", value: selectedEmployee.Birthdate },
-      { label: "Age:", value: selectedEmployee.Age },
-      { label: "Birth Month:", value: selectedEmployee.BirthMonth },
-      { label: "Age Bracket:", value: selectedEmployee.AgeBracket },
-      { label: "Gender:", value: selectedEmployee.Gender },
-      { label: "Marital Status:", value: selectedEmployee.MaritalStatus },
-      { label: "SSS:", value: selectedEmployee.SSS },
-      { label: "PHIC:", value: selectedEmployee.PHIC },
-      { label: "HDMF:", value: selectedEmployee.HDMF },
-      { label: "TIN:", value: selectedEmployee.TIN },
-      { label: "Contact Number:", value: selectedEmployee.ContactNumber },
-      { label: "Email Address:", value: selectedEmployee.EmailAddress },
+  
+    const personalDetails = [
+      { label: "Employee ID:", value: Array.isArray(employeeData.EmployeeId) ? employeeData.EmployeeId[0] : employeeData.EmployeeId },
+      { label: "Name:", value: employeeData.EmployeeName },
+      { label: "First Name:", value: employeeData.FirstName },
+      { label: "Middle Name:", value: employeeData.MiddleName },
+      { label: "Last Name:", value: employeeData.LastName },
+      { label: "Maiden Name:", value: employeeData.MaidenName },
+      { label: "Birthdate:", value: employeeData.Birthdate },
+      { label: "Age:", value: employeeData.Age },
+      { label: "Birth Month:", value: employeeData.BirthMonth },
+      { label: "Age Bracket:", value: employeeData.AgeBracket },
+      { label: "Gender:", value: employeeData.Gender },
+      { label: "Marital Status:", value: employeeData.MaritalStatus },
+      { label: "SSS:", value: employeeData.SSS },
+      { label: "PHIC:", value: employeeData.PHIC },
+      { label: "HDMF:", value: employeeData.HDMF },
+      { label: "TIN:", value: employeeData.TIN },
+      { label: "Contact Number:", value: employeeData.ContactNumber },
+      { label: "Email Address:", value: employeeData.EmailAddress },
     ];
-
+  
     doc.setFontSize(12);
     doc.setTextColor(0);
-
-    employeeInfo.forEach(({ label, value }) => {
-      doc.setFont("helvetica", "bold");
-      doc.text(label, 20, y);
-      doc.setFont("helvetica", "normal");
-      doc.text(value, 80, y);
-      y += 10;
+  
+    personalDetails.forEach(({ label, value }, index) => {
+      // Determine the column based on index (even or odd)
+      const isLeftColumn = index % 2 === 0;
+  
+      if (isLeftColumn) {
+        doc.setFont("helvetica", "bold");
+        doc.text(label, leftColumnX, y);
+        doc.setFont("helvetica", "normal");
+        doc.text(value, rightColumnX, y);
+      } else {
+        doc.setFont("helvetica", "bold");
+        doc.text(label, leftColumnX, y + 5); // Add extra spacing for the right column
+        doc.setFont("helvetica", "normal");
+        doc.text(value, rightColumnX, y + 5);
+        y += 10; // Move to the next row after displaying both columns
+      }
     });
-
+  
     doc.save("employee_details.pdf");
   };
+  
+  
+  // const handleDownloadPDF = () => {
+  //   if (!employeeData) return;
+  
+  //   const doc = new jsPDF();
+  //   let y = 20;
+  
+  //   doc.setFillColor(65, 105, 225); // background color (royal blue)
+  //   doc.setTextColor(255); // White text color
+  //   doc.setFontSize(16);
+  
+  //   const rectWidth = 190; // Width of the rectangle
+  //   const textWidth = doc.getStringUnitWidth("PERSONAL DETAILS") * 16; // Calculate text width based on font size
+  //   const xPosition = (rectWidth - textWidth) / 2 + 4; // Calculate x-coordinate to center the text within the rectangle
+  
+  //   doc.rect(4, y - 10, rectWidth, 15, "F"); // Draw a filled rectangle for the background
+  //   doc.text("PERSONAL DETAILS", xPosition, y); // Centered text
+  //   y += 20;
+  
+  //   const employeeInfo = [
+  //     { label: "Employee ID:", value: employeeData.EmployeeId },
+  //     { label: "Name:", value: employeeData.EmployeeName },
+  //     { label: "First Name:", value: employeeData.FirstName },
+  //     { label: "Middle Name:", value: employeeData.MiddleName },
+  //     { label: "Last Name:", value: employeeData.LastName },
+  //     { label: "Maiden Name:", value: employeeData.MaidenName },
+  //     { label: "Birthdate:", value: employeeData.Birthdate },
+  //     { label: "Age:", value: employeeData.Age },
+  //     { label: "Birth Month:", value: employeeData.BirthMonth },
+  //     { label: "Age Bracket:", value: employeeData.AgeBracket },
+  //     { label: "Gender:", value: employeeData.Gender },
+  //     { label: "Marital Status:", value: employeeData.MaritalStatus },
+  //     { label: "SSS:", value: employeeData.SSS },
+  //     { label: "PHIC:", value: employeeData.PHIC },
+  //     { label: "HDMF:", value: employeeData.HDMF },
+  //     { label: "TIN:", value: employeeData.TIN },
+  //     { label: "Contact Number:", value: employeeData.ContactNumber },
+  //     { label: "Email Address:", value: employeeData.EmailAddress },
+  //   ];
+  
+  //   doc.setFontSize(12);
+  //   doc.setTextColor(0);
+  
+  //   employeeInfo.forEach(({ label, value }) => {
+  //     if (label === "Employee ID:") {
+  //       // Display Employee ID with its value
+  //       doc.setFont("helvetica", "bold");
+  //       doc.text(label, 20, y);
+  //       doc.setFont("helvetica", "normal");
+  //       doc.text(value, 80, y);
+  //       y += 10; // Move to the next line
+  //     } else {
+  //       // Display other fields normally
+  //       doc.setFont("helvetica", "bold");
+  //       doc.text(label, 20, y);
+  //       doc.setFont("helvetica", "normal");
+  //       doc.text(value, 80, y);
+  //       y += 10; // Move to the next line
+  //     }
+  //   });
+  
+  //   doc.save("employee_details.pdf");
+  // };
+  
   
   if (!employeeData) {
     return <div>Loading...</div>;
@@ -866,15 +1011,33 @@ const handleInputChange = (e) => {
           <div className="row justify-content-center">
             <div className="col-xl-12 col-xl-9">
               <div className="card shadow mb-4">
-                <div className='card-body'>
-                <button
+              <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+              <button
                                       className="seeProfile btn btn-xs mr-2"
-                                      onClick={() =>
-                                        handleView(employeeData)
-                                      } // Call handleUpdate with employee ID
+                                      onClick={handleView}
                                     >
                                       <i className="fas fa-eye"></i> See Profile
                                     </button>
+                    {/* <div className="d-flex align-items-center"> */}
+                    <button
+                        className="update-button btn btn-xs"
+                        onClick={handleDownloadPDF}
+                      >
+                        <i className="fas fa-arrow-down"></i> Download Record
+                      </button>
+
+                        {/* <Button variant="primary" onClick={handleDownloadPDF}>
+                        <i className="fas fa-arrow-down"></i> Download Record
+          </Button> */}
+                    {/* </div> */}
+                    </div>
+                {/* <div className='card-body'>
+                <button
+                                      className="seeProfile btn btn-xs mr-2"
+                                      onClick={handleView}
+                                    >
+                                      <i className="fas fa-eye"></i> See Profile
+                                    </button> */}
               {/* <button
                                       className="btn btn-xs btn-primary "
                                       onClick={() =>
@@ -883,7 +1046,8 @@ const handleInputChange = (e) => {
                                     >
                                       <i className="far fa-eye"></i> View Profile
                                     </button> */}
-                                    </div>
+                                    {/* </div> */}
+                                    
               <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                   <ul className="nav nav-tabs nav-fill">
                       <li className="nav-item">
