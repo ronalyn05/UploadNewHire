@@ -143,7 +143,6 @@ function EmployeeProfile() {
                                 >
                                   {employeeData.EmployeeStatus?.toLowerCase()}
                                 </span>
-
                                 <br />
                               </div>
                             </div>

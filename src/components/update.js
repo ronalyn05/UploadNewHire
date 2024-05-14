@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from './navbar';
 import TopNavbar from './topnavbar';
@@ -6,6 +6,8 @@ import Footer from './footer';
 import '../App.css';
 import { Modal, Button } from 'react-bootstrap';
 import jsPDF from "jspdf";
+import html2canvas from 'html2canvas';
+import 'jspdf-autotable';
 
  function UpdateEmployeeInfo() {
   const navigate = useNavigate();
@@ -42,22 +44,24 @@ import jsPDF from "jspdf";
     IsPMPIC: false,
     IsPermanent: false,
     Is_Emergency: false,
-    Is_Permanent: false
+    Is_Permanent: false,
+    ProfilePhoto: "/img/user.png"
   });
   const [initialEmployeeData, setInitialEmployeeData] = useState({});
   const [dependents, setDependents] = useState([]);
   const [selectedDependent, setSelectedDependent] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredDependents, setFilteredDependents] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const personalDetailsRef = useRef(null);
+  const employeeInfoRef = useRef(null);
+  const addressRef = useRef(null);
+  const emergencyRef = useRef(null);
+  const dependentRef = useRef(null);
+  const educationRef = useRef(null);
 
     // Function to handle input change in the search field
     const handleSearchChange = (e) => {
       setSearchQuery(e.target.value);
-    };
-    const handleCloseModal = () => {
-      setIsModalOpen(false);
     };
   
     // Effect to filter dependents based on search query
@@ -866,136 +870,281 @@ const handleInputChange = (e) => {
   
   //   doc.save("employee_details.pdf");
   // };
-  const handleDownloadPDF = () => {
-    if (!employeeData) return;
-  
-    const doc = new jsPDF();
-    let y = 20;
-    const columnWidth = 90; // Width for each column
-    let leftColumnX = 20; // X-coordinate for left column
-    let rightColumnX = columnWidth + leftColumnX; // X-coordinate for right column
-  
-    doc.setFillColor(65, 105, 225); // background color (royal blue)
-    doc.setTextColor(255); // White text color
-    doc.setFontSize(16);
-  
-    const rectWidth = 190; // Width of the rectangle
-    const textWidth = doc.getStringUnitWidth("PERSONAL DETAILS") * 16; // Calculate text width based on font size
-    const xPosition = (rectWidth - textWidth) / 2 + 4; // Calculate x-coordinate to center the text within the rectangle
-  
-    doc.rect(4, y - 10, rectWidth, 15, "F"); // Draw a filled rectangle for the background
-    doc.text("PERSONAL DETAILS", xPosition, y); // Centered text
-    y += 20;
-  
-    const personalDetails = [
-      { label: "Employee ID:", value: Array.isArray(employeeData.EmployeeId) ? employeeData.EmployeeId[0] : employeeData.EmployeeId },
-      { label: "Name:", value: employeeData.EmployeeName },
-      { label: "First Name:", value: employeeData.FirstName },
-      { label: "Middle Name:", value: employeeData.MiddleName },
-      { label: "Last Name:", value: employeeData.LastName },
-      { label: "Maiden Name:", value: employeeData.MaidenName },
-      { label: "Birthdate:", value: employeeData.Birthdate },
-      { label: "Age:", value: employeeData.Age },
-      { label: "Birth Month:", value: employeeData.BirthMonth },
-      { label: "Age Bracket:", value: employeeData.AgeBracket },
-      { label: "Gender:", value: employeeData.Gender },
-      { label: "Marital Status:", value: employeeData.MaritalStatus },
-      { label: "SSS:", value: employeeData.SSS },
-      { label: "PHIC:", value: employeeData.PHIC },
-      { label: "HDMF:", value: employeeData.HDMF },
-      { label: "TIN:", value: employeeData.TIN },
-      { label: "Contact Number:", value: employeeData.ContactNumber },
-      { label: "Email Address:", value: employeeData.EmailAddress },
-    ];
-  
-    doc.setFontSize(12);
-    doc.setTextColor(0);
-  
-    personalDetails.forEach(({ label, value }, index) => {
-      // Determine the column based on index (even or odd)
-      const isLeftColumn = index % 2 === 0;
-  
-      if (isLeftColumn) {
-        doc.setFont("helvetica", "bold");
-        doc.text(label, leftColumnX, y);
-        doc.setFont("helvetica", "normal");
-        doc.text(value, rightColumnX, y);
-      } else {
-        doc.setFont("helvetica", "bold");
-        doc.text(label, leftColumnX, y + 5); // Add extra spacing for the right column
-        doc.setFont("helvetica", "normal");
-        doc.text(value, rightColumnX, y + 5);
-        y += 10; // Move to the next row after displaying both columns
-      }
+//   const handleDownloadPDF = () => {
+//     const personalDetails = personalDetailsRef.current;
+//     const employmentInfo = employmentInfoRef.current;
+
+//     if (!personalDetails || !employmentInfo) {
+//         console.error("Element not found");
+//         return;
+//     }
+
+//     html2canvas(personalDetails).then((canvas1) => {
+//         html2canvas(employmentInfo).then((canvas2) => {
+//             const pdf = new jsPDF('p', 'mm', 'a4');
+//             const imgWidth = 210;
+//             const pageHeight = 295;
+
+//             // Add Personal Details section
+//             const imgHeight1 = canvas1.height * imgWidth / canvas1.width;
+//             let heightLeft1 = imgHeight1;
+//             let position1 = 0;
+
+//             pdf.addImage(canvas1.toDataURL('image/png'), 'PNG', 0, position1, imgWidth, imgHeight1);
+//             heightLeft1 -= pageHeight;
+
+//             if (heightLeft1 >= 0) {
+//                 position1 = heightLeft1 - imgHeight1;
+//                 pdf.addPage();
+//                 pdf.addImage(canvas1.toDataURL('image/png'), 'PNG', 0, position1, imgWidth, imgHeight1);
+//             }
+
+//             // Add Employment Information section
+//             const imgHeight2 = canvas2.height * imgWidth / canvas2.width;
+//             let heightLeft2 = imgHeight2;
+//             let position2 = 0;
+
+//             pdf.addPage(); // Add new page for the next section
+//             pdf.addImage(canvas2.toDataURL('image/png'), 'PNG', 0, position2, imgWidth, imgHeight2);
+
+//             pdf.save("employee_record.pdf");
+//         });
+//     }).catch((error) => {
+//         console.error("Error generating PDF:", error);
+//     });
+// };
+
+const handleDownloadPDF = async () => {
+  const pdf = new jsPDF();
+
+  try {
+    // Add Personal Details section to PDF
+    await addSectionToPDF(personalDetailsRef, 'Personal Details', pdf);
+
+    // Add Employment Information section to PDF
+    await addSectionToPDF(employeeInfoRef, 'Employment Information', pdf);
+
+    // Add Address Information section to PDF
+    await addSectionToPDF(addressRef, 'Address Details', pdf);
+
+    //Add Education Details section to PDF
+    await addSectionToPDF(educationRef, 'Education Details', pdf);
+
+    // Add Emergency Contact Details section to PDF
+    await addSectionToPDF(emergencyRef, 'Emergency Contact Details', pdf);
+
+    // Add Dependent Details section to PDF
+    await addSectionToPDF(dependentRef, 'Dependent Records', pdf);
+
+    // Save PDF
+    pdf.save('employee_details.pdf');
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+  }
+};
+
+// const addSectionToPDF = async (ref, title, pdf) => {
+//   try {
+//     console.log(`Capturing section: ${title}`);
+
+//     await new Promise((resolve) => setTimeout(resolve, 1000));
+
+//     const element = ref.current;
+
+//     if (!element) {
+//       console.error('Element not found:', ref);
+//       return;
+//     }
+
+//     console.log('Element:', element);
+//     console.log('Element dimensions:', element.offsetWidth, 'x', element.offsetHeight);
+
+//     const canvas = await html2canvas(element, {
+//       useCORS: true,
+//       logging: true,
+//       scale: 2,
+//     });
+
+//     if (!canvas) {
+//       console.error('Canvas not created for element:', element);
+//       return;
+//     }
+
+//     // Check if the canvas is empty
+//     const isEmptyCanvas = canvas.width === 0 || canvas.height === 0;
+//     if (isEmptyCanvas) {
+//       console.warn(`Skipping section '${title}' due to empty content.`);
+//       return;
+//     }
+
+//     const imageData = canvas.toDataURL('image/png');
+
+//     if (!imageData || !imageData.startsWith('data:image/png')) {
+//       console.error('Invalid image data for element:', element);
+//       return;
+//     }
+
+//     if (pdf.internal.getNumberOfPages() > 0) {
+//       // pdf.addPage();
+//     }
+
+//     const pdfWidth = pdf.internal.pageSize.getWidth();
+//     const titleWidth = pdf.getStringUnitWidth(title) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+//     const titleX = (pdfWidth - titleWidth) / 2;
+
+//     // Draw the background rectangle for the title
+//     pdf.setFillColor(0, 71, 171); // Cobalt blue background
+//     pdf.rect(10, 5, pdfWidth - 20, 15, 'F');
+
+//     // Add the title text
+//     pdf.setTextColor(255, 255, 255); // White text color
+//     pdf.text(title, titleX, 15, { align: 'center' });
+
+//     // Add the captured image
+//     pdf.addImage(imageData, 'PNG', 10, 30, 180, 0);
+
+//     console.log(`Section '${title}' added to PDF successfully.`);
+//   } catch (error) {
+//     console.error(`Error capturing section '${title}':`, error);
+//   }
+// };
+const addSectionToPDF = async (ref, title, pdf) => {
+  try {
+    console.log(`Capturing section: ${title}`);
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    const element = ref.current;
+
+    if (!element) {
+      console.error('Element not found:', ref);
+      return;
+    }
+
+    console.log('Element:', element);
+    console.log('Element dimensions:', element.offsetWidth, 'x', element.offsetHeight);
+
+    const canvas = await html2canvas(element, {
+      useCORS: true,
+      logging: true,
+      scale: 2,
     });
-  
-    doc.save("employee_details.pdf");
-  };
-  
-  
-  // const handleDownloadPDF = () => {
-  //   if (!employeeData) return;
-  
-  //   const doc = new jsPDF();
-  //   let y = 20;
-  
-  //   doc.setFillColor(65, 105, 225); // background color (royal blue)
-  //   doc.setTextColor(255); // White text color
-  //   doc.setFontSize(16);
-  
-  //   const rectWidth = 190; // Width of the rectangle
-  //   const textWidth = doc.getStringUnitWidth("PERSONAL DETAILS") * 16; // Calculate text width based on font size
-  //   const xPosition = (rectWidth - textWidth) / 2 + 4; // Calculate x-coordinate to center the text within the rectangle
-  
-  //   doc.rect(4, y - 10, rectWidth, 15, "F"); // Draw a filled rectangle for the background
-  //   doc.text("PERSONAL DETAILS", xPosition, y); // Centered text
-  //   y += 20;
-  
-  //   const employeeInfo = [
-  //     { label: "Employee ID:", value: employeeData.EmployeeId },
-  //     { label: "Name:", value: employeeData.EmployeeName },
-  //     { label: "First Name:", value: employeeData.FirstName },
-  //     { label: "Middle Name:", value: employeeData.MiddleName },
-  //     { label: "Last Name:", value: employeeData.LastName },
-  //     { label: "Maiden Name:", value: employeeData.MaidenName },
-  //     { label: "Birthdate:", value: employeeData.Birthdate },
-  //     { label: "Age:", value: employeeData.Age },
-  //     { label: "Birth Month:", value: employeeData.BirthMonth },
-  //     { label: "Age Bracket:", value: employeeData.AgeBracket },
-  //     { label: "Gender:", value: employeeData.Gender },
-  //     { label: "Marital Status:", value: employeeData.MaritalStatus },
-  //     { label: "SSS:", value: employeeData.SSS },
-  //     { label: "PHIC:", value: employeeData.PHIC },
-  //     { label: "HDMF:", value: employeeData.HDMF },
-  //     { label: "TIN:", value: employeeData.TIN },
-  //     { label: "Contact Number:", value: employeeData.ContactNumber },
-  //     { label: "Email Address:", value: employeeData.EmailAddress },
-  //   ];
-  
-  //   doc.setFontSize(12);
-  //   doc.setTextColor(0);
-  
-  //   employeeInfo.forEach(({ label, value }) => {
-  //     if (label === "Employee ID:") {
-  //       // Display Employee ID with its value
-  //       doc.setFont("helvetica", "bold");
-  //       doc.text(label, 20, y);
-  //       doc.setFont("helvetica", "normal");
-  //       doc.text(value, 80, y);
-  //       y += 10; // Move to the next line
-  //     } else {
-  //       // Display other fields normally
-  //       doc.setFont("helvetica", "bold");
-  //       doc.text(label, 20, y);
-  //       doc.setFont("helvetica", "normal");
-  //       doc.text(value, 80, y);
-  //       y += 10; // Move to the next line
-  //     }
-  //   });
-  
-  //   doc.save("employee_details.pdf");
-  // };
-  
+
+    if (!canvas) {
+      console.error('Canvas not created for element:', element);
+      return;
+    }
+
+    const imageData = canvas.toDataURL('image/png');
+
+    if (!imageData || !imageData.startsWith('data:image/png')) {
+      console.error('Invalid image data for element:', element);
+      return;
+    }
+
+    if (pdf.internal.getNumberOfPages() > 0) {
+      // pdf.addPage();
+    }
+
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const titleWidth = pdf.getStringUnitWidth(title) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+    const titleX = (pdfWidth - titleWidth) / 2;
+
+    // Draw the background rectangle for the title
+    pdf.setFillColor(0, 71, 171); // Cobalt blue background
+    pdf.rect(10, 5, pdfWidth - 15, 15, 'F');
+
+    // Add the title text
+    pdf.setTextColor(255, 255, 255); // White text color
+    pdf.text(title, titleX, 15, { align: 'center' });
+
+    // Add the captured image
+    pdf.addImage(imageData, 'PNG', 10, 30, 180, 0);
+
+    console.log(`Section '${title}' added to PDF successfully.`);
+  } catch (error) {
+    console.error(`Error capturing section '${title}':`, error);
+  }
+};
+// // Function to generate the PDF
+// const handleDownloadPDF = () => {
+//   const doc = new jsPDF();
+
+//   // Personal Details Section
+//   doc.setFontSize(18);
+//   doc.text('Personal Details', 14, 22);
+//   doc.setFontSize(12);
+//   const personalDetails = [
+//     ['Employee Id', Array.isArray(employeeData.EmployeeId) ? employeeData.EmployeeId[0] : employeeData.EmployeeId],
+//     ['HRAN ID', employeeData.HRANID],
+//     ['Date Hired', employeeData.DateHired],
+//     ['Tenure', employeeData.Tenure],
+//     ['Employee Level', employeeData.EmployeeLevel],
+//     ['Project Code', employeeData.ProjectCode],
+//     ['Project Name', employeeData.ProjectName],
+//     ['Designation', employeeData.Designation],
+//     ['Department', employeeData.DepartmentName],
+//     ['Product Code', employeeData.ProdCode],
+//     ['Product Description', employeeData.ProdDesc],
+//     ['Employment Status', employeeData.EmploymentStatus],
+//     ['Employee Status', employeeData.EmployeeStatus],
+//     ['Work week type', employeeData.WorkWeekType],
+//     ['Shift', employeeData.ShiftName],
+//     ['Work Arrangement', employeeData.WorkArrangement],
+//     ['Rate Class', employeeData.RateClass],
+//     ['Rate', employeeData.Rate],
+//     ['Manager Id', employeeData.ManagerID],
+//     ['Manager Name', employeeData.ManagerName],
+//     ['PMPICID', employeeData.PMPICID],
+//     ['PMPICID Name', employeeData.PMPICIDName],
+//     ['Delivery Unit', employeeData.DUName],
+//     ['DUHID', employeeData.DUHID],
+//     ['DUH Name', employeeData.DUHName],
+//     ['Is Manager', employeeData.IsManager ? 'Yes' : 'No'],
+//     ['Is PMPIC', employeeData.IsPMPIC ? 'Yes' : 'No'],
+//     ['Is Individual Contributor', employeeData.IsIndividualContributor ? 'Yes' : 'No'],
+//     ['Is Active', employeeData.IsActive ? 'Yes' : 'No'],
+//     ['Is DU Head', employeeData.IsDUHead ? 'Yes' : 'No'],
+//     ['HRAN Type', employeeData.HRANType],
+//     ['TITO Type', employeeData.TITOType],
+//     ['Position', employeeData.Position],
+//     ['Position Level', employeeData.PositionLevel],
+//   ];
+//   personalDetails.forEach((detail, index) => {
+//     doc.text(`${detail[0]}: ${detail[1]}`, 14, 30 + (index * 8));
+//   });
+
+//   // Dependents Details Section
+//   doc.addPage();
+//   doc.setFontSize(18);
+//   doc.text('Dependents Details', 14, 22);
+//   doc.autoTable({
+//     head: [['Full Name', 'Phone Number', 'Relationship', 'Date of Birth', 'Occupation', 'Address', 'City', 'Province', 'Postal Code', 'Beneficiary', 'Beneficiary Date', 'Type of Coverage', 'Insurance', 'Insurance Date', 'Remarks', 'Company Paid', 'HMO Provider', 'HMO Policy Number']],
+//     body: filteredDependents.map(dependent => [
+//       dependent.FullName,
+//       dependent.PhoneNum,
+//       dependent.Relationship,
+//       dependent.DateOfBirth,
+//       dependent.Occupation,
+//       dependent.Address,
+//       dependent.City,
+//       dependent.DepProvince,
+//       dependent.PostalCode,
+//       dependent.Beneficiary,
+//       dependent.BeneficiaryDate,
+//       dependent.TypeOfCoverage,
+//       dependent.Insurance,
+//       dependent.InsuranceDate,
+//       dependent.Remarks,
+//       dependent.CompanyPaid,
+//       dependent.HMOProvider,
+//       dependent.HMOPolicyNumber
+//     ]),
+//     startY: 30
+//   });
+
+//   doc.save('employee_data.pdf');
+// };
   
   if (!employeeData) {
     return <div>Loading...</div>;
@@ -1047,7 +1196,6 @@ const handleInputChange = (e) => {
                                       <i className="far fa-eye"></i> View Profile
                                     </button> */}
                                     {/* </div> */}
-                                    
               <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                   <ul className="nav nav-tabs nav-fill">
                       <li className="nav-item">
@@ -1096,6 +1244,8 @@ const handleInputChange = (e) => {
                         {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
                         {successMessage && <div className="alert alert-success">{successMessage}</div>}
                             <form onSubmit={handleFormSubmit}>
+                            {/* <div className='card-body' id="employee-details-form" ref={personalDetailsRef}> */}
+                            <div className='card-body' ref={personalDetailsRef}>
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
@@ -1211,14 +1361,7 @@ const handleInputChange = (e) => {
                                               </div>
                                             </div>
                                 </div>
-                                {/* <div className="row justify-content-center">
-                                <div className="col-md-4">
-                                              <div className="form-group">
-                                              <label htmlFor="HRANID">HRANID</label>
-                                              <input type="text" className="form-control" value={employeeData.HRANID} onChange={handleInputChange} name="HRANID"/>     
-                                              </div>
-                                            </div>
-                                        </div> */}
+                                </div>
                                 <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
                             </form>
                         </div>
@@ -1228,6 +1371,7 @@ const handleInputChange = (e) => {
                           {/* Employment Information Form */}
                           <div className="container">
                             <form onSubmit={handleFormEmpInfoSubmit}>
+                            <div className='card-body' ref={employeeInfoRef}>
                                 <div className="row justify-content-center">
                                 <div className="col-md-4">
                                               <div className="form-group">
@@ -1474,7 +1618,7 @@ const handleInputChange = (e) => {
                                               </div>
                                             </div>
                                 </div>
-                               
+                                </div>
                                 <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
                             </form>
                         </div>
@@ -1520,9 +1664,6 @@ const handleInputChange = (e) => {
                                             </select>
                                         </div>
                                     </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    
                                 </div>
                                 <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
                             </form>
@@ -1627,6 +1768,7 @@ const handleInputChange = (e) => {
                                         </div>
                                     </div>
                                     </div> */}
+
                                     <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
@@ -1652,6 +1794,7 @@ const handleInputChange = (e) => {
                           {/* Address Form */}
                           <div className="container">
                           <form onSubmit={handleAddressFormSubmit}>
+                          <div className='card-body' ref={addressRef}>
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
@@ -1739,6 +1882,7 @@ const handleInputChange = (e) => {
                                               </div>
                                             </div>
                                 </div>
+                                </div>
                                 <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
                             </form>
                         </div>
@@ -1748,6 +1892,7 @@ const handleInputChange = (e) => {
                           {/* Education Form */}
                           <div className="container">
                             <form onSubmit={handleEducationFormSubmit}>
+                            <div className='card-body' ref={educationRef}>
                                 <div className="row justify-content-center">
                                 <div className="col-md-4">
                                         <div className="form-group">
@@ -1823,6 +1968,7 @@ const handleInputChange = (e) => {
                                         </div>
                                     </div>
                                 </div>
+                                </div>
                                 <button type="submit" className="btn btn-primary d-block mx-auto">Submit</button>
                             </form>
                         </div>
@@ -1859,6 +2005,7 @@ const handleInputChange = (e) => {
                           {/* Emergency Contact Form */}
                           <div className="container">
                           <form onSubmit={handleECFormSubmit}>
+                            <div className='card-body' ref={emergencyRef}>
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
                                         <div className="form-group">
@@ -1949,6 +2096,7 @@ const handleInputChange = (e) => {
                                                 <option value={false}>No</option>
                                             </select>
                                         </div>
+                                    </div>
                                     </div>
                                     </div>
                                 <br/>
@@ -2270,7 +2418,8 @@ const handleInputChange = (e) => {
                               </Modal>
                           {/* </div> */}
                                  {/* Dependent Table */}
-                                <div className="card-body">
+                                 <div className='card-body' ref={dependentRef}>
+                                {/* <div className="card-body"> */}
                                   <div className="table-responsive">
                                     <table className="table">
                                       <thead>
@@ -2377,6 +2526,7 @@ const handleInputChange = (e) => {
                       <br/>
                       </div>
                   </div>
+                  
               </div>
               </div>
               </div>

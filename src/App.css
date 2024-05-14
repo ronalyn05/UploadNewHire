@@ -79,16 +79,8 @@
   box-sizing: border-box;
   overflow-wrap: break-word;
   text-overflow: ellipsis;
+  margin-right: 10px;
 }
-/* .autoAdjustSpan {
-  display: block;
-  overflow-wrap: break-word; 
-  word-wrap: break-word;    
-  max-width: 100%;           
-  padding: 8px;             
-  border: 1px solid #ccc;    
-} */
-
 
 .valueBadge{
   text-align: center;
@@ -96,8 +88,8 @@
   text-decoration: underline;
 }
 .border {
-  border: 1px solid #ccc; /* Solid gray border */
-  padding: 10px; /* Optional padding for spacing */
+  border: 1px solid #ccc; 
+  padding: 10px; 
 }
 .textDecorationUnderline {
   text-decoration: underline;
