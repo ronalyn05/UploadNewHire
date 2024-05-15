@@ -813,6 +813,398 @@ const handleInputChange = (e) => {
   
   //   const doc = new jsPDF();
   //   let y = 20;
+    
+  //   // Function to add section header
+  //   const addSectionHeader = (doc, text, y) => {
+  //     doc.setFillColor(65, 105, 225); // Background color (royal blue)
+  //     doc.setTextColor(255); // White text color
+  //     doc.setFontSize(16);
+  
+  //     const rectWidth = 190; // Width of the rectangle
+  //     const textWidth = doc.getStringUnitWidth(text) * 16; // Calculate text width based on font size
+  //     const xPosition = (rectWidth - textWidth) / 2 + 4; // Calculate x-coordinate to center the text within the rectangle
+  
+  //     doc.rect(4, y - 10, rectWidth, 12, "F"); // Draw a filled rectangle for the background
+  //     doc.text(text, xPosition, y); // Centered text
+  //     y += 20;
+  //     return y;
+  //   };
+  
+  //   // Personal Details Section
+  //   y = addSectionHeader(doc, "PERSONAL DETAILS", y);
+  
+  //   // Function to add detail fields
+  //   const addDetailFields = (doc, details, y) => {
+  //     doc.setFontSize(12);
+  //     doc.setTextColor(0);
+  
+  //     for (let i = 0; i < details.length; i += 2) {
+  //       const detail1 = details[i];
+  //       const detail2 = details[i + 1];
+  
+  //       doc.setFont("helvetica", "bold");
+  //       doc.text(detail1.label, 20, y);
+  //       doc.setFont("helvetica", "normal");
+  
+  //       // Adjust value position to avoid overflow
+  //       const detail1ValueX = 20 + doc.getStringUnitWidth(detail1.label) * doc.internal.getFontSize() / doc.internal.scaleFactor + 5;
+  //       doc.text(detail1.value, detail1ValueX, y);
+  
+  //       if (detail2) {
+  //         doc.setFont("helvetica", "bold");
+  //         doc.text(detail2.label, 110, y);
+  //         doc.setFont("helvetica", "normal");
+  
+  //         // Adjust value position to avoid overflow
+  //         const detail2ValueX = 110 + doc.getStringUnitWidth(detail2.label) * doc.internal.getFontSize() / doc.internal.scaleFactor + 5;
+  //         doc.text(detail2.value, detail2ValueX, y);
+  //       }
+  
+  //       y += 10;
+  //     }
+  //     return y;
+  //   };
+  
+  //   // Personal Details Fields
+  //   const personalDetails = [
+  //     { label: "Employee Id:", value: Array.isArray(employeeData.EmployeeId) ? employeeData.EmployeeId[0] : employeeData.EmployeeId },
+  //     { label: "Name:", value: employeeData.EmployeeName },
+  //     { label: "First Name:", value: employeeData.FirstName },
+  //     { label: "Middle Name:", value: employeeData.MiddleName },
+  //     { label: "Last Name:", value: employeeData.LastName },
+  //     { label: "Maiden Name:", value: employeeData.MaidenName },
+  //     { label: "Birthdate:", value: employeeData.Birthdate },
+  //     { label: "Age:", value: employeeData.Age },
+  //     { label: "Birth Month:", value: employeeData.BirthMonth },
+  //     { label: "Age Bracket:", value: employeeData.AgeBracket },
+  //     { label: "Gender:", value: employeeData.Gender },
+  //     { label: "Marital Status:", value: employeeData.MaritalStatus },
+  //     { label: "SSS:", value: employeeData.SSS },
+  //     { label: "PHIC:", value: employeeData.PHIC },
+  //     { label: "HDMF:", value: employeeData.HDMF },
+  //     { label: "TIN:", value: employeeData.TIN },
+  //     { label: "Contact Number:", value: employeeData.ContactNumber },
+  //     { label: "Email Address:", value: employeeData.EmailAddress },
+  //   ];
+  
+  //   y = addDetailFields(doc, personalDetails, y);
+  
+  //   // Adding a new page for employee information form
+  //   doc.addPage();
+  //   y = 20;
+  
+  //   // Employee Information Section
+  //   y = addSectionHeader(doc, "EMPLOYEE INFORMATION", y);
+  
+  //   // Employee Information Fields
+  //   const formData = [
+  //     { label: "HRAN ID:", value: employeeData.HRANID },
+  //     { label: "Date Hired:", value: employeeData.DateHired },
+  //     { label: "Tenure:", value: employeeData.Tenure },
+  //     { label: "Employee Level:", value: employeeData.EmployeeLevel },
+  //     { label: "Project Code:", value: employeeData.ProjectCode },
+  //     { label: "Project Name:", value: employeeData.ProjectName },
+  //     { label: "Designation:", value: employeeData.Designation },
+  //     { label: "Department:", value: employeeData.DepartmentName },
+  //     { label: "Product Code:", value: employeeData.ProdCode },
+  //     { label: "Product Description:", value: employeeData.ProdDesc },
+  //     { label: "Employment Status:", value: employeeData.EmploymentStatus },
+  //     { label: "Employee Status:", value: employeeData.EmployeeStatus },
+  //     { label: "Work Week Type:", value: employeeData.WorkWeekType },
+  //     { label: "Shift:", value: employeeData.ShiftName },
+  //     { label: "Work Arrangement:", value: employeeData.WorkArrangement },
+  //     { label: "Rate Class:", value: employeeData.RateClass },
+  //     { label: "Rate:", value: employeeData.Rate },
+  //     { label: "Manager ID:", value: employeeData.ManagerID },
+  //     { label: "Manager Name:", value: employeeData.ManagerName },
+  //     { label: "PMPICID:", value: employeeData.PMPICID },
+  //     { label: "PMPICID Name:", value: employeeData.PMPICIDName },
+  //     { label: "Delivery Unit:", value: employeeData.DUName },
+  //     { label: "DUHID:", value: employeeData.DUHID },
+  //     { label: "DUH Name:", value: employeeData.DUHName },
+  //     { label: "Is Manager:", value: employeeData.IsManager ? 'Yes' : 'No' },
+  //     { label: "Is PMPIC:", value: employeeData.IsPMPIC ? 'Yes' : 'No' },
+  //     { label: "Is Individual Contributor:", value: employeeData.IsIndividualContributor ? 'Yes' : 'No' },
+  //     { label: "Is Active:", value: employeeData.IsActive ? 'Yes' : 'No' },
+  //     { label: "Is DU Head:", value: employeeData.IsDUHead ? 'Yes' : 'No' },
+  //     { label: "HRAN Type:", value: employeeData.HRANType },
+  //     { label: "TITO Type:", value: employeeData.TITOType },
+  //     { label: "Position:", value: employeeData.Position },
+  //     { label: "Position Level:", value: employeeData.PositionLevel },
+  //   ];
+  
+  //   y = addDetailFields(doc, formData, y);
+  
+  //   doc.save("employee_report.pdf");
+  // };
+  const handleDownloadPDF = () => {
+    if (!employeeData) return;
+  
+    const doc = new jsPDF();
+    let y = 20;
+  
+    // Calculate the x position for Employee ID and Name
+      const infoX = 70; // X position for Employee ID and Name
+
+      // Add profile photo
+      const profilePhotoBase64 = employeeData.ProfilePhoto || '/img/user.png';
+      doc.addImage(profilePhotoBase64, 'JPEG', 20, y, 35, 35);
+
+      // Add Employee ID next to profile image
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "bold");
+      doc.text("Employee Id:", infoX, y + 10);
+      doc.setFont("helvetica", "normal");
+      doc.text(Array.isArray(employeeData.EmployeeId) ? employeeData.EmployeeId[0] : employeeData.EmployeeId.toString(), infoX + 40, y + 10, { maxWidth: 80 });
+
+      // Add Name next to Employee ID
+      doc.setFont("helvetica", "bold");
+      doc.text("Name:", infoX, y + 20);
+      doc.setFont("helvetica", "normal");
+      doc.text(employeeData.EmployeeName, infoX + 40, y + 20, { maxWidth: 80 });
+
+      y += 50; // Move down after the profile section and employee info
+  
+      // Function to add section header
+      const addSectionHeader = (doc, text, y) => {
+      doc.setFillColor(65, 105, 225); // Background color (royal blue)
+      doc.setTextColor(255); // White text color
+      doc.setFontSize(14);
+  
+      const rectWidth = 190; // Width of the rectangle
+      const textWidth = doc.getTextWidth(text); // Calculate text width
+      const xPosition = (rectWidth - textWidth) / 2 + 4; // Calculate x-coordinate to center the text within the rectangle
+  
+      doc.rect(4, y - 10, rectWidth, 12, "F"); // Draw a filled rectangle for the background
+      doc.text(text, xPosition, y); // Centered text
+      y += 20;
+      return y;
+    };
+  
+    // Personal Details Section
+    y = addSectionHeader(doc, "PERSONAL DETAILS", y);
+
+    // Function to add detail fields
+    const addDetailFields = (doc, details, startY) => {
+      doc.setFontSize(11);
+      doc.setTextColor(0);
+    
+      const maxWidth = 180; // Maximum width before wrapping to next line
+      const labelX = 20; // X position for labels
+      const valueX = labelX + 100; // X position for values
+      let currentY = startY;
+    
+      for (let i = 0; i < details.length; i++) {
+        const { label, value } = details[i];
+    
+        // Calculate the number of lines needed for the label and value
+        const labelLines = splitTextToLines(label, maxWidth);
+        const valueLines = doc.splitTextToSize(value, 80);
+    
+        // Determine the maximum lines between label and value
+        const maxLines = Math.max(labelLines.length, valueLines.length);
+    
+        // Calculate the total height required for this detail section
+        const totalHeight = maxLines * 6 + 4;
+    
+        // Check if adding this detail would exceed the page height
+        if (currentY + totalHeight > doc.internal.pageSize.height - 20) {
+          doc.addPage();
+          currentY = 20; // Reset startY position for new page
+        }
+    
+        // Draw label and value line by line
+        for (let lineIndex = 0; lineIndex < maxLines; lineIndex++) {
+          const labelLine = labelLines[lineIndex] || '';
+          const valueLine = valueLines[lineIndex] || '';
+    
+          // Calculate current Y position for this line
+          const lineY = currentY + lineIndex * 6;
+    
+          // Draw label and value
+          doc.setFont("helvetica", "bold");
+          doc.text(labelLine, labelX, lineY);
+    
+          doc.setFont("helvetica", "normal");
+          doc.text(valueLine, valueX, lineY);
+        }
+    
+        // Update currentY position for the next detail section
+        currentY += totalHeight;
+      }
+    
+      return currentY; // Return final currentY position after rendering all details
+    };
+    
+    // Helper function to split text into lines based on maxWidth
+    const splitTextToLines = (text, maxWidth) => {
+      const words = text.split(' ');
+      let line = '';
+      const lines = [];
+    
+      words.forEach((word) => {
+        const testLine = line.length > 0 ? line + ' ' + word : word;
+        const testWidth = doc.getTextWidth(testLine);
+    
+        if (testWidth <= maxWidth) {
+          line = testLine;
+        } else {
+          lines.push(line);
+          line = word;
+        }
+      });
+    
+      // Push the last line
+      lines.push(line);
+    
+      return lines;
+    };
+    
+    // const addDetailFields = (doc, details, y) => {
+    //   doc.setFontSize(11);
+    //   doc.setTextColor(0);
+    
+    //   const maxWidth = 180; // Maximum width before wrapping to next line
+    
+    //   for (let i = 0; i < details.length; i += 2) {
+    //     const detail1 = details[i];
+    //     const detail2 = details[i + 1];
+    
+    //     // Function to split label into multiple lines if width exceeds maxWidth
+    //     const splitLabelIfNeeded = (label) => {
+    //       const labelWidth = doc.getTextWidth(label);
+    //       if (labelWidth > maxWidth) {
+    //         const words = label.split(' ');
+    //         let line = '';
+    //         const lines = [];
+    //         words.forEach((word) => {
+    //           const testLine = line.length > 0 ? line + ' ' + word : word;
+    //           const testWidth = doc.getTextWidth(testLine);
+    //           if (testWidth <= maxWidth) {
+    //             line = testLine;
+    //           } else {
+    //             lines.push(line);
+    //             line = word;
+    //           }
+    //         });
+    //         lines.push(line);
+    //         return lines;
+    //       }
+    //       return [label];
+    //     };
+    
+    //     doc.setFont("helvetica", "bold");
+    //     const detail1Lines = splitLabelIfNeeded(detail1.label);
+    //     detail1Lines.forEach((line, index) => {
+    //       doc.text(line, 20, y + index * 6);
+    //     });
+    
+    //     doc.setFont("helvetica", "normal");
+    //     const detail1ValueX = 20 + doc.getTextWidth(detail1.label) + 5;
+    //     const detail1Value = doc.splitTextToSize(detail1.value, 80);
+    //     doc.text(detail1Value, detail1ValueX, y);
+    
+    //     if (detail2) {
+    //       doc.setFont("helvetica", "bold");
+    //       const detail2Lines = splitLabelIfNeeded(detail2.label);
+    //       detail2Lines.forEach((line, index) => {
+    //         doc.text(line, 110, y + index * 6);
+    //       });
+    
+    //       doc.setFont("helvetica", "normal");
+    //       const detail2ValueX = 110 + doc.getTextWidth(detail2.label) + 5;
+    //       const detail2ValueText = doc.splitTextToSize(detail2.value, 80);
+    //       doc.text(detail2ValueText, detail2ValueX, y);
+    
+    //       const maxLength = Math.max(detail1Value.length, detail2ValueText.length);
+    //       y += (detail2Lines.length > detail1Lines.length ? detail2Lines.length : detail1Lines.length) * 6 + 4;
+    //     } else {
+    //       y += detail1Lines.length * 6 + 4;
+    //     }
+    //   }
+    //   return y;
+    // };
+    
+  
+    // Personal Details Fields
+    const personalDetails = [
+      { label: "First Name:", value: employeeData.FirstName },
+      { label: "Middle Name:", value: employeeData.MiddleName },
+      { label: "Last Name:", value: employeeData.LastName },
+      { label: "Maiden Name:", value: employeeData.MaidenName },
+      { label: "Birthdate:", value: employeeData.Birthdate },
+      { label: "Age:", value: employeeData.Age },
+      { label: "Birth Month:", value: employeeData.BirthMonth },
+      { label: "Age Bracket:", value: employeeData.AgeBracket },
+      { label: "Gender:", value: employeeData.Gender },
+      { label: "Marital Status:", value: employeeData.MaritalStatus },
+      { label: "SSS:", value: employeeData.SSS },
+      { label: "PHIC:", value: employeeData.PHIC },
+      { label: "HDMF:", value: employeeData.HDMF },
+      { label: "TIN:", value: employeeData.TIN },
+      { label: "Contact Number:", value: employeeData.ContactNumber },
+      { label: "Email Address:", value: employeeData.EmailAddress },
+    ];
+  
+    y = addDetailFields(doc, personalDetails, y);
+  
+    // Adding a new page for employee information form
+    doc.addPage();
+    y = 20;
+  
+    // Employee Information Section
+    y = addSectionHeader(doc, "EMPLOYEE INFORMATION", y);
+  
+    // Employee Information Fields
+    const formData = [
+      { label: "HRAN ID:", value: employeeData.HRANID },
+      { label: "Date Hired:", value: employeeData.DateHired },
+      { label: "Tenure:", value: employeeData.Tenure },
+      { label: "Employee Level:", value: employeeData.EmployeeLevel },
+      { label: "Project Code:", value: employeeData.ProjectCode },
+      { label: "Project Name:", value: employeeData.ProjectName },
+      { label: "Designation:", value: employeeData.Designation },
+      { label: "Department:", value: employeeData.DepartmentName },
+      { label: "Product Code:", value: employeeData.ProdCode },
+      { label: "Product Description:", value: employeeData.ProdDesc },
+      { label: "Employment Status:", value: employeeData.EmploymentStatus },
+      { label: "Employee Status:", value: employeeData.EmployeeStatus },
+      { label: "Work Week Type:", value: employeeData.WorkWeekType },
+      { label: "Shift:", value: employeeData.ShiftName },
+      { label: "Work Arrangement:", value: employeeData.WorkArrangement },
+      { label: "Rate Class:", value: employeeData.RateClass },
+      { label: "Rate:", value: employeeData.Rate },
+      { label: "Manager ID:", value: employeeData.ManagerID },
+      { label: "Manager Name:", value: employeeData.ManagerName },
+      { label: "PMPICID:", value: employeeData.PMPICID },
+      { label: "PMPICID Name:", value: employeeData.PMPICIDName },
+      { label: "Delivery Unit:", value: employeeData.DUName },
+      { label: "DUHID:", value: employeeData.DUHID },
+      { label: "DUH Name:", value: employeeData.DUHName },
+      { label: "Is Manager:", value: employeeData.IsManager ? 'Yes' : 'No' },
+      { label: "Is PMPIC:", value: employeeData.IsPMPIC ? 'Yes' : 'No' },
+      { label: "Is Individual Contributor:", value: employeeData.IsIndividualContributor ? 'Yes' : 'No' },
+      { label: "Is Active:", value: employeeData.IsActive ? 'Yes' : 'No' },
+      { label: "Is DU Head:", value: employeeData.IsDUHead ? 'Yes' : 'No' },
+      { label: "HRAN Type:", value: employeeData.HRANType },
+      { label: "TITO Type:", value: employeeData.TITOType },
+      { label: "Position:", value: employeeData.Position },
+      { label: "Position Level:", value: employeeData.PositionLevel },
+    ];
+  
+    y = addDetailFields(doc, formData, y);
+  
+    doc.save("employee_report.pdf");
+  };
+  
+  
+  
+  
+  // const handleDownloadPDF = () => {
+  //   if (!employeeData) return;
+  
+  //   const doc = new jsPDF();
+  //   let y = 20;
   
   //   doc.setFillColor(65, 105, 225); // background color (royal blue)
   //   doc.setTextColor(255); // White text color
@@ -827,7 +1219,7 @@ const handleInputChange = (e) => {
   //   y += 20;
   
   //   // Display Employee ID
-  //   const employeeIdLabel = "Employee ID:";
+  //   // const employeeIdLabel = "Employee ID:";
   //   const employeeIdValue = Array.isArray(employeeData.EmployeeId) ? employeeData.EmployeeId[0] : employeeData.EmployeeId;
   //   doc.setFont("helvetica", "bold");
   //   doc.text(employeeIdLabel, 20, y);
@@ -870,6 +1262,7 @@ const handleInputChange = (e) => {
   
   //   doc.save("employee_details.pdf");
   // };
+
 //   const handleDownloadPDF = () => {
 //     const personalDetails = personalDetailsRef.current;
 //     const employmentInfo = employmentInfoRef.current;
@@ -914,34 +1307,35 @@ const handleInputChange = (e) => {
 //     });
 // };
 
-const handleDownloadPDF = async () => {
-  const pdf = new jsPDF();
 
-  try {
-    // Add Personal Details section to PDF
-    await addSectionToPDF(personalDetailsRef, 'Personal Details', pdf);
+// const handleDownloadPDF = async () => {
+//   const pdf = new jsPDF();
 
-    // Add Employment Information section to PDF
-    await addSectionToPDF(employeeInfoRef, 'Employment Information', pdf);
+//   try {
+//     // Add Personal Details section to PDF
+//     await addSectionToPDF(personalDetailsRef, 'Personal Details', pdf);
 
-    // Add Address Information section to PDF
-    await addSectionToPDF(addressRef, 'Address Details', pdf);
+//     // Add Employment Information section to PDF
+//     await addSectionToPDF(employeeInfoRef, 'Employment Information', pdf);
 
-    //Add Education Details section to PDF
-    await addSectionToPDF(educationRef, 'Education Details', pdf);
+//     // Add Address Information section to PDF
+//     await addSectionToPDF(addressRef, 'Address Details', pdf);
 
-    // Add Emergency Contact Details section to PDF
-    await addSectionToPDF(emergencyRef, 'Emergency Contact Details', pdf);
+//     //Add Education Details section to PDF
+//     await addSectionToPDF(educationRef, 'Education Details', pdf);
 
-    // Add Dependent Details section to PDF
-    await addSectionToPDF(dependentRef, 'Dependent Records', pdf);
+//     // Add Emergency Contact Details section to PDF
+//     await addSectionToPDF(emergencyRef, 'Emergency Contact Details', pdf);
 
-    // Save PDF
-    pdf.save('employee_details.pdf');
-  } catch (error) {
-    console.error('Error generating PDF:', error);
-  }
-};
+//     // Add Dependent Details section to PDF
+//     await addSectionToPDF(dependentRef, 'Dependent Records', pdf);
+
+//     // Save PDF
+//     pdf.save('employee_details.pdf');
+//   } catch (error) {
+//     console.error('Error generating PDF:', error);
+//   }
+// };
 
 // const addSectionToPDF = async (ref, title, pdf) => {
 //   try {
@@ -970,13 +1364,6 @@ const handleDownloadPDF = async () => {
 //       return;
 //     }
 
-//     // Check if the canvas is empty
-//     const isEmptyCanvas = canvas.width === 0 || canvas.height === 0;
-//     if (isEmptyCanvas) {
-//       console.warn(`Skipping section '${title}' due to empty content.`);
-//       return;
-//     }
-
 //     const imageData = canvas.toDataURL('image/png');
 
 //     if (!imageData || !imageData.startsWith('data:image/png')) {
@@ -994,7 +1381,7 @@ const handleDownloadPDF = async () => {
 
 //     // Draw the background rectangle for the title
 //     pdf.setFillColor(0, 71, 171); // Cobalt blue background
-//     pdf.rect(10, 5, pdfWidth - 20, 15, 'F');
+//     pdf.rect(10, 5, pdfWidth - 15, 15, 'F');
 
 //     // Add the title text
 //     pdf.setTextColor(255, 255, 255); // White text color
@@ -1008,64 +1395,7 @@ const handleDownloadPDF = async () => {
 //     console.error(`Error capturing section '${title}':`, error);
 //   }
 // };
-const addSectionToPDF = async (ref, title, pdf) => {
-  try {
-    console.log(`Capturing section: ${title}`);
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    const element = ref.current;
-
-    if (!element) {
-      console.error('Element not found:', ref);
-      return;
-    }
-
-    console.log('Element:', element);
-    console.log('Element dimensions:', element.offsetWidth, 'x', element.offsetHeight);
-
-    const canvas = await html2canvas(element, {
-      useCORS: true,
-      logging: true,
-      scale: 2,
-    });
-
-    if (!canvas) {
-      console.error('Canvas not created for element:', element);
-      return;
-    }
-
-    const imageData = canvas.toDataURL('image/png');
-
-    if (!imageData || !imageData.startsWith('data:image/png')) {
-      console.error('Invalid image data for element:', element);
-      return;
-    }
-
-    if (pdf.internal.getNumberOfPages() > 0) {
-      // pdf.addPage();
-    }
-
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const titleWidth = pdf.getStringUnitWidth(title) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
-    const titleX = (pdfWidth - titleWidth) / 2;
-
-    // Draw the background rectangle for the title
-    pdf.setFillColor(0, 71, 171); // Cobalt blue background
-    pdf.rect(10, 5, pdfWidth - 15, 15, 'F');
-
-    // Add the title text
-    pdf.setTextColor(255, 255, 255); // White text color
-    pdf.text(title, titleX, 15, { align: 'center' });
-
-    // Add the captured image
-    pdf.addImage(imageData, 'PNG', 10, 30, 180, 0);
-
-    console.log(`Section '${title}' added to PDF successfully.`);
-  } catch (error) {
-    console.error(`Error capturing section '${title}':`, error);
-  }
-};
 // // Function to generate the PDF
 // const handleDownloadPDF = () => {
 //   const doc = new jsPDF();
@@ -1162,11 +1492,10 @@ const addSectionToPDF = async (ref, title, pdf) => {
               <div className="card shadow mb-4">
               <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
               <button
-                                      className="seeProfile btn btn-xs mr-2"
-                                      onClick={handleView}
-                                    >
-                                      <i className="fas fa-eye"></i> See Profile
-                                    </button>
+                className="seeProfile btn btn-xs mr-2"
+                onClick={handleView} >
+                <i className="fas fa-eye"></i> See Profile
+               </button>
                     {/* <div className="d-flex align-items-center"> */}
                     <button
                         className="update-button btn btn-xs"
@@ -1969,7 +2298,7 @@ const addSectionToPDF = async (ref, title, pdf) => {
                                     </div>
                                 </div>
                                 </div>
-                                <button type="submit" className="btn btn-primary d-block mx-auto">Submit</button>
+                                <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
                             </form>
                         </div>
                       <br/>
@@ -2520,7 +2849,7 @@ const addSectionToPDF = async (ref, title, pdf) => {
                                     </div>
                                 </div>
                                 <br/>
-                                <button type="submit" className="btn btn-primary d-block mx-auto">Submit</button>
+                                <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
                             </form>
                         </div>
                       <br/>
