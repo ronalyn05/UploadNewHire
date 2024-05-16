@@ -47,79 +47,79 @@ function EmployeeProfile() {
     // Navigate back one step in history (equivalent to pressing the browser's back button)
     navigate(-1);
   };
-  const handleDownloadPDF = async () => {
-    const pdf = new jsPDF();
+  // const handleDownloadPDF = async () => {
+  //   const pdf = new jsPDF();
   
-    try {
-      // Add Personal Details section to PDF
-      await addSectionToPDF(employeeProfileRef, 'Employee Profile', pdf);
+  //   try {
+  //     // Add Personal Details section to PDF
+  //     await addSectionToPDF(employeeProfileRef, 'Employee Profile', pdf);
   
   
-      // Save PDF
-      pdf.save('employee_profile.pdf');
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-    }
-  };
+  //     // Save PDF
+  //     pdf.save('employee_profile.pdf');
+  //   } catch (error) {
+  //     console.error('Error generating PDF:', error);
+  //   }
+  // };
   
-  const addSectionToPDF = async (ref, title, pdf) => {
-    try {
-      console.log(`Capturing section: ${title}`);
+  // const addSectionToPDF = async (ref, title, pdf) => {
+  //   try {
+  //     console.log(`Capturing section: ${title}`);
   
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+  //     await new Promise((resolve) => setTimeout(resolve, 1000));
   
-      const element = ref.current;
+  //     const element = ref.current;
   
-      if (!element) {
-        console.error('Element not found:', ref);
-        return;
-      }
+  //     if (!element) {
+  //       console.error('Element not found:', ref);
+  //       return;
+  //     }
   
-      console.log('Element:', element);
-      console.log('Element dimensions:', element.offsetWidth, 'x', element.offsetHeight);
+  //     console.log('Element:', element);
+  //     console.log('Element dimensions:', element.offsetWidth, 'x', element.offsetHeight);
   
-      const canvas = await html2canvas(element, {
-        useCORS: true,
-        logging: true,
-        scale: 2,
-      });
+  //     const canvas = await html2canvas(element, {
+  //       useCORS: true,
+  //       logging: true,
+  //       scale: 2,
+  //     });
   
-      if (!canvas) {
-        console.error('Canvas not created for element:', element);
-        return;
-      }
+  //     if (!canvas) {
+  //       console.error('Canvas not created for element:', element);
+  //       return;
+  //     }
   
-      const imageData = canvas.toDataURL('image/png');
+  //     const imageData = canvas.toDataURL('image/png');
   
-      if (!imageData || !imageData.startsWith('data:image/png')) {
-        console.error('Invalid image data for element:', element);
-        return;
-      }
+  //     if (!imageData || !imageData.startsWith('data:image/png')) {
+  //       console.error('Invalid image data for element:', element);
+  //       return;
+  //     }
   
-      if (pdf.internal.getNumberOfPages() > 0) {
-        // pdf.addPage();
-      }
+  //     if (pdf.internal.getNumberOfPages() > 0) {
+  //       // pdf.addPage();
+  //     }
   
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const titleWidth = pdf.getStringUnitWidth(title) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
-      const titleX = (pdfWidth - titleWidth) / 2;
+  //     const pdfWidth = pdf.internal.pageSize.getWidth();
+  //     const titleWidth = pdf.getStringUnitWidth(title) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+  //     const titleX = (pdfWidth - titleWidth) / 2;
   
-      // Draw the background rectangle for the title
-      pdf.setFillColor(0, 71, 171); // Cobalt blue background
-      pdf.rect(10, 5, pdfWidth - 15, 15, 'F');
+  //     // Draw the background rectangle for the title
+  //     pdf.setFillColor(0, 71, 171); // Cobalt blue background
+  //     pdf.rect(10, 5, pdfWidth - 15, 15, 'F');
   
-      // Add the title text
-      pdf.setTextColor(255, 255, 255); // White text color
-      pdf.text(title, titleX, 15, { align: 'center' });
+  //     // Add the title text
+  //     pdf.setTextColor(255, 255, 255); // White text color
+  //     pdf.text(title, titleX, 15, { align: 'center' });
   
-      // Add the captured image
-      pdf.addImage(imageData, 'PNG', 10, 30, 180, 0);
+  //     // Add the captured image
+  //     pdf.addImage(imageData, 'PNG', 10, 30, 180, 0);
   
-      console.log(`Section '${title}' added to PDF successfully.`);
-    } catch (error) {
-      console.error(`Error capturing section '${title}':`, error);
-    }
-  };
+  //     console.log(`Section '${title}' added to PDF successfully.`);
+  //   } catch (error) {
+  //     console.error(`Error capturing section '${title}':`, error);
+  //   }
+  // };
 
   if (!employeeData) {
     return <div>Loading...</div>;
@@ -157,14 +157,14 @@ function EmployeeProfile() {
                           <i className="fas fa-arrow-left"></i> Back
                         </button>
                       </div> */}
-                      <div className="d-flex align-items-center">
+                      {/* <div className="d-flex align-items-center">
                         <button
                         className="update-button btn btn-xs mr-2"
                         onClick={handleDownloadPDF}
                         >
                         <i className="fas fa-arrow-down"></i> Download Profile
                         </button>
-                    </div>
+                    </div> */}
                     </div>
                     <div className="card-body" ref={employeeProfileRef}>
                       <div className="row">
