@@ -106,12 +106,14 @@ const insertNewHire = async (newHire) => {
       .input("PHIC", newHire.PHIC)
       .input("HDMF", newHire.HDMF)
       .input("TIN", newHire.TIN)
+      .input("HmoProvider", newHire.HmoProvider)
+      .input("HmoPolicyNumber", newHire.HmoPolicyNumber)
       // .input("ContactNumber", newHire.ContactNumber)
       .input("EmailAddress", newHire.EmailAddress).query(`
         INSERT INTO EmpPersonalDetails (EmployeeId, EmployeeName, FirstName, MiddleName, LastName, MaidenName, 
-          Birthdate, Age, BirthMonth, AgeBracket, Gender, MaritalStatus, SSS, PHIC, HDMF, TIN, EmailAddress) 
+          Birthdate, Age, BirthMonth, AgeBracket, Gender, MaritalStatus, SSS, PHIC, HDMF, TIN, HmoProvider, HmoPolicyNumber, EmailAddress) 
         VALUES (@EmployeeId, @EmployeeName, @FirstName, @MiddleName, @LastName, @MaidenName,
-          @Birthdate, @Age, @BirthMonth, @AgeBracket, @Gender, @MaritalStatus, @SSS, @PHIC, @HDMF, @TIN, @EmailAddress)
+          @Birthdate, @Age, @BirthMonth, @AgeBracket, @Gender, @MaritalStatus, @SSS, @PHIC, @HDMF, @TIN, @HmoProvider, @HmoPolicyNumber, @EmailAddress)
       `);
     //insert contact number to Contact table
     await pool
@@ -312,6 +314,8 @@ await pool
     .input("EmployeeId", newHire.EmployeeId)
     .input("HRANID", newHire.HRANID)
     .input("DateHired", newHire.DateHired)
+    .input("Facility", newHire.Facility)
+    .input("Role", newHire.Role)
     .input("Tenure", newHire.Tenure)
     .input("EmployeeLevel", newHire.EmployeeLevel)
     .input("Designation", newHire.Designation)
@@ -343,14 +347,14 @@ await pool
     .query(`
     INSERT INTO EmployeeInfo (
       EmployeeId, ProjectId, DepartmentId, ProdId, ShiftId, DUID,
-      HRANID, DateHired, Tenure, EmployeeLevel, Designation, EmploymentStatus, EmployeeStatus,
+      HRANID, DateHired, Facility, Role, Tenure, EmployeeLevel, Designation, EmploymentStatus, EmployeeStatus,
       WorkWeekType, WorkArrangement, RateClass, Rate, ManagerID, ManagerName, PMPICID,
       PMPICIDName, DUHID, DUHName, IsManager, IsPMPIC, IsIndividualContributor, IsActive,
       HRANType, TITOType, Position, PositionLevel, IsDUHead
     )
     SELECT 
       @EmployeeId, P.ProjectId, D.DepartmentId, Pr.ProdId, S.ShiftId, DU.DUID, 
-      @HRANID, @DateHired, @Tenure, @EmployeeLevel, @Designation, @EmploymentStatus, 
+      @HRANID, @DateHired, @Facility, @Role, @Tenure, @EmployeeLevel, @Designation, @EmploymentStatus, 
       @EmployeeStatus, @WorkWeekType, @WorkArrangement, @RateClass, @Rate, 
       @ManagerID, @ManagerName, @PMPICID, @PMPICIDName, @DUHID, @DUHName, 
       @IsManager, @IsPMPIC, @IsIndividualContributor, @IsActive, @HRANType, 
@@ -372,16 +376,58 @@ await pool
     throw new Error("Failed to insert new data.");
   }
 };
-//retrieve personal details
+// Function to insert a new contact record into the database
+const getAddNewContactId = async (employeeId, newContactData) => {
+  try {
+    let pool = await sql.connect(config);
+    let result = await pool
+      .request()
+      .input('EmployeeId', sql.VarChar, employeeId)
+      .input('SecondaryContactNum', sql.VarChar(255), newContactData.newContactNumber)
+      .query(`
+            UPDATE Contact
+            SET SecondaryContactNum = @SecondaryContactNum
+            WHERE EmployeeId = @EmployeeId
+        `);
+
+    return result;
+  } catch (error) {
+    console.error('Error inserting contact record:', error);
+    throw error;
+  }
+};
+//retrieve employee data 
 const getAllNewHireEmployees = async () => {
   try {
     let pool = await sql.connect(config);
     let result = await pool.request()
     .query(`
-        SELECT EP.*, C.ContactNumber 
-        FROM EmpPersonalDetails AS EP
-        INNER JOIN Contact AS C ON EP.EmployeeId = C.EmployeeId
-        WHERE C.ContactId NOT IN (SELECT ContactId FROM EmergencyContactNumber);
+    SELECT 
+    EP.EmployeeId,
+    EP.EmployeeName,
+    EI.Facility,
+    EI.EmployeeStatus,
+    EI.EmploymentStatus,
+    EI.Role,
+    EI.DateHired,
+    EI.Position,
+    EI.EmployeeLevel,
+    EI.WorkArrangement,
+    EI.WorkWeekType,
+    PR.ProjectCode,
+    Dept.DepartmentName,
+    DU.DUName,
+    SHFT.ShiftName,
+    SHFT.ShiftType,
+    EI.Designation
+    FROM EmpPersonalDetails AS EP
+    INNER JOIN EmployeeInfo AS EI ON EP.EmployeeId = EI.EmployeeId
+    LEFT JOIN Project AS PR ON EP.EmployeeId = PR.EmployeeId
+    LEFT JOIN DeliveryUnit AS DU ON EP.EmployeeId = DU.EmployeeId
+    LEFT JOIN Department AS Dept ON EP.EmployeeId = Dept.EmployeeId
+    LEFT JOIN Shift AS SHFT ON EP.EmployeeId = SHFT.EmployeeId
+    WHERE EI.EmployeeId IS NOT NULL;
+ 
     `);
     return result.recordset;
   } catch (error) {
@@ -441,7 +487,7 @@ const getEmployeeById = async (employeeId) => {
         LEFT JOIN DeliveryUnit AS DU ON PD.EmployeeId = DU.EmployeeId
         LEFT JOIN Department AS DEPT ON PD.EmployeeId = DEPT.EmployeeId
         LEFT JOIN Product AS PROD ON PD.EmployeeId = PROD.EmployeeId
-        LEFT JOIN UserAccount AS UA ON PD.EmployeeId = UA.EmployeeId -- Join with UserAccount table
+        LEFT JOIN UserAccount AS UA ON PD.EmployeeId = UA.EmployeeId 
         WHERE PD.EmployeeId = @EmployeeId;
       `);
 
@@ -1353,5 +1399,6 @@ module.exports = {
   insertDependent,
   deleteAllEmployeeData,
   getDependentsByEmployeeId,
-  updateDependentById
+  updateDependentById,
+  getAddNewContactId
 };

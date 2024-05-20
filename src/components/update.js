@@ -53,12 +53,19 @@ import 'jspdf-autotable';
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredDependents, setFilteredDependents] = useState([]);
   const educationRef = useRef(null);
+  // const [newContactNumber, setNewContactNumber] = useState('');
+
 
     // Function to handle input change in the search field
     const handleSearchChange = (e) => {
       setSearchQuery(e.target.value);
     };
-  
+     // Go back to the previous page in history
+  const handleNavigateBack = () => {
+    // Navigate back one step in history (equivalent to pressing the browser's back button)
+    navigate(-1);
+  };
+
     // Effect to filter dependents based on search query
     useEffect(() => {
       const filtered = dependents.filter((dependent) =>
@@ -210,6 +217,39 @@ const handleInputChange = (e) => {
       [name]: newValue
     });
   };
+
+// Handle form submission for adding new contact
+const handleAddContactForm = async (e) => {
+  e.preventDefault();
+  console.log(employeeData.newContactNumber);
+  try {
+    //  const employeeId = employeeData.EmployeeId;;
+    const contactResponse = await fetch(`http://localhost:5000/addContactNumber/${employeeId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify( employeeData )
+    });
+
+    if (!contactResponse.ok) {
+      throw new Error('Failed to add new contact number');
+    }
+
+    const contactData = await contactResponse.json();
+    console.log('Contact number added:', contactData.message);
+
+    // Refresh employee data after successful addition
+    fetchEmployeeData();
+
+    // Reload the tab
+    // window.location.reload();
+
+  } catch (error) {
+    console.error('Error adding contact number:', error);
+    alert('Failed to add contact number. Please try again.');
+  }
+};
   //UPDATE EMPLOYEE PERSONAL DETAILS
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -253,7 +293,7 @@ const handleInputChange = (e) => {
       alert(successMessage);
 
        // Reload the page after showing the alert
-       window.location.reload();
+      //  window.location.reload();
   
       } catch (error) {
         console.error('Error updating employee personal details:', error);
@@ -680,6 +720,9 @@ const handleInputChange = (e) => {
      // Refresh employee data after successful addition
      fetchEmployeeData();
 
+     // Reload the tab
+     window.location.reload();
+
     } catch (error) {
       console.error('Error adding dependent:', error);
       alert('Failed to add dependent. Please try again.');
@@ -1058,6 +1101,17 @@ const handleInputChange = (e) => {
   
     const statusColor = getStatusColor(employeeData.EmployeeStatus);
   
+    const handleRegionChange = (e) => {
+      const region = e.target.value;
+      setEmployeeData({
+        ...employeeData,
+        Province: '', 
+        CityMunicipality: '', 
+        ZipCode: '', 
+        Region: region
+      });
+      
+    };
   if (!employeeData) {
     return <div>Loading...</div>;
   }
@@ -1078,13 +1132,22 @@ const handleInputChange = (e) => {
                 onClick={handleView} >
                 <i className="fas fa-eye"></i> See Profile
                </button>
+               <div className="d-flex align-items-center">
+                <button
+                  className="update-button btn btn-xs mr-2"
+                  onClick={handleNavigateBack}
+                >
+                  <i className="fas fa-arrow-left"></i> Back
+                </button>
+              </div>
+              {/* <br /> */}
                     {/* <div className="d-flex align-items-center"> */}
-                    <button
+                    {/* <button
                         className="update-button btn btn-xs"
                         onClick={handleDownloadPDF}
                       >
                         <i className="fas fa-arrow-down"></i> Download Record
-                      </button>
+                      </button> */}
 
                         {/* <Button variant="primary" onClick={handleDownloadPDF}>
                         <i className="fas fa-arrow-down"></i> Download Record
@@ -1116,16 +1179,10 @@ const handleInputChange = (e) => {
                           <a className="nav-link" id="employmentInfo-tab" data-toggle="tab" href="#employmentInfo" role="tab" aria-controls="employmentInfo" aria-selected="false">Employment Information</a>
                       </li>
                       <li className="nav-item">
-                          <a className="nav-link " id="address-tab" data-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="false">Address</a>
+                          <a className="nav-link " id="address-tab" data-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="false">Address & Contact Info</a>
                       </li>
                       <li className="nav-item">
                           <a className="nav-link " id="education-tab" data-toggle="tab" href="#education" role="tab" aria-controls="education" aria-selected="false">Education</a>
-                      </li>
-                      <li className="nav-item">
-                          <a className="nav-link " id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Contact</a>
-                      </li>
-                      <li className="nav-item">
-                          <a className="nav-link " id="emergencyContact-tab" data-toggle="tab" href="#emergencyContact" role="tab" aria-controls="emergencyContact" aria-selected="false">Emergency Contact</a>
                       </li>
                       <li className="nav-item">
                           <a className="nav-link " id="dependent-tab" data-toggle="tab" href="#dependent" role="tab" aria-controls="dependent" aria-selected="false">Dependent</a>
@@ -1311,11 +1368,11 @@ const handleInputChange = (e) => {
                                         </div>
                                     </div>
                                     <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="empLevel">Associate</label>
-                                            <input type="text" className="form-control" value={employeeData.Associate} placeholder="enter Associate" name="Associate" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
+                                              <div className="form-group">
+                                              <label htmlFor="titoType">TITO Type</label>
+                                              <input type="text" className="form-control" value={employeeData.TITOType} placeholder="enter tito type" name="TitoType" onChange={handleInputChange} />
+                                              </div>
+                                            </div>
                                 </div>
                                 <div className="row justify-content-center">
                                         <div className="col-md-4">
@@ -1350,10 +1407,10 @@ const handleInputChange = (e) => {
                                               <label >Employment Status</label>
                                               <select className= 'form-control' 
                                                     value={employeeData.EmploymentStatus} name="EmploymentStatus" onChange={handleInputChange}>
-                                                        <option value="0">Probationary</option>
-                                                        <option value="1">Permanent</option>
-                                                        <option value="2">Project</option>
-                                                        <option value="3">Fixed Term</option>
+                                                        <option value="Probationary">Probationary</option>
+                                                        <option value="Permanent">Permanent</option>
+                                                        <option value="Project">Project</option>
+                                                        <option value="Fixed Term">Fixed Term</option>
                                                     </select>
                                               </div>
                                             </div>
@@ -1386,6 +1443,121 @@ const handleInputChange = (e) => {
                                               </div>
                                             </div>
                                 </div>
+                                <div className="row ">
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                              <label htmlFor="position">Position</label>
+                                              {/* <input type="text" className="form-control" value={employeeData.Position} placeholder="enter tito type" name="TitoType" onChange={handleInputChange} /> */}
+                                              <select className='form-control' 
+                                                      value={employeeData.Position} 
+                                                      name="Position" 
+                                                      onChange={handleInputChange}>
+                                                  <option value="Associate">Associate</option>
+                                                  <option value="Lead Associate">Lead Associate</option>
+                                                  <option value="VP-Country Head, Philippines">VP-Country Head, Philippines</option>
+                                                  <option value="Sr. Associate">Sr. Associate</option>
+                                                  <option value="Group Manager-HR">Group Manager-HR</option>
+                                                  <option value="Senior Software Engineer">Senior Software Engineer</option>
+                                                  <option value="Junior Specialist">Junior Specialist</option>
+                                                  <option value="Indexer/ Abstractor">Indexer/ Abstractor</option>
+                                                  <option value="Production Associate">Production Associate</option>
+                                                  <option value="Team Manager">Team Manager</option>
+                                                  <option value="Indexer">Indexer</option>
+                                                  <option value="Senior Project Coordinator">Senior Project Coordinator</option>
+                                                  <option value="Solutions Architect">Solutions Architect</option>
+                                                  <option value="Software Engineer - Level 2">Software Engineer - Level 2</option>
+                                                  <option value="Project Manager">Project Manager</option>
+                                                  <option value="Jr. Specialist">Jr. Specialist</option>
+                                                  <option value="Sr. Software Engineer">Sr. Software Engineer</option>
+                                                  <option value="Project Support - Level 1">Project Support - Level 1</option>
+                                                  <option value="Group Manager - Training">Group Manager - Training</option>
+                                                  <option value="Project Analyst">Project Analyst</option>
+                                                  <option value="Specialist - Finance">Specialist - Finance</option>
+                                                  <option value="Group Manager">Group Manager</option>
+                                                  <option value="Software Engineer - Level 1">Software Engineer - Level 1</option>
+                                                  <option value="Quality Assurance Analyst">Quality Assurance Analyst</option>
+                                                  <option value="Senior Production Manager">Senior Production Manager</option>
+                                                  <option value="Process Analyst">Process Analyst</option>
+                                                  <option value="Team Manager - Finance">Team Manager - Finance</option>
+                                                  <option value="Customer Service Account Executive">Customer Service Account Executive</option>
+                                                  <option value="Specialist">Specialist</option>
+                                                  <option value="Lead Associate - FIN">Lead Associate - FIN</option>
+                                                  <option value="Sr. Specialist">Sr. Specialist</option>
+                                                  <option value="Engineer">Engineer</option>
+                                                  <option value="Content Manager">Content Manager</option>
+                                                  <option value="Division Manager">Division Manager</option>
+                                                  <option value="Project Support - Level 2">Project Support - Level 2</option>
+                                                  <option value="Sr. Production Manager">Sr. Production Manager</option>
+                                                  <option value="Senior Manager-Finance">Senior Manager-Finance</option>
+                                                  <option value="Division Manager-HR">Division Manager-HR</option>
+                                                  <option value="Team Manager - Finance">Team Manager - Finance</option>
+                                                  <option value="Customer Service Account Executive">Customer Service Account Executive</option>
+                                                  <option value="Admin Manager">Admin Manager</option>
+                                                  <option value="Team Manager-Fac">Team Manager-Fac</option>
+                                                  <option value="Head of Talent Acquisition, PH">Head of Talent Acquisition, PH</option>
+                                                  <option value="VP-Delivery Unit Head, Project Delivery">VP-Delivery Unit Head, Project Delivery</option>
+                                                  <option value="Senior Specialist">Senior Specialist</option>
+                                                  <option value="Senior Manager-HR">Senior Manager-HR</option>
+                                                  <option value="Senior Manager - Facilities Admin">Senior Manager - Facilities Admin</option>
+                                                  <option value="Manager-Finance">Manager-Finance</option>
+                                                  <option value="Sr. Administrator">Sr. Administrator</option>
+                                                  <option value="Associate Vice President">Associate Vice President</option>
+                                                  <option value="Division Manager-Finance">Division Manager-Finance</option>
+                                                  <option value="Head of Infrastructure">Head of Infrastructure</option>
+                                                  <option value="Senior Manager-QA">Senior Manager-QA</option>
+                                                  <option value="Group Manager-Fac">Group Manager-Fac</option>
+                                                  <option value="Head of Finance">Head of Finance</option>
+                                                  <option value="Group Manager-QA">Group Manager-QA</option>
+                                                  <option value="Executive-HR">Executive-HR</option>
+                                                  <option value="Lead Specialist">Lead Specialist</option>
+                                                  <option value="Lead Analyst">Lead Analyst</option>
+                                                  <option value="Manager-HR">Manager-HR</option>
+                                                  <option value="Executive HR - Learning and Culture Specialist">Executive HR - Learning and Culture Specialist</option>
+                                                  <option value="Analyst - AI/LLM Practice">Analyst - AI/LLM Practice</option>
+                                                  <option value="Trainer">Trainer</option>
+                                                  <option value="Senior Analyst - AI/LLM Practice">Senior Analyst - AI/LLM Practice</option>
+                                                  <option value="Editor-Analyst - AI/LLM Practice">Editor-Analyst - AI/LLM Practice</option>
+                                                  <option value="Team Manager, Trainer">Team Manager, Trainer"</option>
+                                                  <option value="Sr. Manager-FP&A">Sr. Manager-FP&A</option>
+                                                  <option value="Admin Manager">Admin Manager</option>
+                                                  <option value="Senior Manager-GT">Senior Manager-GT</option>
+                                                  <option value="Head of Infrastructure - Data Center Support">Head of Infrastructure - Data Center Support</option>
+                                                  <option value="AVP, Project Delivery">AVP, Project Delivery</option>
+                                              </select>
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                              <label htmlFor="positionLevel">Position Level</label>
+                                              <select className="form-control" value={employeeData.PositionLevel} name="PositionLevel" onChange={handleInputChange}>
+                                                        <option value="Level 1">Level 1</option>
+                                                        <option value="Level 2">Level 2</option>
+                                                        <option value="Level 3">Level 3</option>
+                                                        <option value="Level 4">Level 4</option>
+                                                        <option value="Level 5">Level 5</option>
+                                                        <option value="Level 6">Level 6</option>
+                                                        <option value="Level 7">Level 7</option>
+                                                        <option value="Level 8">Level 8</option>
+                                                        <option value="Level 9">Level 9</option>
+                                                        <option value="Level 10">Level 10</option>
+                                                        <option value="Level 11">Level 11</option>
+                                                        <option value="Level 12">Level 12</option>
+                                                        <option value="Level 13">Level 13</option>
+                                                    </select>
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                              <label htmlFor="facility">Facility</label>
+                                              <select className="form-control" value={employeeData.Facility} name="Facility" onChange={handleInputChange}>
+                                                        <option value="Cebu">Cebu</option>
+                                                        <option value="Manila">Manila</option>
+                                                        <option value="Legazpi">Legazpi</option>
+                                                    </select>
+                                              </div>
+                                            </div>
+                                </div>
+                                
                                 <hr/>
                                   <h5 className='text-primary'>Section 2</h5>
                                   <hr className="hr-cobalt-blue"/>
@@ -1563,116 +1735,6 @@ const handleInputChange = (e) => {
                                                 </div>
                                      </div>
                                 </div> 
-                                <div className="row justify-content-center">
-                                            <div className="col-md-4">
-                                              <div className="form-group">
-                                              <label htmlFor="titoType">TITO Type</label>
-                                              <input type="text" className="form-control" value={employeeData.TITOType} placeholder="enter tito type" name="TitoType" onChange={handleInputChange} />
-                                              </div>
-                                            </div>
-                                            <div className="col-md-4">
-                                              <div className="form-group">
-                                              <label htmlFor="position">Position</label>
-                                              {/* <input type="text" className="form-control" value={employeeData.Position} placeholder="enter tito type" name="TitoType" onChange={handleInputChange} /> */}
-                                              <select className='form-control' 
-                                                      value={employeeData.Position} 
-                                                      name="Position" 
-                                                      onChange={handleInputChange}>
-                                                  <option value="Associate">Associate</option>
-                                                  <option value="Lead Associate">Lead Associate</option>
-                                                  <option value="VP-Country Head, Philippines">VP-Country Head, Philippines</option>
-                                                  <option value="Sr. Associate">Sr. Associate</option>
-                                                  <option value="Group Manager-HR">Group Manager-HR</option>
-                                                  <option value="Senior Software Engineer">Senior Software Engineer</option>
-                                                  <option value="Junior Specialist">Junior Specialist</option>
-                                                  <option value="Indexer/ Abstractor">Indexer/ Abstractor</option>
-                                                  <option value="Production Associate">Production Associate</option>
-                                                  <option value="Team Manager">Team Manager</option>
-                                                  <option value="Indexer">Indexer</option>
-                                                  <option value="Senior Project Coordinator">Senior Project Coordinator</option>
-                                                  <option value="Solutions Architect">Solutions Architect</option>
-                                                  <option value="Software Engineer - Level 2">Software Engineer - Level 2</option>
-                                                  <option value="Project Manager">Project Manager</option>
-                                                  <option value="Jr. Specialist">Jr. Specialist</option>
-                                                  <option value="Sr. Software Engineer">Sr. Software Engineer</option>
-                                                  <option value="Project Support - Level 1">Project Support - Level 1</option>
-                                                  <option value="Group Manager - Training">Group Manager - Training</option>
-                                                  <option value="Project Analyst">Project Analyst</option>
-                                                  <option value="Specialist - Finance">Specialist - Finance</option>
-                                                  <option value="Group Manager">Group Manager</option>
-                                                  <option value="Software Engineer - Level 1">Software Engineer - Level 1</option>
-                                                  <option value="Quality Assurance Analyst">Quality Assurance Analyst</option>
-                                                  <option value="Senior Production Manager">Senior Production Manager</option>
-                                                  <option value="Process Analyst">Process Analyst</option>
-                                                  <option value="Team Manager - Finance">Team Manager - Finance</option>
-                                                  <option value="Customer Service Account Executive">Customer Service Account Executive</option>
-                                                  <option value="Specialist">Specialist</option>
-                                                  <option value="Lead Associate - FIN">Lead Associate - FIN</option>
-                                                  <option value="Sr. Specialist">Sr. Specialist</option>
-                                                  <option value="Engineer">Engineer</option>
-                                                  <option value="Content Manager">Content Manager</option>
-                                                  <option value="Division Manager">Division Manager</option>
-                                                  <option value="Project Support - Level 2">Project Support - Level 2</option>
-                                                  <option value="Sr. Production Manager">Sr. Production Manager</option>
-                                                  <option value="Senior Manager-Finance">Senior Manager-Finance</option>
-                                                  <option value="Division Manager-HR">Division Manager-HR</option>
-                                                  <option value="Team Manager - Finance">Team Manager - Finance</option>
-                                                  <option value="Customer Service Account Executive">Customer Service Account Executive</option>
-                                                  <option value="Admin Manager">Admin Manager</option>
-                                                  <option value="Team Manager-Fac">Team Manager-Fac</option>
-                                                  <option value="Head of Talent Acquisition, PH">Head of Talent Acquisition, PH</option>
-                                                  <option value="VP-Delivery Unit Head, Project Delivery">VP-Delivery Unit Head, Project Delivery</option>
-                                                  <option value="Senior Specialist">Senior Specialist</option>
-                                                  <option value="Senior Manager-HR">Senior Manager-HR</option>
-                                                  <option value="Senior Manager - Facilities Admin">Senior Manager - Facilities Admin</option>
-                                                  <option value="Manager-Finance">Manager-Finance</option>
-                                                  <option value="Sr. Administrator">Sr. Administrator</option>
-                                                  <option value="Associate Vice President">Associate Vice President</option>
-                                                  <option value="Division Manager-Finance">Division Manager-Finance</option>
-                                                  <option value="Head of Infrastructure">Head of Infrastructure</option>
-                                                  <option value="Senior Manager-QA">Senior Manager-QA</option>
-                                                  <option value="Group Manager-Fac">Group Manager-Fac</option>
-                                                  <option value="Head of Finance">Head of Finance</option>
-                                                  <option value="Group Manager-QA">Group Manager-QA</option>
-                                                  <option value="Executive-HR">Executive-HR</option>
-                                                  <option value="Lead Specialist">Lead Specialist</option>
-                                                  <option value="Lead Analyst">Lead Analyst</option>
-                                                  <option value="Manager-HR">Manager-HR</option>
-                                                  <option value="Executive HR - Learning and Culture Specialist">Executive HR - Learning and Culture Specialist</option>
-                                                  <option value="Analyst - AI/LLM Practice">Analyst - AI/LLM Practice</option>
-                                                  <option value="Trainer">Trainer</option>
-                                                  <option value="Senior Analyst - AI/LLM Practice">Senior Analyst - AI/LLM Practice</option>
-                                                  <option value="Editor-Analyst - AI/LLM Practice">Editor-Analyst - AI/LLM Practice</option>
-                                                  <option value="Team Manager, Trainer">Team Manager, Trainer"</option>
-                                                  <option value="Sr. Manager-FP&A">Sr. Manager-FP&A</option>
-                                                  <option value="Admin Manager">Admin Manager</option>
-                                                  <option value="Senior Manager-GT">Senior Manager-GT</option>
-                                                  <option value="Head of Infrastructure - Data Center Support">Head of Infrastructure - Data Center Support</option>
-                                                  <option value="AVP, Project Delivery">AVP, Project Delivery</option>
-                                              </select>
-                                              </div>
-                                            </div>
-                                            <div className="col-md-4">
-                                              <div className="form-group">
-                                              <label htmlFor="positionLevel">Position Level</label>
-                                              <select className="form-control" value={employeeData.PositionLevel} name="PositionLevel" onChange={handleInputChange}>
-                                                        <option value="Level 1">Level 1</option>
-                                                        <option value="Level 2">Level 2</option>
-                                                        <option value="Level 3">Level 3</option>
-                                                        <option value="Level 4">Level 4</option>
-                                                        <option value="Level 5">Level 5</option>
-                                                        <option value="Level 6">Level 6</option>
-                                                        <option value="Level 7">Level 7</option>
-                                                        <option value="Level 8">Level 8</option>
-                                                        <option value="Level 9">Level 9</option>
-                                                        <option value="Level 10">Level 10</option>
-                                                        <option value="Level 11">Level 11</option>
-                                                        <option value="Level 12">Level 12</option>
-                                                        <option value="Level 13">Level 13</option>
-                                                    </select>
-                                              </div>
-                                            </div>
-                                </div>
                                 </div>
                                 <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
                             </form>
@@ -1682,16 +1744,103 @@ const handleInputChange = (e) => {
                       <div className="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
                           {/* Address Form */}
                           <div className="container">
+                          <h5 className='text-primary'>Contact Details</h5>
+                                <hr className="hr-cobalt-blue"/>
+                                <br/>
+                                <div className="row">
+                                <form onSubmit={handleFormSubmit}>
+                                  <div className="form-group">
+                                    <label>Update Contact Number</label>
+                                    <div className="d-flex align-items-center">
+                                      <input 
+                                        type="tel" 
+                                        className="form-control mr-2" 
+                                        value={employeeData.ContactNumber} 
+                                        placeholder="update contact number" 
+                                        name="ContactNumber" 
+                                        onChange={handleInputChange} 
+                                      />
+                                      <button type="submit" className="btn btn-primary">Update</button>
+                                    </div>
+                                  </div>
+                                </form>
+                                    {/* <div className="col-md-4">
+                                    <form onSubmit={handleAddContactForm}>
+                                      <div>
+                                        <label >Primary Contact Number</label>
+                                        <span className='form-control'>{employeeData.ContactNumber}</span>
+                                      </div>
+                                      </form>
+                                    </div> */}
+                                    {employeeData.SecondaryContactNum && employeeData.SecondaryContactNum !== "N/A" && (
+                                    <div className="col-md-4">
+                                      <div>
+                                        <label>Secondary Contact Number</label>
+                                        {/* <input 
+                                        type="tel" 
+                                        className="form-control mr-2" 
+                                        value={employeeData.SecondaryContactNum} 
+                                        placeholder="update contact number" 
+                                        name="SecondaryContactNum" 
+                                        onChange={handleInputChange} 
+                                      /> */}
+                                      {/* <button type="submit" onSubmit={handleAddContactForm} className="btn btn-primary">Update</button> */}
+                                        <span className='form-control'>{employeeData.SecondaryContactNum}</span>
+                                      </div>
+                                    </div>
+                                  )}
+                                   <div className="col-md-4">
+                                    <form onSubmit={handleAddContactForm}>
+                                      <div className="form-group">
+                                        {employeeData.SecondaryContactNum ? (
+                                          <>
+                                            <label>Update New Contact Number</label>
+                                            <div className="d-flex align-items-center">
+                                              <input 
+                                                type="tel" 
+                                                className="form-control mr-2" 
+                                                value={employeeData.newContactNumber} 
+                                                placeholder="update contact number" 
+                                                name="newContactNumber" 
+                                                onChange={handleInputChange} 
+                                              />
+                                              <button type="submit" className="btn btn-primary">Update</button>
+                                            </div>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <label>Add New Contact Number</label>
+                                            <div className="d-flex align-items-center">
+                                              <input 
+                                                type="tel" 
+                                                className="form-control mr-2" 
+                                                value={employeeData.newContactNumber} 
+                                                placeholder="add new contact number" 
+                                                name="newContactNumber" 
+                                                onChange={handleInputChange} 
+                                              />
+                                              <button type="submit" className="btn btn-primary">Add</button>
+                                            </div>
+                                          </>
+                                        )}
+                                      </div>
+                                    </form>
+                                  </div>
+
+                                  </div>
+                                    <hr/>
                           <form onSubmit={handleAddressFormSubmit}>
                           <div className='card-body'>
+                          <h5 className='text-primary'>Address Details</h5>
+                                <hr className="hr-cobalt-blue"/>
+                                <br/>
                                 <div className="row justify-content-center">
-                                    <div className="col-md-4">
+                                    {/* <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Employee ID</label>
                                             <span className="form-control">{Array.isArray(employeeData.EmployeeId) ? employeeData.EmployeeId[0] : employeeData.EmployeeId}</span>
-                                            {/* <input type="text" className="form-control" readOnly={true} value={Array.isArray(employeeData.EmployeeId) ? employeeData.EmployeeId[0] : employeeData.EmployeeId} name="EmpID" onChange={handleInputChange} />                                         */}
                                         </div>
-                                    </div>
+                                    </div> */}
                                     <div className="col-md-4">
                                         <div className="form-group">
                                             <label htmlFor="houseNumber">House Number</label>
@@ -1719,18 +1868,59 @@ const handleInputChange = (e) => {
                                         </div>
                                     </div>
                                     <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="province">Province</label>
-                                            <input type="text" className="form-control" placeholder="Enter Province" name="Province" value={employeeData.Province} onChange={handleInputChange} />
-                                        </div>
+                                      <div className="form-group">
+                                        <label htmlFor="province">Province</label>
+                                        <select className="form-control" value={employeeData.Province} name="Province" onChange={handleInputChange}>
+                                          <option value="">Select Province</option>
+                                          <option value="Abra">Abra</option>
+                                          <option value="Agusan del Norte">Agusan del Norte</option>
+                                          <option value="Agusan del Sur">Agusan del Sur</option>
+                                          <option value="Aklan">Aklan</option>
+                                          <option value="Albay">Albay</option>
+                                          <option value="Antique">Antique</option>
+                                          <option value="Apayao">Apayao</option>
+                                          <option value="Aurora">Aurora</option>
+                                          <option value="Basilan">Basilan</option>
+                                          <option value="Bataan">Bataan</option>
+                                          <option value="Batanes">Batanes</option>
+                                          <option value="Batangas">Batangas</option>
+                                          <option value="Benguet">Benguet</option>
+                                          <option value="Biliran">Biliran</option>
+                                          <option value="Bohol">Bohol</option>
+                                          <option value="Bukidnon">Bukidnon</option>
+                                          <option value="Bulacan">Bulacan</option>
+                                          <option value="Cagayan">Cagayan</option>
+                                          <option value="Camarines Norte">Camarines Norte</option>
+                                          <option value="Agusan del Norte">Agusan del Norte</option>
+                                        </select>
+                                      </div>
                                     </div>
-                                </div>
-                                <div className="row justify-content-center">
+                                  </div>
+                                  <div className="row justify-content-center">
                                     <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="region">Region</label>
-                                            <input type="text" className="form-control" placeholder="Enter Region" name="Region" value={employeeData.Region} onChange={handleInputChange} />
-                                        </div>
+                                      <div className="form-group">
+                                        <label htmlFor="region">Region</label>
+                                        <select className="form-control" value={employeeData.Region} name="Region" onChange={handleRegionChange}>
+                                          <option value="">Select Region</option>
+                                          <option value="Ilocos Region">Ilocos Region</option>
+                                          <option value="Cagayan Valley">Cagayan Valley</option>
+                                          <option value="Central Luzon">Central Luzon</option>
+                                          <option value="CALABARZON">CALABARZON</option>
+                                          <option value="Bicol Region">Bicol Region</option>
+                                          <option value="Western Visayas">Western Visayas</option>
+                                          <option value="Central Visayas">Central Visayas</option>
+                                          <option value="Eastern Visayas">Eastern Visayas</option>
+                                          <option value="Zamboanga Peninsula">Zamboanga Peninsula</option>
+                                          <option value="Northern Mindanao">Northern Mindanao</option>
+                                          <option value="Davao Region">Davao Region</option>
+                                          <option value="SOCCSKSARGEN">SOCCSKSARGEN</option>
+                                          <option value="Caraga Region">Caraga Region</option>
+                                          <option value="Cordillera Administrative Region">Cordillera Administrative Region</option>
+                                          <option value="National Capital Region">National Capital Region</option>
+                                          <option value="MIMAROPA">MIMAROPA</option>
+                                          <option value="Bangsamoro Autonomous Region in Muslim Mindanao">Bangsamoro Autonomous Region in Muslim Mindanao</option>
+                                        </select>
+                                      </div>
                                     </div>
                                     <div className="col-md-4">
                                         <div className="form-group">
@@ -1774,126 +1964,11 @@ const handleInputChange = (e) => {
                                 </div>
                                 <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
                             </form>
-                        </div>
-                      <br/>
-                      </div>
-                      <div className="tab-pane fade" id="education" role="tabpanel" aria-labelledby="education-tab">
-                          {/* Education Form */}
-                          <div className="container">
-                            <form onSubmit={handleEducationFormSubmit}>
-                            <div className='card-body' ref={educationRef}>
-                                <div className="row justify-content-center">
-                                <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label> School </label>
-                                            <input type="text" className="form-control" value={employeeData.School} placeholder="Enter School" name="School" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label>Education Level</label>
-                                            <input type="text" className="form-control" value={employeeData.EducationLevel} placeholder="Enter Education Level" name="EducationLevel" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label>Degree</label>
-                                            <input type="text" value={employeeData.Degree} className="form-control" placeholder="Enter Degree" name="Degree" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="majorCourse">Major course</label>
-                                            <input type="text" className="form-control" value={employeeData.MajorCourse} placeholder="Enter Major Course" name="MajorCourse" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="honorRank">Honor Rank</label>
-                                            <input type="text" className="form-control" value={employeeData.HonorRank} placeholder="Enter Honor Rank" name="HonorRank" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="col-md-4">
-                                              <div className="form-group">
-                                              <label htmlFor="session">Session</label>
-                                              <input type="text" className="form-control" value={employeeData.Session} placeholder="Enter Session" name="Session" onChange={handleInputChange} />
-                                              </div>
-                                            </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="dateFrom">Date From</label>
-                                            <input type="text" className="form-control" value={employeeData.DateFrom} placeholder="Enter date From" name="DateFrom" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                        <label htmlFor="dateTo">Date To</label>
-                                            <input type="text" className="form-control" value={employeeData.DateTo} placeholder="Enter date To" name="DateTo" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="monthCompleted">Month Completed</label>
-                                            <input type="text" className="form-control" value={employeeData.MonthCompleted} placeholder="Enter Month Completed" name="MonthCompleted" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                <div className="col-md-4">
-                                        <div className="form-group">
-                                        <label>Units Earned</label>
-                                            <input type="text" className="form-control" value={employeeData.UnitsEarned} placeholder="Enter Units Earned" name="UnitsEarned" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                        <label htmlFor="completed">Completed</label>
-                                            <input type="text" className="form-control" value={employeeData.Completed} placeholder="Enter Completed" name="Completed" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                </div>
-                                </div>
-                                <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
-                            </form>
-                        </div>
-                      <br/>
-                      </div>
-                      <div className="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
-                          {/* Contact Form */}
-                          <div className="container">
-                          <form onSubmit={handleFormSubmit}>
-                                <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label>Employee Id</label>
-                                            <span className="form-control">{Array.isArray(employeeData.EmployeeId) ? employeeData.EmployeeId[0] : employeeData.EmployeeId}</span>
-                                        </div>
-                                    </div>
-                                    </div>
-                                    <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                      <div className="form-group">
-                                          <label >Contact Number</label>
-                                          <input type="tel" className="form-control" value={employeeData.ContactNumber} placeholder="Enter contact number" name="ContactNumber" onChange={handleInputChange} />
-                                      </div>
-                                  </div>
-                                    </div>
-                                  
+                            <hr/>
+                            <h5 className='text-primary'>Emergency Contact Details</h5>
+                                <hr className="hr-cobalt-blue"/>
                                 <br/>
-                                <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
-                            </form>
-                        </div>
-                      <br/>
-                      </div>
-                      <div className="tab-pane fade" id="emergencyContact" role="tabpanel" aria-labelledby="emergencyContact-tab">
-                          {/* Emergency Contact Form */}
-                          <div className="container">
-                          <form onSubmit={handleECFormSubmit}>
+                            <form onSubmit={handleECFormSubmit}>
                             <div className='card-body'>
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
@@ -1989,6 +2064,92 @@ const handleInputChange = (e) => {
                                     </div>
                                     </div>
                                 <br/>
+                                <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
+                            </form>
+                        </div>
+                      <br/>
+                      </div>
+                      <div className="tab-pane fade" id="education" role="tabpanel" aria-labelledby="education-tab">
+                          {/* Education Form */}
+                          <div className="container">
+                            <form onSubmit={handleEducationFormSubmit}>
+                            <div className='card-body' ref={educationRef}>
+                                <div className="row justify-content-center">
+                                <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label> School </label>
+                                            <input type="text" className="form-control" value={employeeData.School} placeholder="Enter School" name="School" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label>Education Level</label>
+                                            <input type="text" className="form-control" value={employeeData.EducationLevel} placeholder="Enter Education Level" name="EducationLevel" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label>Degree</label>
+                                            <input type="text" value={employeeData.Degree} className="form-control" placeholder="Enter Degree" name="Degree" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="row justify-content-center">
+                                <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label htmlFor="majorCourse">Major course</label>
+                                            <input type="text" className="form-control" value={employeeData.MajorCourse} placeholder="Enter Major Course" name="MajorCourse" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label htmlFor="honorRank">Honor Rank</label>
+                                            <input type="text" className="form-control" value={employeeData.HonorRank} placeholder="Enter Honor Rank" name="HonorRank" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="col-md-4">
+                                              <div className="form-group">
+                                              <label htmlFor="session">Session</label>
+                                              <input type="text" className="form-control" value={employeeData.Session} placeholder="Enter Session" name="Session" onChange={handleInputChange} />
+                                              </div>
+                                            </div>
+                                </div>
+                                <div className="row justify-content-center">
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label htmlFor="dateFrom">Date From</label>
+                                            <input type="text" className="form-control" value={employeeData.DateFrom} placeholder="Enter date From" name="DateFrom" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                        <label htmlFor="dateTo">Date To</label>
+                                            <input type="text" className="form-control" value={employeeData.DateTo} placeholder="Enter date To" name="DateTo" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                            <label htmlFor="monthCompleted">Month Completed</label>
+                                            <input type="text" className="form-control" value={employeeData.MonthCompleted} placeholder="Enter Month Completed" name="MonthCompleted" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="row justify-content-center">
+                                <div className="col-md-4">
+                                        <div className="form-group">
+                                        <label>Units Earned</label>
+                                            <input type="text" className="form-control" value={employeeData.UnitsEarned} placeholder="Enter Units Earned" name="UnitsEarned" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <div className="form-group">
+                                        <label htmlFor="completed">Completed</label>
+                                            <input type="text" className="form-control" value={employeeData.Completed} placeholder="Enter Completed" name="Completed" onChange={handleInputChange} />
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
                                 <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
                             </form>
                         </div>
@@ -2372,7 +2533,6 @@ const handleInputChange = (e) => {
                           </tr>
                         )}
                       </tbody>
-
                                     </table>
                                   </div>
                            </div>

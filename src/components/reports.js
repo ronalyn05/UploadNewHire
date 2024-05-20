@@ -11,12 +11,26 @@ const Reports = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [employees, setEmployees] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [selectedFacility, setSelectedFacility] = useState("All"); // State for selected facility filter
+ 
 
   const handleUpdate = (EmployeeId) => {
     // Redirect to the update page with employee ID as a parameter
     navigate(`/update/${EmployeeId}`);
     // navigate(`/update/${employee.EmpID}`, { state: { employee } });
   };
+    // Function to handle changes in the facility filter selection
+    const handleFacilityFilterChange = (event) => {
+      const { value } = event.target;
+      setSelectedFacility(value);
+      if (value === "All") {
+        setFilteredEmployees(employees);
+      } else {
+        const filtered = employees.filter((employee) => employee.Facility === value);
+        setFilteredEmployees(filtered);
+      }
+    };
+    
   // //function to handle on deleting all data in different tables
   // const handleDeleteAllData = async () => {
   //   try {
@@ -46,51 +60,43 @@ const Reports = () => {
     setFilteredEmployees(filtered);
   };
 //handles in fetching the personal details
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        // Make a GET request to fetch new hire employees from the server
-        const response = await fetch("/newHireEmp"); // Fetch reports for the logged-in user
-        // const response = await fetch('/newHireEmp');
-        //  await fetch("/viewProfile");
+useEffect(() => {
+  async function fetchData() {
+    try {
+      const response = await fetch("/newHireEmp");
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
 
-        // Check if the response is successful
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
+      const data = await response.json();
 
-        // Extract the data from the response
-        const data = await response.json();
-
-        // To convert all the capital letters in a string to title case (capitalize the first letter of each word)
-        function convertToTitleCase(str) {
+      function convertToTitleCase(str) {
+        if (typeof str === "string" && str !== null && str.trim() !== "") {
           return str.toLowerCase().replace(/\b\w/g, function (char) {
             return char.toUpperCase();
           });
+        } else {
+          return "";
         }
-        // Convert names to title case before setting in state
-        const formattedData = data.map((employee) => ({
-          ...employee,
-          EmployeeName: convertToTitleCase(employee.EmployeeName),
-          FirstName: convertToTitleCase(employee.FirstName),
-          MiddleName: convertToTitleCase(employee.MiddleName),
-          LastName: convertToTitleCase(employee.LastName),
-          BirthMonth: convertToTitleCase(employee.BirthMonth),
-          MaritalStatus: convertToTitleCase(employee.MaritalStatus),
-          Gender: convertToTitleCase(employee.Gender),
-        }));
-
-        // Set the retrieved data in your component state
-        setEmployees(formattedData);
-        setFilteredEmployees(formattedData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
       }
-    }
 
-    // Call the fetchData function when the component mounts
-    fetchData();
-  }, []); // Empty dependency array to run only once when the component mounts
+      const formattedData = data.map((employee) => ({
+        ...employee,
+        EmployeeName: convertToTitleCase(employee.EmployeeName),
+        EmployeeStatus: convertToTitleCase(employee.EmployeeStatus),
+        EmploymentStatus: convertToTitleCase(employee.EmploymentStatus),
+      }));
+
+      setEmployees(formattedData);
+      setFilteredEmployees(formattedData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+
+  fetchData();
+}, []);
+
 
   return (
     <div>
@@ -113,6 +119,20 @@ const Reports = () => {
                       <h5 className="m-0 font-weight-bold text-primary">
                         Reports
                       </h5>
+                        {/* Facility filter dropdown */}
+                        {/* <select
+                        className="form-select"
+                        value={selectedFacility}
+                        onChange={handleFacilityFilterChange}
+                      >
+                        <option value="All">All</option>
+                        {employees.length > 0 &&
+                          [...new Set(employees.map((employee) => employee.Facility))].map((facility, index) => (
+                            <option key={index} value={facility}>
+                              {facility}
+                            </option>
+                          ))}
+                      </select> */}
                       {/* Topbar Search */}
                       <form className="form-inline ml-auto">
                         <div className="input-group">
@@ -139,29 +159,48 @@ const Reports = () => {
                                     <span>Delete all data</span> */}
                     </div>
                     <div className="card-body">
+                       {/* Facility filter dropdown */}
+                       <div className="col-md-2">
+                        <div className="form-group d-flex align-items-center">
+                        {/* <label className="form-label me-2" style={{ fontSize: '1rem' }}>Facility by:</label> */}
+                          <select
+                            className="form-control"
+                            value={selectedFacility}
+                            onChange={handleFacilityFilterChange}
+                          >
+                             <option value="All">All Facility</option>
+                              {employees.length > 0 &&
+                                [...new Set(employees.map((employee) => employee.Facility))].map((facility, index) => (
+                                  <option key={index} value={facility}>
+                                     {facility} Facility
+                             </option>
+                              ))}
+                          </select>
+                        </div>
+                      </div>
+
                       <div className="table-responsive">
                         <table className="table">
                           <thead>
                             <tr>
-                              <th scope="col">ACTION</th>
-                              <th scope="col">EMPLOYEE ID</th>
-                              <th scope="col">NAME</th>
-                              <th scope="col">FIRST NAME</th>
-                              <th scope="col">MIDDLE NAME</th>
-                              <th scope="col">LAST NAME</th>
-                              <th scope="col">MAIDEN NAME</th>
-                              <th scope="col">BIRTHDATE</th>
-                              <th scope="col">AGE</th>
-                              <th scope="col">BIRTH MONTH</th>
-                              <th scope="col">AGE BRACKET</th>
-                              <th scope="col">GENDER</th>
-                              <th scope="col">MARITAL STATUS</th>
-                              <th scope="col">SSS</th>
-                              <th scope="col">PHIC</th>
-                              <th scope="col">HDMF</th>
-                              <th scope="col">TIN</th>
-                              <th scope="col">CONTACT NUMBER</th>
-                              <th scope="col">EMAIL ADDRESS</th>
+                              <th scope="col">Action</th>
+                              <th scope="col">Employee Id</th>
+                              <th scope="col">Name</th>
+                              <th scope="col">Facility</th>
+                              <th scope="col">Employee Status</th>
+                              <th scope="col">Employment Status</th>
+                              <th scope="col">Date Hired</th>
+                              <th scope="col">Role</th>
+                              <th scope="col">Position</th>
+                              <th scope="col">Level</th>
+                              <th scope="col">Project Code</th>
+                              <th scope="col">Delivery Unit</th>
+                              <th scope="col">Department</th>
+                              <th scope="col">Work Week Type</th>
+                              <th scope="col">Work Arrangement</th>
+                              <th scope="col">Shift</th>
+                              <th scope="col">Shift Type</th>
+                              <th scope="col">Designation</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -180,7 +219,7 @@ const Reports = () => {
                                     {/* <button
                                       className="btn btn-xs btn-success "
                                       onClick={() =>
-                                        handleViewDetails(employee)
+                                        handleDownload(employee)
                                       }
                                     >
                                       <i className="far fa-eye"></i>
@@ -188,23 +227,21 @@ const Reports = () => {
                                   </td>
                                   <td>{employee.EmployeeId}</td>
                                   <td>{employee.EmployeeName}</td>
-                                  <td>{employee.FirstName}</td>
-                                  <td>{employee.MiddleName}</td>
-                                  <td>{employee.LastName}</td>
-                                  <td>{employee.MaidenName}</td>
-                                  <td>{employee.Birthdate}</td>
-                                  <td>{employee.Age}</td>
-                                  <td>{employee.BirthMonth}</td>
-                                  <td>{employee.AgeBracket}</td>
-                                  <td>{employee.Gender}</td>
-                                  <td>{employee.MaritalStatus}</td>
-                                  <td>{employee.SSS}</td>
-                                  <td>{employee.PHIC}</td>
-                                  <td>{employee.HDMF}</td>
-                                  <td>{employee.TIN}</td>
-                                  {/* <td>{employee.HRANID}</td> */}
-                                  <td>{employee.ContactNumber}</td>
-                                  <td>{employee.EmailAddress}</td>
+                                  <td>{employee.Facility}</td>
+                                  <td>{employee.EmployeeStatus}</td>
+                                  <td>{employee.EmploymentStatus}</td>
+                                  <td>{employee.DateHired}</td>
+                                  <td>{employee.Role}</td>
+                                  <td>{employee.Position}</td>
+                                  <td>{employee.EmployeeLevel}</td>
+                                  <td>{employee.ProjectCode}</td>
+                                  <td>{employee.DepartmentName}</td>
+                                  <td>{employee.DUName}</td>
+                                  <td>{employee.WorkWeekType}</td>
+                                  <td>{employee.WorkArrangement}</td>
+                                  <td>{employee.ShiftName}</td>
+                                  <td>{employee.ShiftType}</td>
+                                  <td>{employee.Designation}</td>
                                 </tr>
                               ))
                             ) : (

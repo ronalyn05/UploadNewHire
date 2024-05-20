@@ -243,6 +243,34 @@ app.get('/newHireEmp', async (req, res) => {
       res.status(500).send('Error retrieving employee data.');
   }
 });
+// Endpoint for adding a new contact number
+// app.post('/addContactNumber/:employeeId', async (req, res) => {
+//   try {
+//     const employeeId = req.params.employeeId;
+//     const newContactNumber = req.body.newContactNumber;
+
+//     // Call the function to insert new contact into the database
+//     const result = await getAddNewContactId(employeeId, newContactNumber);
+
+//     // Send response
+//     res.status(200).json({ message: 'Contact number added successfully' });
+//   } catch (error) {
+//     console.error('Error adding contact number:', error);
+//     res.status(500).json({ error: 'Failed to add contact number' });
+//   }
+// });
+app.post('/addContactNumber/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  const newContactData = req.body;
+  try {
+    // const result = await dbOperation.insertDependent(employeeId, newDependentData);
+    await dbOperation.getAddNewContactId(employeeId, newContactData); // No need to assign to result if not used
+    res.json({ message: 'Secondary Contact number added successfully' });
+  } catch (error) {
+    console.error('Error adding Contact number:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 // Endpoint to retrieve users account data
 app.get('/usersAccount', async (req, res) => {
   try {
