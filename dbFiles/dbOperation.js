@@ -322,6 +322,7 @@ await pool
     .input("Department", newHire.Department)
     .input("EmploymentStatus", newHire.EmploymentStatus)
     .input("EmployeeStatus", newHire.EmployeeStatus)
+    .input("EmployeeCategory", newHire.EmployeeCategory)
     .input("WorkWeekType", newHire.WorkWeekType)
     .input("WorkArrangement", newHire.WorkArrangement)
     .input("RateClass", newHire.RateClass)
@@ -348,14 +349,14 @@ await pool
     INSERT INTO EmployeeInfo (
       EmployeeId, ProjectId, DepartmentId, ProdId, ShiftId, DUID,
       HRANID, DateHired, Facility, Role, Tenure, EmployeeLevel, Designation, EmploymentStatus, EmployeeStatus,
-      WorkWeekType, WorkArrangement, RateClass, Rate, ManagerID, ManagerName, PMPICID,
+      EmployeeCategory, WorkWeekType, WorkArrangement, RateClass, Rate, ManagerID, ManagerName, PMPICID,
       PMPICIDName, DUHID, DUHName, IsManager, IsPMPIC, IsIndividualContributor, IsActive,
       HRANType, TITOType, Position, PositionLevel, IsDUHead
     )
     SELECT 
       @EmployeeId, P.ProjectId, D.DepartmentId, Pr.ProdId, S.ShiftId, DU.DUID, 
       @HRANID, @DateHired, @Facility, @Role, @Tenure, @EmployeeLevel, @Designation, @EmploymentStatus, 
-      @EmployeeStatus, @WorkWeekType, @WorkArrangement, @RateClass, @Rate, 
+      @EmployeeCategory, @EmployeeStatus, @WorkWeekType, @WorkArrangement, @RateClass, @Rate, 
       @ManagerID, @ManagerName, @PMPICID, @PMPICIDName, @DUHID, @DUHName, 
       @IsManager, @IsPMPIC, @IsIndividualContributor, @IsActive, @HRANType, 
       @TITOType, @Position, @PositionLevel, @IsDUHead
@@ -637,6 +638,76 @@ const updateEmployeeInfoById = async (employeeId, updatedEmployeeData) => {
               PositionLevel = @PositionLevel
           WHERE EmployeeId = @EmployeeId
         `);
+
+        //update project table
+        await pool
+      .request()
+      .input("EmployeeId", sql.VarChar, employeeId)
+      .input("ProjectCode", sql.VarChar(255), updatedEmployeeData.ProjectCode)
+      .input("ProjectName", sql.VarChar(255), updatedEmployeeData.ProjectName)
+      .input("is_Active", sql.Bit, updatedEmployeeData.is_Active ? 1 : 0)
+      .query(`
+          UPDATE Project 
+          SET ProjectCode = @ProjectCode,
+          ProjectName = @ProjectName,
+          is_Active = @is_Active
+          WHERE EmployeeId = @EmployeeId
+        `);
+
+        //update product table
+        await pool
+      .request()
+      .input("EmployeeId", sql.VarChar, employeeId)
+      .input("ProdCode", sql.VarChar(255), updatedEmployeeData.ProdCode)
+      .input("ProdDesc", sql.VarChar(255), updatedEmployeeData.ProdDesc)
+      .query(`
+          UPDATE Product 
+          SET ProdCode = @ProdCode,
+          ProdDesc  = @ProdDesc
+          WHERE EmployeeId = @EmployeeId
+        `);
+        
+        //update shift details
+        await pool
+      .request()
+      .input("EmployeeId", sql.VarChar, employeeId)
+      .input("ShiftCode", sql.VarChar(255), updatedEmployeeData.ShiftCode)
+      .input("ShiftName", sql.VarChar(255), updatedEmployeeData.ShiftName)
+      .input("ShiftType", sql.VarChar(255), updatedEmployeeData.ShiftType)
+      .input("LevelID", sql.VarChar(255), updatedEmployeeData.LevelID)
+      .query(`
+          UPDATE Shift 
+          SET ShiftCode = @ShiftCode,
+          ShiftName = @ShiftName,
+          ShiftType = @ShiftType,
+          LevelID = @LevelID
+          WHERE EmployeeId = @EmployeeId
+        `);
+        //update department details
+        await pool
+        .request()
+        .input("EmployeeId", sql.VarChar, employeeId)
+        .input("DepartmentName", sql.VarChar(255), updatedEmployeeData.DepartmentName)
+        .query(`
+            UPDATE Department 
+            SET DepartmentName = @DepartmentName
+            WHERE EmployeeId = @EmployeeId
+          `);
+          //update delivery unit details
+          await pool
+      .request()
+      .input("EmployeeId", sql.VarChar, employeeId)
+      .input("DUCode", sql.VarChar(255), updatedEmployeeData.DUCode)
+      .input("DUName", sql.VarChar(255), updatedEmployeeData.DUName)
+      .input("Is_Active", sql.Bit, updatedEmployeeData.Is_Active ? 1 : 0)
+      .query(`
+          UPDATE DeliveryUnit 
+          SET DUCode = @DUCode,
+          DUName = @DUName,
+          Is_Active = @Is_Active
+          WHERE EmployeeId = @EmployeeId
+        `);
+        
     return result;
   } catch (error) {
     console.error("Error updating employee information by ID:", error);
@@ -1353,10 +1424,26 @@ const deleteAllEmployeeData = async () => {
 
     // Delete records from EmployeeInfo table
     await transaction.request().query("DELETE FROM EmployeeInfo");
-
+    // await transaction.request().query("DELETE FROM Product");
+    
     // Delete records from other related tables
+    await deleteAllFromTable(transaction, "Department");
+    await deleteAllFromTable(transaction, "Project");
+    await deleteAllFromTable(transaction, "Product");
+    await deleteAllFromTable(transaction, "Shift");
+    await deleteAllFromTable(transaction, "DeliveryUnit");
+    // await deleteAllFromTable(transaction, "EmployeeInfo");
+    await deleteAllFromTable(transaction, "Contact");
+    await deleteAllFromTable(transaction, "Dependent");
+    await deleteAllFromTable(transaction, "Education");
+    await deleteAllFromTable(transaction, "Address");
+    await deleteAllFromTable(transaction, "UserAccount");
+    // await deleteAllFromTable(transaction, "CompensationBenefits");
     await deleteAllFromTable(transaction, "EmergencyContactNumber");
-    // Add more table deletions...
+    
+    await deleteAllFromTable(transaction, "EmpPersonalDetails");
+
+    
 
     await transaction.commit();
     await pool.close();
