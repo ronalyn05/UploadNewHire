@@ -1386,13 +1386,13 @@ const handleAddContactForm = async (e) => {
                                                       className='form-control'
                                                     >
                                                     {/* <select value={employeeData.EmployeeStatus} name="EmployeeStatus" onChange={handleInputChange}> */}
-                                                        <option value="0">Active</option>
-                                                        <option value="1">Separated</option>
-                                                        <option value="2">Inactive - Maternity</option>
-                                                        <option value="3">Inactive - Sickness</option>
-                                                        <option value="4">Inactive - Absent with leave</option>
-                                                        <option value="5">Inactive - Absent Without Leave</option>
-                                                        <option value="6">Inactive - Suspension</option>
+                                                        <option value="Active">Active</option>
+                                                        <option value="Separated">Separated</option>
+                                                        <option value="Inactive - Maternity">Inactive - Maternity</option>
+                                                        <option value="Inactive - Sickness">Inactive - Sickness</option>
+                                                        <option value="Inactive - Absent with leave">Inactive - Absent with leave</option>
+                                                        <option value="Inactive - Absent Without Leave">Inactive - Absent Without Leave</option>
+                                                        <option value="Inactive - Suspension">Inactive - Suspension</option>
                                                     </select>
                                                 </div>
                                         </div>

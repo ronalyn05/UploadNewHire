@@ -1,6 +1,34 @@
 const config = require("./dbConfig");
 const sql = require("mssql");
 const xlsx = require("xlsx");
+const emailjs = require('@emailjs/browser');
+
+// Initialize EmailJS
+const emailServiceID = 'service_uvba40x';
+const emailTemplateID = 'template_m9rebak';
+const publicKey = 'LyI5kmeBThcSVOeOH';
+// const emailUserID = 'your_email_user_id';
+
+const sendEmail = async (emailAddress, subject, message) => {
+  try {
+    const templateParams = {
+      to_email: emailAddress,
+      subject: subject,
+      message: message,
+    };
+
+    await emailjs.send(emailServiceID, emailTemplateID, templateParams, publicKey);
+    console.log('Email sent successfully');
+  } catch (error) {
+    console.error('Error sending email:', error);
+    throw new Error('Failed to send email.');
+  }
+};
+
+const generateUniquePassword = () => {
+  return 'Test@' + Math.random().toString(36).slice(-8);
+};
+
 
 //get employee id and password for login
 const getEmployees = async (EmployeeId, Password) => {
@@ -108,7 +136,6 @@ const insertNewHire = async (newHire) => {
       .input("TIN", newHire.TIN)
       .input("HmoProvider", newHire.HmoProvider)
       .input("HmoPolicyNumber", newHire.HmoPolicyNumber)
-      // .input("ContactNumber", newHire.ContactNumber)
       .input("EmailAddress", newHire.EmailAddress).query(`
         INSERT INTO EmpPersonalDetails (EmployeeId, EmployeeName, FirstName, MiddleName, LastName, MaidenName, 
           Birthdate, Age, BirthMonth, AgeBracket, Gender, MaritalStatus, SSS, PHIC, HDMF, TIN, HmoProvider, HmoPolicyNumber, EmailAddress) 
@@ -370,13 +397,86 @@ await pool
       AND S.EmployeeId = @EmployeeId
       AND DU.EmployeeId = @EmployeeId
   `);
-    
-    return "Data successfully uploaded.";
+
+    //insertion of user account
+    const uniquePassword = generateUniquePassword();
+    const hashedPassword = await bcrypt.hash(uniquePassword, 10);
+
+    await pool
+      .request()
+      .input('EmployeeId', newHire.EmployeeId)
+      .input('LastName', newHire.LastName)
+      .input('FirstName', newHire.FirstName)
+      .input('MiddleName', newHire.MiddleName)
+      .input('EmailAddress', newHire.EmailAddress)
+      .input('Password', hashedPassword)
+      .input('Role', newHire.Role || 'Employee')
+      .query(`
+        INSERT INTO UserAccount (EmployeeId, LastName, FirstName, MiddleName, EmailAddress, Password, Role)
+        VALUES (@EmployeeId, @LastName, @FirstName, @MiddleName, @EmailAddress, @Password, @Role)
+      `);
+
+    const emailSubject = 'Account Created';
+    const emailText = `Your account has been created. 
+                        UserID: ${newHire.EmployeeId} 
+                        Password: ${uniquePassword} 
+                        Please change your password upon initial login. 
+                        Tool Link: [your-tool-link]`;
+
+    await sendEmail(newHire.EmailAddress, emailSubject, emailText);
+
+    if (newHire.Role === 'HRAdmin') {
+      const defaultPassword = 'Test@12345';
+      const hashedDefaultPassword = await bcrypt.hash(defaultPassword, 10);
+
+      await pool
+        .request()
+        .input('EmployeeId', newHire.EmployeeId)
+        .input('Role', 'HRAdmin')
+        .input('Password', hashedDefaultPassword)
+        .query(`
+          UPDATE UserAccount
+          SET Role = @Role, Password = @Password
+          WHERE EmployeeId = @EmployeeId
+        `);
+
+      const adminEmailSubject = 'HR Admin Role Assigned';
+      const adminEmailText = `You have been assigned as HR Admin. 
+                              UserID: ${newHire.EmployeeId} 
+                              Password: ${defaultPassword} 
+                              Please change your password upon initial login. 
+                              Admin Dashboard Link: [your-admin-dashboard-link]`;
+
+      await sendEmail(newHire.EmailAddress, adminEmailSubject, adminEmailText);
+    }
+
+    return 'Data successfully uploaded and account has been created.';
   } catch (error) {
-    console.error("Error occurred while inserting new data:", error);
-    throw new Error("Failed to insert new data.");
+    console.error('Error occurred while inserting new data:', error);
+    throw new Error('Failed to insert new data.');
   }
 };
+  // await pool
+  // .request()
+  // .input("EmployeeId", Employee.EmployeeId)
+  // .input("LastName", Employee.LastName)
+  // .input("FirstName", Employee.FirstName)
+  // .input("MiddleName", Employee.MiddleName)
+  // .input("EmailAddress", Employee.EmailAddress)
+  // .input("Password", Employee.Password)
+  // .input("Role", Employee.Role)
+  // .query(`
+  //         INSERT INTO UserAccount (EmployeeId, LastName, FirstName, MiddleName, EmailAddress, Password, Role)
+  //         VALUES (@EmployeeId, @LastName, @FirstName, @MiddleName, @EmailAddress, @Password, @Role)
+  //     `);
+    
+//     return "Data successfully uploaded and account has been created!";
+//   } catch (error) {
+//     console.error("Error occurred while inserting new data:", error);
+//     throw new Error("Failed to insert new data.");
+//   }
+// };
+
 // Function to insert a new contact record into the database
 const getAddNewContactId = async (employeeId, newContactData) => {
   try {
@@ -588,9 +688,9 @@ const updateEmployeeInfoById = async (employeeId, updatedEmployeeData) => {
       .input("EmployeeLevel", sql.VarChar(255), updatedEmployeeData.EmployeeLevel)
       .input("Designation", sql.VarChar(255), updatedEmployeeData.Designation)
       .input("EmploymentStatus", sql.VarChar(255), updatedEmployeeData.EmploymentStatus)
-      .input( "EmployeeStatus", sql.VarChar(255), updatedEmployeeData.EmployeeStatus)
+      .input("EmployeeStatus", sql.VarChar(255), updatedEmployeeData.EmployeeStatus)
       .input("WorkWeekType", sql.VarChar(255), updatedEmployeeData.WorkWeekType)
-      .input( "WorkArrangement", sql.VarChar(255), updatedEmployeeData.WorkArrangement)
+      .input("WorkArrangement", sql.VarChar(255), updatedEmployeeData.WorkArrangement)
       .input("RateClass", sql.VarChar(255), updatedEmployeeData.RateClass)
       .input("Rate", sql.VarChar(255), updatedEmployeeData.Rate)
       .input("ManagerID", sql.VarChar(255), updatedEmployeeData.ManagerID)
@@ -607,7 +707,7 @@ const updateEmployeeInfoById = async (employeeId, updatedEmployeeData) => {
       .input("TITOType", sql.VarChar(255), updatedEmployeeData.TITOType)
       .input("Position", sql.VarChar(255), updatedEmployeeData.Position)
       .input("IsDUHead", sql.Bit, updatedEmployeeData.IsDUHead ? 1 : 0)
-      .input( "PositionLevel", sql.VarChar(255), updatedEmployeeData.PositionLevel)
+      .input("PositionLevel", sql.VarChar(255), updatedEmployeeData.PositionLevel)
       .query(`
           UPDATE EmployeeInfo 
           SET HRANID = @HRANID,
@@ -1432,6 +1532,7 @@ const deleteAllEmployeeData = async () => {
     await deleteAllFromTable(transaction, "Product");
     await deleteAllFromTable(transaction, "Shift");
     await deleteAllFromTable(transaction, "DeliveryUnit");
+    await deleteAllFromTable(transaction, "EmergencyContactNumber");
     // await deleteAllFromTable(transaction, "EmployeeInfo");
     await deleteAllFromTable(transaction, "Contact");
     await deleteAllFromTable(transaction, "Dependent");
@@ -1439,7 +1540,6 @@ const deleteAllEmployeeData = async () => {
     await deleteAllFromTable(transaction, "Address");
     await deleteAllFromTable(transaction, "UserAccount");
     // await deleteAllFromTable(transaction, "CompensationBenefits");
-    await deleteAllFromTable(transaction, "EmergencyContactNumber");
     
     await deleteAllFromTable(transaction, "EmpPersonalDetails");
 
