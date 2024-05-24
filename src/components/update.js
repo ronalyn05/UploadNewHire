@@ -53,8 +53,6 @@ import 'jspdf-autotable';
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredDependents, setFilteredDependents] = useState([]);
   const educationRef = useRef(null);
-  // const [newContactNumber, setNewContactNumber] = useState('');
-
 
     // Function to handle input change in the search field
     const handleSearchChange = (e) => {
@@ -1084,15 +1082,15 @@ const handleAddContactForm = async (e) => {
     // Define a function to determine the color based on EmployeeStatus value
     const getStatusColor = (status) => {
       switch (status) {
-        case '0': // Active
+        case 'Active': // Active
           return 'green';
-        case '1': // Separated
+        case 'Separated': // Separated
           return 'red';
-        case '2': // Inactive - Maternity
-        case '3': // Inactive - Sickness
-        case '4': // Inactive - Absent with leave
-        case '5': // Inactive - Absent Without Leave
-        case '6': // Inactive - Suspension
+        case 'Inactive - Maternity': // Inactive - Maternity
+        case 'Inactive - Sickness': // Inactive - Sickness
+        case 'Inactive - Absent with leave': // Inactive - Absent with leave
+        case 'Inactive - Absent Without Leave': // Inactive - Absent Without Leave
+        case 'Inactive - Suspension': // Inactive - Suspension
           return 'gray';
         default:
           return 'black'; // Default color
@@ -1349,32 +1347,6 @@ const handleAddContactForm = async (e) => {
                                     </div>
                                 </div>
                                 <div className="row justify-content-center">
-                                    {/* <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="hranId">HRAN ID</label>
-                                            <input type="text" className="form-control" value={employeeData.HRANID} placeholder="enter HRANID" name="HRANID" onChange={handleInputChange}/>
-                                        </div>
-                                    </div> */}
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="empLevel">Employee Level</label>
-                                            <input type="text" className="form-control" value={employeeData.EmployeeLevel} placeholder="enter employee Level" name="EmployeeLevel" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="designation">Designation</label>
-                                            <input type="text" className="form-control" value={employeeData.Designation} placeholder="enter designation" name="Designation" onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                              <div className="form-group">
-                                              <label htmlFor="titoType">TITO Type</label>
-                                              <input type="text" className="form-control" value={employeeData.TITOType} placeholder="enter tito type" name="TitoType" onChange={handleInputChange} />
-                                              </div>
-                                            </div>
-                                </div>
-                                <div className="row justify-content-center">
                                         <div className="col-md-4">
                                                 <div className="form-group">
                                                     <label htmlFor="empStatus">Employee Status</label>
@@ -1425,9 +1397,9 @@ const handleAddContactForm = async (e) => {
                                                 <div className="form-group">
                                                     <label htmlFor="Role">Role</label>
                                                     <select className= 'form-control' 
-                                                    value={employeeData.Role} name="Role" onChange={handleInputChange}>
-                                                        <option value="0">Individual Contributor</option>
-                                                        <option value="1">People Manager</option>
+                                                    value={employeeData.EmployeeRole} name="EmployeeRole" onChange={handleInputChange}>
+                                                        <option value="Individual Contributor">Individual Contributor</option>
+                                                        <option value="People Manager">People Manager</option>
                                                     </select>
                                                 </div>
                                         </div>
@@ -1534,7 +1506,7 @@ const handleAddContactForm = async (e) => {
                                             <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="positionLevel">Position Level</label>
-                                              <select className="form-control" value={employeeData.PositionLevel} name="PositionLevel" onChange={handleInputChange}>
+                                              <select className="form-control" value={employeeData.Level} name="Level" onChange={handleInputChange}>
                                                         <option value="Level 1">Level 1</option>
                                                         <option value="Level 2">Level 2</option>
                                                         <option value="Level 3">Level 3</option>
@@ -1562,23 +1534,199 @@ const handleAddContactForm = async (e) => {
                                               </div>
                                             </div>
                                 </div>
+                                <div className="row ">
+                                    <div className="col-md-4">
+                                              <div className="form-group">
+                                              <label htmlFor="titoType">TITO Type</label>
+                                              <input type="text" className="form-control" value={employeeData.TITOType} placeholder="enter tito type" name="TitoType" onChange={handleInputChange} />
+                                              </div>
+                                            </div>
+                                </div>
                                 
                                 <hr/>
                                   <h5 className='text-primary'>Section 2</h5>
                                   <hr className="hr-cobalt-blue"/>
                                 <br/>
                                 <div className="row ">
-                                            <div className="col-md-6">
+                                <div className="col-md-4">
                                               <div className="form-group">
-                                              <label htmlFor="shiftname">Shift</label>
+                                              <label htmlFor="shiftCode"> Shift Code </label>
+                                              <select className= 'form-control' 
+                                                    value={employeeData.ShiftCode} name="ShiftCode" onChange={handleInputChange}>
+                                                        <option value="G1">G1</option>
+                                                        <option value="F54">F54</option>
+                                                        <option value="G3">G3</option>
+                                                        <option value="F39">F39</option>
+                                                        <option value="F47">F47</option>
+                                                        <option value="C3">C3</option>
+                                                        <option value="G2">G2</option>
+                                                        <option value="F14">F14</option>
+                                                        <option value="F11">F11</option>
+                                                        <option value="C9 ">C9</option>
+                                                        <option value="F40">F40</option>
+                                                        <option value="F43">F43</option>
+                                                        <option value="HB"></option>
+                                                        <option value="F1"></option>
+                                                        <option value="F4"></option>
+                                                        <option value="N1"></option>
+                                                        <option value="F13"></option>
+                                                        <option value="F3"></option>
+                                                        <option value="F18"></option>
+                                                        <option value="N2"></option>
+                                                        <option value="F55"></option>
+                                                        <option value="F77"></option>
+                                                        <option value="N9"></option>
+                                                        <option value="F41"></option>
+                                                        <option value="F46"></option>
+                                                        <option value="C1"></option>
+                                                        <option value="F81"></option>
+                                                        <option value="N10"></option>
+                                                        <option value="N3"></option>
+                                                        <option value="F62"></option>
+                                                        <option value="F48"></option>
+                                                        <option value="C7"></option>
+                                                        <option value="F7"></option>
+                                                        <option value="F86"></option>
+                                                        <option value="F69"></option>
+                                                        <option value="F12"></option>
+                                                        <option value="G79"></option>
+                                                        <option value="G59"></option>
+                                                        <option value="C10"></option>
+                                                        <option value="F2"></option>
+                                                        <option value="F61"></option>
+                                                        <option value="G4"></option>
+                                                        <option value="N4"></option>
+                                                        <option value="N8"></option>
+                                                        <option value="C2"></option>
+                                                        <option value="N6">N6</option>
+                                                        <option value="C6">C6</option>
+                                                        <option value="F15">F15</option>
+                                                        <option value="F82 ">F82</option>
+                                                        <option value="F57">F57</option>
+                                                        <option value="G41">G41</option>
+                                                        <option value="F60">F60</option>
+                                                        <option value="N11">N11</option>
+                                                        <option value="F76">F76</option>
+                                                        <option value="N5">N5</option>
+                                                        <option value="F17">F17</option>
+                                                        <option value="F72">F72</option>
+                                                        <option value="F73">F73</option>
+                                                        <option value="F84">F84</option>
+                                                        <option value="F68">F68</option>
+                                                        <option value="C4">C4</option>
+                                                        <option value="N12">N12</option>
+                                                        <option value="F5">F5</option>
+                                                        <option value="F83">F83</option>
+                                                        <option value="F50">F50</option>
+                                                        <option value="F9">F9</option>
+                                                        <option value="C5">C5</option>
+                                                        <option value="C11">C11</option>
+                                                        <option value="C8">C8</option>
+                                                        <option value="G5">G5</option>
+                                                        <option value="F63">F63</option>
+                                                        <option value="G61">G61</option>
+                                                        <option value="F16 ">F16</option>
+                                                        <option value="F64">F64</option>
+                                                        <option value="F80">F80</option>
+                                                        <option value="F74">F74</option>
+                                                        <option value="F59">F59</option>
+                                                        <option value="F6">F6 </option>
+                                                    </select>
+                                              {/* <input type="text" className="form-control" value={employeeData.EmployeeCategory} placeholder="enter work Week Type" name="EmployeeCategory" onChange={handleInputChange} /> */}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                              <label htmlFor="shiftname">Shift Name</label>
                                               {/* <input type="text" className="form-control" value={employeeData.ShiftName} name="ShiftName" />     */}
                                               <select className="form-control" value={employeeData.ShiftName} name="ShiftName" onChange={handleInputChange}>
-                                                      <option value="G1">[G1] FIXED - 6 Day 6:00AM to 2:00PM</option>
-                                                      <option value="F54">[F54] FIXED - 5 Day 8:00PM to 5:12AM</option>
-                                                      <option value="G3">[G3] FIXED - 6 Day 10:00PM to 6:00AM</option>
-                                                      <option value="F39">[F39] FIXED - 5 Day 9:00PM to 6:12AM</option>
-                                                      <option value="F47">[F47] FIXED - 5 Day 9:00AM to 6:12PM</option>
-                                                      <option value="C3">[C3] FLEXI - 8:00AM to 8:00PM</option>
+                                              {/* <select className="form-control" value={`${employeeData.ShiftName}`} name="ShiftName" onChange={handleShiftChange}> */}
+                                                <option value=" FIXED - 6 Day 6:00AM to 2:00PM">FIXED - 6 Day 6:00AM to 2:00PM</option>
+                                                <option value=" FIXED - 5 Day 8:00PM to 5:12AM"> FIXED - 5 Day 8:00PM to 5:12AM</option>
+                                                <option value=" FIXED - 6 Day 10:00PM to 6:00AM"> FIXED - 6 Day 10:00PM to 6:00AM</option>
+                                                <option value=" FIXED - 5 Day 9:00PM to 6:12AM"> FIXED - 5 Day 9:00PM to 6:12AM</option>
+                                                <option value=" FIXED - 5 Day 9:00AM to 6:12PM"> FIXED - 5 Day 9:00AM to 6:12PM</option>
+                                                <option value=" FLEXI - 8:00AM to 8:00PM"> FLEXI - 8:00AM to 8:00PM</option>
+                                                <option value=" FIXED - 6 Day 2:00PM to 10:00PM"> FIXED - 6 Day 2:00PM to 10:00PM</option>
+                                                <option value=" FIXED - 5 Day 11:00AM to 8:12PM"> FIXED - 5 Day 11:00AM to 8:12PM</option>
+                                                <option value=" FIXED - 5 Day 6:00AM to 3:12PM"> FIXED - 5 Day 6:00AM to 3:12PM</option>
+                                                <option value=" FLEXI - 10:00AM to 10:00PM"> FLEXI - 10:00AM to 10:00PM</option>
+                                                <option value=" FIXED - 5 Day 12:00PM to 9:12PM"> FIXED - 5 Day 12:00PM to 9:12PM</option>
+                                                <option value=" FIXED - 5 Day 11:00PM to 8:12AM">FIXED - 5 Day 11:00PM to 8:12AM</option>
+                                                <option value=" HOME-BASED ONLY"> HOME-BASED ONLY</option>
+                                                <option value=" FIXED - 6 Day 6:00AM to 2:00PM"> FIXED - 6 Day 6:00AM to 2:00PM</option>
+                                                <option value=" FIXED - 6 Day 9:00AM to 5:00PM"> FIXED - 6 Day 9:00AM to 5:00PM</option>
+                                                <option value=" FLEXI 2 - 6:00AM to 6:00PM"> FLEXI 2 - 6:00AM to 6:00PM</option>
+                                                <option value=" FIXED - 5 Day 10:00AM to 7:12PM"> FIXED - 5 Day 10:00AM to 7:12PM</option>
+                                                <option value=" FIXED - 6 Day 10:00PM to 6:00AM"> FIXED - 6 Day 10:00PM to 6:00AM</option>
+                                                <option value=" FIXED - 5 Day 10:00PM to 7:12AM"> FIXED - 5 Day 10:00PM to 7:12AM</option>
+                                                <option value=" FLEXI 2 - 12:00PM to 12:00AM"> FLEXI 2 - 12:00PM to 12:00AM</option>
+                                                <option value="FIXED - 5 Day 4:00PM to 1:12AM"> FIXED - 5 Day 4:00PM to 1:12AM</option>
+                                                <option value=" FIXED - 5 Day 5:00AM to 2:12PM"> FIXED - 5 Day 5:00AM to 2:12PM</option>
+                                                <option value=" FLEXI 2 - 10:00AM to 10:00PM"> FLEXI 2 - 10:00AM to 10:00PM</option>
+                                                <option value=" FIXED - 6 Day 10:00AM to 6:00PM"> FIXED - 6 Day 10:00AM to 6:00PM</option>
+                                                <option value=" FIXED - 5 Day 4:00AM to 1:12PM"> FIXED - 5 Day 4:00AM to 1:12PM</option>
+                                                <option value=" FLEXI - 6:00AM to 6:00PM"> FLEXI - 6:00AM to 6:00PM</option>
+                                                <option value=" FIXED - 5 Day 3:15PM to 12:27AM"> FIXED - 5 Day 3:15PM to 12:27AM</option>
+                                                <option value=" FLEXI 2 - 9:00AM to 9:00PM"> FLEXI 2 - 9:00AM to 9:00PM</option>
+                                                <option value=" FLEXI 2 - 8:00AM to 8:00PM"> FLEXI 2 - 8:00AM to 8:00PM</option>
+                                                <option value=" FIXED - 5 Day 3:00PM to 12:12AM"> FIXED - 5 Day 3:00PM to 12:12AM</option>
+                                                <option value=" FIXED - 5 Day 12:00MN to 9:12AM"> FIXED - 5 Day 12:00MN to 9:12AM</option>
+                                                <option value=" FLEXI - 7:00AM to 7:00PM"> FLEXI - 7:00AM to 7:00PM</option>
+                                                <option value=" FIXED - 6 Day 12:00AM to 8:00AM"> FIXED - 6 Day 12:00AM to 8:00AM</option>
+                                                <option value=" FIXED - 5 Day 6:20AM to 3:32PM"> FIXED - 5 Day 6:20AM to 3:32PM</option>
+                                                <option value=" FIXED - 5 Day 7:00AM to 4:12PM"> FIXED - 5 Day 7:00AM to 4:12PM</option>
+                                                <option value=" FIXED - 5 Day 8:00AM to 5:12PM"> FIXED - 5 Day 8:00AM to 5:12PM</option>
+                                                <option value=" FIXED - 6 Day 12:00AM to 8:00AM"> FIXED - 6 Day 12:00AM to 8:00AM</option>
+                                                <option value=" FIXED - 6 Day 8:00AM to 4:00PM"> FIXED - 6 Day 8:00AM to 4:00PM</option>
+                                                <option value=" FLEXI - 9:00AM to 9:00PM"> FLEXI - 9:00AM to 9:00PM</option>
+                                                <option value=" FIXED - 6 Day 2:00PM to 10:00PM"> FIXED - 6 Day 2:00PM to 10:00PM</option>
+                                                <option value=" FIXED - 6 Day 7:00AM to 3:00PM"> FIXED - 6 Day 7:00AM to 3:00PM</option>
+                                                <option value=" FIXED - 6 Day 9:00AM to 5:00PM"> FIXED - 6 Day 9:00AM to 5:00PM</option>
+                                                <option value=" FLEXI 2 - 3:00PM to 3:00AM"> FLEXI 2 - 3:00PM to 3:00AM</option>
+                                                <option value=" FLEXI 2 - 5:00PM to 5:00AM"> FLEXI 2 - 5:00PM to 5:00AM</option>
+                                                <option value=" FLEXI - 12:00PM to 12:00AM"> FLEXI - 12:00PM to 12:00AM</option>
+                                                <option value=" FLEXI 2 - 10:00PM to 10:00AM"> FLEXI 2 - 10:00PM to 10:00AM</option>
+                                                <option value=" FLEXI - 10:00PM to 10:00AM"> FLEXI - 10:00PM to 10:00AM</option>
+                                                <option value=" FIXED - 5 Day 1:00PM to 10:12PM"> FIXED - 5 Day 1:00PM to 10:12PM</option>
+                                                <option value=" FIXED - 5 Day 2:12PM to 11:24PM"> FIXED - 5 Day 2:12PM to 11:24PM</option>
+                                                <option value=" FIXED - 5 Day 11:30AM to 8:42PM"> FIXED - 5 Day 11:30AM to 8:42PM</option>
+                                                <option value=" FIXED - 6 Day 10:00AM to 6:00PM"> FIXED - 6 Day 10:00AM to 6:00PM</option>
+                                                <option value=" FIXED - 6 Day 3:00PM to 11:00PM"> FIXED - 6 Day 3:00PM to 11:00PM</option>
+                                                <option value=" FLEXI 2 - 11:00AM to 11:00PM"> FLEXI 2 - 11:00AM to 11:00PM</option>
+                                                <option value=" FIXED - 5 Day 10:30PM to 7:42AM"> FIXED - 5 Day 10:30PM to 7:42AM</option>
+                                                <option value=" FLEXI 2 - 8:00PM to 8:00AM"> FLEXI 2 - 8:00PM to 8:00AM</option>
+                                                <option value=" FIXED - 5 Day 3:12PM to 12:25AM"> FIXED - 5 Day 3:12PM to 12:25AM</option>
+                                                <option value=" FIXED - 5 Day 5:00PM to 2:12AM"> FIXED - 5 Day 5:00PM to 2:12AM</option>
+                                                <option value=" FIXED - 5 Day 6:00PM to 3:12AM"> FIXED - 5 Day 6:00PM to 3:12AM</option>
+                                                <option value=" FIXED - 5 Day 7:20AM to 4:32PM"> FIXED - 5 Day 7:20AM to 4:32PM</option>
+                                                <option value=" FIXED - 6 Day 6:00PM to 2:00AM"> FIXED - 6 Day 6:00PM to 2:00AM</option>
+                                                <option value=" FLEXI - 3:00PM to 3:00AM"> FLEXI - 3:00PM to 3:00AM</option>
+                                                <option value=" FLEXI 2 - 2:00PM to 2:00AM"> FLEXI 2 - 2:00PM to 2:00AM</option>
+                                                <option value=" FIXED - 6 Day 12:00PM to 8:00PM"> FIXED - 6 Day 12:00PM to 8:00PM</option>
+                                                <option value=" FIXED - 5 Day 12:40PM to 9:52PM"> FIXED - 5 Day 12:40PM to 9:52PM</option>
+                                                <option value=" FIXED - 5 Day 2:00AM to 11:12AM"> FIXED - 5 Day 2:00AM to 11:12AM</option>
+                                                <option value=" FIXED - 6 Day 4:00PM to 12:00AM"> FIXED - 6 Day 4:00PM to 12:00AM</option>
+                                                <option value=" FLEXI - 8:00PM to 8:00AM"> FLEXI - 8:00PM to 8:00AM</option>
+                                                <option value=" FLEXI - 11:00AM to 11:00PM"> FLEXI - 11:00AM to 11:00PM</option>
+                                                <option value=" FLEXI - 5:00PM to 5:00AM"> FLEXI - 5:00PM to 5:00AM</option>
+                                                <option value=" FIXED - 6 Day 12:00PM to 8:00PM"> FIXED - 6 Day 12:00PM to 8:00PM</option>
+                                                <option value=" FIXED - 5 Day 7:00PM to 4:12AM"> FIXED - 5 Day 7:00PM to 4:12AM</option>
+                                                <option value=" FIXED - 6 Day 7:00AM to 3:00PM"> FIXED - 6 Day 7:00AM to 3:00PM</option>
+                                                <option value=" FIXED - 5 Day 2:00PM to 11:12PM"> FIXED - 5 Day 2:00PM to 11:12PM</option>
+                                                <option value=" FIXED - 5 Day 1:00AM to 10:12AM"> FIXED - 5 Day 1:00AM to 10:12AM</option>
+                                                <option value=" FIXED - 5 Day 8:20AM to 5:32PM"> FIXED - 5 Day 8:20AM to 5:32PM</option>
+                                                <option value=" FIXED - 5 Day 3:00AM to 12:12PM"> FIXED - 5 Day 3:00AM to 12:12PM</option>
+                                                <option value=" FIXED - 6 Day 8:00AM to 4:00PM"> FIXED - 6 Day 8:00AM to 4:00PM</option>
+                                                <option value=" FIXED - 6 Day 8:00PM to 4:00AM"> FIXED - 6 Day 8:00PM to 4:00AM</option>
+                                            </select>
+                                              {/* <select className="form-control" value={employeeData.ShiftCode + '' + employeeData.ShiftName} name="ShiftName" onChange={handleInputChange}>
+                                                      <option value="[G1] FIXED - 6 Day 6:00AM to 2:00PM ">[G1] FIXED - 6 Day 6:00AM to 2:00PM</option>
+                                                      <option value="[F54] FIXED - 5 Day 8:00PM to 5:12AM">[F54] FIXED - 5 Day 8:00PM to 5:12AM</option>
+                                                      <option value="[G3] FIXED - 6 Day 10:00PM to 6:00AM">[G3] FIXED - 6 Day 10:00PM to 6:00AM</option>
+                                                      <option value="[F39] FIXED - 5 Day 9:00PM to 6:12AM">[F39] FIXED - 5 Day 9:00PM to 6:12AM</option>
+                                                      <option value="[F47] FIXED - 5 Day 9:00AM to 6:12PM">[F47] FIXED - 5 Day 9:00AM to 6:12PM</option>
+                                                      <option value="[C3] FLEXI - 8:00AM to 8:00PM">[C3] FLEXI - 8:00AM to 8:00PM</option>
                                                       <option value="G2">[G2] FIXED - 6 Day 2:00PM to 10:00PM</option>
                                                       <option value="F14">[F14] FIXED - 5 Day 11:00AM to 8:12PM</option>
                                                       <option value="F11">[F11] FIXED - 5 Day 6:00AM to 3:12PM</option>
@@ -1651,10 +1799,10 @@ const handleAddContactForm = async (e) => {
                                                       <option value="F74">[F74] FIXED - 5 Day 3:00AM to 12:12PM</option>
                                                       <option value="F59">[F59] FIXED - 6 Day 8:00AM to 4:00PM</option>
                                                       <option value="F6">[F6] FIXED - 6 Day 8:00PM to 4:00AM</option>
-                                                    </select>   
+                                                    </select>    */}
                                               </div>
                                             </div>
-                                            <div className="col-md-6">
+                                            <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="shifttype">Shift Type</label>
                                               {/* <input type="text" className="form-control" value={employeeData.ShiftType} name="ShiftType" />   */}
@@ -1714,7 +1862,7 @@ const handleAddContactForm = async (e) => {
                                 <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="pmpicIdName">PM/PIC Name</label>
-                                              <input type="text" className="form-control" value={employeeData.PMPICIDName} placeholder="enter PMPICID Name" name="PmpicIdName" onChange={handleInputChange} />     
+                                              <input type="text" className="form-control" value={employeeData.PMPICIDName} placeholder="enter PMPICID Name" name="PMPICIDName" onChange={handleInputChange} />     
                                               </div>
                                             </div>
                                             <div className="col-md-4">
@@ -1726,7 +1874,7 @@ const handleAddContactForm = async (e) => {
                                             <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="du">Delivery Unit Head Name</label>
-                                              <input type="text" className="form-control" value={employeeData.DUHName} placeholder="enter DUH Name" name="DuhName" onChange={handleInputChange} />
+                                              <input type="text" className="form-control" value={employeeData.DUHName} placeholder="enter DUH Name" name="DUHName" onChange={handleInputChange} />
                                               </div>
                                             </div>
                                             

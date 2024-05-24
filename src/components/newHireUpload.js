@@ -7,6 +7,16 @@ import Footer from "./footer";
 import "../App.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import * as emailjs from 'emailjs-com';
+import bcrypt from 'bcryptjs';
+// Import the generateUniquePassword function
+const { generateUniquePassword } = require('./utils');
+
+  // Initialize EmailJS with your user ID
+  emailjs.init("LyI5kmeBThcSVOeOH");
+  // Define email service ID and template ID
+const emailServiceID = 'service_uvba40x';
+const emailTemplateID = 'template_m9rebak';
 
 const NewHireUpload = () => {
   const [file, setFile] = useState(null);
@@ -136,6 +146,40 @@ const NewHireUpload = () => {
     setEditModalShow(false);
   };
 
+// Function to generate a unique password
+// const generateUniquePassword = () => {
+//   return 'Test@' + Math.random().toString(36).slice(-8);
+// };
+
+// Function to send email notification
+const sendEmailNotification = async ( templateParams) => {
+  try {
+    // Send email using EmailJS API
+    await emailjs.send(emailServiceID, emailTemplateID, templateParams);
+
+    console.log('Email sent successfully');
+  } catch (error) {
+    console.error('Error sending email:', error);
+  }
+};
+
+// const sendEmailNotification = async (to, subject, message) => {
+//   try {
+//     const templateParams = {
+//       to_email: to,
+//       subject: subject,
+//       message: message
+//     };
+
+//     // Send email using EmailJS API
+//     await emailjs.send(emailServiceID, emailTemplateID, templateParams);
+
+//     console.log('Email sent successfully');
+//   } catch (error) {
+//     console.error('Error sending email:', error);
+//   }
+// };
+//function of insertion of data
   const handleSaveData = async () => {
     console.log("Saving data...");
     console.log("Excel Data:", excelData);
@@ -230,10 +274,30 @@ const NewHireUpload = () => {
         throw new Error("Failed to save data");
       }
 
+      for (const row of excelData) {
+        // Generate a unique password for each employee
+        const uniquePassword = generateUniquePassword();
+        row.Password = uniquePassword;
+
+        // Create the template parameters
+        const templateParams = {
+            firstName: row.FirstName,
+            employeeId: row.EmployeeId,
+            temporaryPassword: row.Password,
+            to_email: row.EmailAddress,
+            subject: 'Your Account Details'
+        };
+
+        // Send email notification with account details
+        await sendEmailNotification(templateParams);
+    }
+      
+
+    alert("Data has been successfully uploaded and Email notifications sent successfully!");
       console.log("Upload response:", response.data);
-      alert("Data has been successfully uploaded!");
+      // alert("Data has been successfully uploaded!");
       navigate("/reports"); // Navigate to report.js after successful upload
-    } catch (error) {
+    } catch (error) { 
       console.error("Error occurred while saving data:", error);
 
       if (error.message.includes("Duplicate Employee IDs detected")) {

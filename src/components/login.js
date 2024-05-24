@@ -55,9 +55,9 @@ function LoginPage() {
       sessionStorage.setItem('role', data.Role);
 
             // Redirect based on user role
-            if (data.Role === "hrAdmin") {
+            if (data.Role === "HRAdmin") {
               navigate("/dashboard", { state: data });
-            } else if (data.Role === "employee") {
+            } else if (data.Role === "Employee") {
               navigate("/employee", { state: data });
             } else {
               throw new Error("Invalid user role");
@@ -66,7 +66,7 @@ function LoginPage() {
             console.error("Login Failed", error);
             setErrorMessage(error.message || "Login Failed.");
           }
-        };
+  };
 
   useEffect(() => {
     // Manipulate browser history on component mount

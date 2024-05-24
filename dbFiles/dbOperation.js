@@ -1,34 +1,6 @@
 const config = require("./dbConfig");
 const sql = require("mssql");
 const xlsx = require("xlsx");
-const emailjs = require('@emailjs/browser');
-
-// Initialize EmailJS
-const emailServiceID = 'service_uvba40x';
-const emailTemplateID = 'template_m9rebak';
-const publicKey = 'LyI5kmeBThcSVOeOH';
-// const emailUserID = 'your_email_user_id';
-
-const sendEmail = async (emailAddress, subject, message) => {
-  try {
-    const templateParams = {
-      to_email: emailAddress,
-      subject: subject,
-      message: message,
-    };
-
-    await emailjs.send(emailServiceID, emailTemplateID, templateParams, publicKey);
-    console.log('Email sent successfully');
-  } catch (error) {
-    console.error('Error sending email:', error);
-    throw new Error('Failed to send email.');
-  }
-};
-
-const generateUniquePassword = () => {
-  return 'Test@' + Math.random().toString(36).slice(-8);
-};
-
 
 //get employee id and password for login
 const getEmployees = async (EmployeeId, Password) => {
@@ -100,7 +72,7 @@ const insertEmployee = async (Employee) => {
   }
 };
 //insertion of the list of employee data to multiple table
-const insertNewHire = async (newHire) => {
+const insertNewHire = async (newHire, password) => {
   try {
     let pool = await sql.connect(config);
 
@@ -341,15 +313,11 @@ await pool
     .input("EmployeeId", newHire.EmployeeId)
     .input("HRANID", newHire.HRANID)
     .input("DateHired", newHire.DateHired)
-    .input("Facility", newHire.Facility)
-    .input("Role", newHire.Role)
     .input("Tenure", newHire.Tenure)
-    .input("EmployeeLevel", newHire.EmployeeLevel)
-    .input("Designation", newHire.Designation)
+    .input("Level", newHire.Level)
     .input("Department", newHire.Department)
     .input("EmploymentStatus", newHire.EmploymentStatus)
     .input("EmployeeStatus", newHire.EmployeeStatus)
-    .input("EmployeeCategory", newHire.EmployeeCategory)
     .input("WorkWeekType", newHire.WorkWeekType)
     .input("WorkArrangement", newHire.WorkArrangement)
     .input("RateClass", newHire.RateClass)
@@ -372,21 +340,24 @@ await pool
     .input("Position", newHire.Position)
     .input("PositionLevel", newHire.PositionLevel)
     .input("IsDUHead", validateAndConvertBit(newHire.IsDUHead))
+    .input("Facility", newHire.Facility)
+    .input("EmployeeRole", newHire.EmployeeRole)
+    .input("EmployeeCategory", newHire.EmployeeCategory)
     .query(`
     INSERT INTO EmployeeInfo (
       EmployeeId, ProjectId, DepartmentId, ProdId, ShiftId, DUID,
-      HRANID, DateHired, Facility, Role, Tenure, EmployeeLevel, Designation, EmploymentStatus, EmployeeStatus,
-      EmployeeCategory, WorkWeekType, WorkArrangement, RateClass, Rate, ManagerID, ManagerName, PMPICID,
+      HRANID, DateHired, Tenure, Level, EmploymentStatus, EmployeeStatus,
+      WorkWeekType, WorkArrangement, RateClass, Rate, ManagerID, ManagerName, PMPICID,
       PMPICIDName, DUHID, DUHName, IsManager, IsPMPIC, IsIndividualContributor, IsActive,
-      HRANType, TITOType, Position, PositionLevel, IsDUHead
+      HRANType, TITOType, Position, IsDUHead, Facility, EmployeeRole, EmployeeCategory
     )
     SELECT 
       @EmployeeId, P.ProjectId, D.DepartmentId, Pr.ProdId, S.ShiftId, DU.DUID, 
-      @HRANID, @DateHired, @Facility, @Role, @Tenure, @EmployeeLevel, @Designation, @EmploymentStatus, 
-      @EmployeeCategory, @EmployeeStatus, @WorkWeekType, @WorkArrangement, @RateClass, @Rate, 
+      @HRANID, @DateHired, @Tenure, @Level, @EmploymentStatus, 
+      @EmployeeStatus, @WorkWeekType, @WorkArrangement, @RateClass, @Rate, 
       @ManagerID, @ManagerName, @PMPICID, @PMPICIDName, @DUHID, @DUHName, 
       @IsManager, @IsPMPIC, @IsIndividualContributor, @IsActive, @HRANType, 
-      @TITOType, @Position, @PositionLevel, @IsDUHead
+      @TITOType, @Position, @IsDUHead, @Facility, @EmployeeRole, @EmployeeCategory
     FROM 
       Project P, Department D, Product Pr, Shift S,
       DeliveryUnit DU
@@ -399,8 +370,8 @@ await pool
   `);
 
     //insertion of user account
-    const uniquePassword = generateUniquePassword();
-    const hashedPassword = await bcrypt.hash(uniquePassword, 10);
+    //  const uniquePassword = generateUniquePassword();
+    //  const hashedPassword = await bcrypt.hash(uniquePassword, 10);
 
     await pool
       .request()
@@ -409,46 +380,47 @@ await pool
       .input('FirstName', newHire.FirstName)
       .input('MiddleName', newHire.MiddleName)
       .input('EmailAddress', newHire.EmailAddress)
-      .input('Password', hashedPassword)
-      .input('Role', newHire.Role || 'Employee')
+      .input('Password', password)
+      .input('Role', newHire.Role)
+    //  .input('Role', newHire.Role || 'Employee')
       .query(`
         INSERT INTO UserAccount (EmployeeId, LastName, FirstName, MiddleName, EmailAddress, Password, Role)
         VALUES (@EmployeeId, @LastName, @FirstName, @MiddleName, @EmailAddress, @Password, @Role)
       `);
 
-    const emailSubject = 'Account Created';
-    const emailText = `Your account has been created. 
-                        UserID: ${newHire.EmployeeId} 
-                        Password: ${uniquePassword} 
-                        Please change your password upon initial login. 
-                        Tool Link: [your-tool-link]`;
+    // const emailSubject = 'Account Created';
+    // const emailText = `Your account has been created. 
+    //                     UserID: ${newHire.EmployeeId} 
+    //                     Password: ${uniquePassword} 
+    //                     Please change your password upon initial login. 
+    //                     Tool Link: [your-tool-link]`;
 
-    await sendEmail(newHire.EmailAddress, emailSubject, emailText);
+    // await sendEmail(newHire.EmailAddress, emailSubject, emailText);
 
-    if (newHire.Role === 'HRAdmin') {
-      const defaultPassword = 'Test@12345';
-      const hashedDefaultPassword = await bcrypt.hash(defaultPassword, 10);
+    // if (newHire.Role === 'HRAdmin') {
+    //   const defaultPassword = 'Test@12345';
+    //   const hashedDefaultPassword = await bcrypt.hash(defaultPassword, 10);
 
-      await pool
-        .request()
-        .input('EmployeeId', newHire.EmployeeId)
-        .input('Role', 'HRAdmin')
-        .input('Password', hashedDefaultPassword)
-        .query(`
-          UPDATE UserAccount
-          SET Role = @Role, Password = @Password
-          WHERE EmployeeId = @EmployeeId
-        `);
+    //   await pool
+    //     .request()
+    //     .input('EmployeeId', newHire.EmployeeId)
+    //     .input('Role', 'HRAdmin')
+    //     .input('Password', hashedDefaultPassword)
+    //     .query(`
+    //       UPDATE UserAccount
+    //       SET Role = @Role, Password = @Password
+    //       WHERE EmployeeId = @EmployeeId
+    //     `);
 
-      const adminEmailSubject = 'HR Admin Role Assigned';
-      const adminEmailText = `You have been assigned as HR Admin. 
-                              UserID: ${newHire.EmployeeId} 
-                              Password: ${defaultPassword} 
-                              Please change your password upon initial login. 
-                              Admin Dashboard Link: [your-admin-dashboard-link]`;
+    //   const adminEmailSubject = 'HR Admin Role Assigned';
+    //   const adminEmailText = `You have been assigned as HR Admin. 
+    //                           UserID: ${newHire.EmployeeId} 
+    //                           Password: ${defaultPassword} 
+    //                           Please change your password upon initial login. 
+    //                           Admin Dashboard Link: [your-admin-dashboard-link]`;
 
-      await sendEmail(newHire.EmailAddress, adminEmailSubject, adminEmailText);
-    }
+    //   await sendEmail(newHire.EmailAddress, adminEmailSubject, adminEmailText);
+    // }
 
     return 'Data successfully uploaded and account has been created.';
   } catch (error) {
@@ -509,18 +481,18 @@ const getAllNewHireEmployees = async () => {
     EI.Facility,
     EI.EmployeeStatus,
     EI.EmploymentStatus,
-    EI.Role,
+    EI.EmployeeRole,
     EI.DateHired,
     EI.Position,
-    EI.EmployeeLevel,
+    EI.Level,
     EI.WorkArrangement,
     EI.WorkWeekType,
     PR.ProjectCode,
     Dept.DepartmentName,
     DU.DUName,
+    SHFT.ShiftCode,
     SHFT.ShiftName,
-    SHFT.ShiftType,
-    EI.Designation
+    SHFT.ShiftType
     FROM EmpPersonalDetails AS EP
     INNER JOIN EmployeeInfo AS EI ON EP.EmployeeId = EI.EmployeeId
     LEFT JOIN Project AS PR ON EP.EmployeeId = PR.EmployeeId
@@ -603,7 +575,6 @@ const getEmployeeById = async (employeeId) => {
     throw error;
   }
 }
-
 //update employee personal details  by id
 const updateEmployeeById = async (employeeId, updatedEmployeeData) => {
   try {
@@ -631,6 +602,8 @@ const updateEmployeeById = async (employeeId, updatedEmployeeData) => {
       .input("HDMF", sql.VarChar(255), updatedEmployeeData.HDMF)
       .input("TIN", sql.VarChar(255), updatedEmployeeData.TIN)
       .input("EmailAddress", sql.VarChar(255), updatedEmployeeData.EmailAddress)
+      .input("HmoProvider", sql.VarChar(255), updatedEmployeeData.HmoProvider)
+      .input("HmoPolicyNumber", sql.VarChar(255), updatedEmployeeData.HmoPolicyNumber)
       .query(`
           UPDATE EmpPersonalDetails 
           SET EmployeeId = @EmployeeId,
@@ -649,7 +622,9 @@ const updateEmployeeById = async (employeeId, updatedEmployeeData) => {
               PHIC = @PHIC,
               HDMF = @HDMF,
               TIN = @TIN,
-              EmailAddress = @EmailAddress
+              EmailAddress = @EmailAddress,
+              HmoProvider = @HmoProvider,
+              HmoPolicyNumber = @HmoPolicyNumber
           WHERE EmployeeId = @employeeId
         `);
         // Update the contact number in the Contact table first
@@ -685,10 +660,12 @@ const updateEmployeeInfoById = async (employeeId, updatedEmployeeData) => {
       .input("HRANID", sql.VarChar(255), updatedEmployeeData.HRANID)
       .input("DateHired", sql.Date, updatedEmployeeData.DateHired)
       .input("Tenure", sql.VarChar(255), updatedEmployeeData.Tenure)
-      .input("EmployeeLevel", sql.VarChar(255), updatedEmployeeData.EmployeeLevel)
-      .input("Designation", sql.VarChar(255), updatedEmployeeData.Designation)
+      .input("Level", sql.VarChar(255), updatedEmployeeData.Level)
       .input("EmploymentStatus", sql.VarChar(255), updatedEmployeeData.EmploymentStatus)
       .input("EmployeeStatus", sql.VarChar(255), updatedEmployeeData.EmployeeStatus)
+      .input("EmployeeRole", sql.VarChar(255), updatedEmployeeData.EmployeeRole)
+      .input("EmployeeCategory", sql.VarChar(255), updatedEmployeeData.EmployeeCategory)
+      .input("Facility", sql.VarChar(255), updatedEmployeeData.Facility)
       .input("WorkWeekType", sql.VarChar(255), updatedEmployeeData.WorkWeekType)
       .input("WorkArrangement", sql.VarChar(255), updatedEmployeeData.WorkArrangement)
       .input("RateClass", sql.VarChar(255), updatedEmployeeData.RateClass)
@@ -707,16 +684,17 @@ const updateEmployeeInfoById = async (employeeId, updatedEmployeeData) => {
       .input("TITOType", sql.VarChar(255), updatedEmployeeData.TITOType)
       .input("Position", sql.VarChar(255), updatedEmployeeData.Position)
       .input("IsDUHead", sql.Bit, updatedEmployeeData.IsDUHead ? 1 : 0)
-      .input("PositionLevel", sql.VarChar(255), updatedEmployeeData.PositionLevel)
       .query(`
           UPDATE EmployeeInfo 
           SET HRANID = @HRANID,
               DateHired = @DateHired,
               Tenure = @Tenure,
-              EmployeeLevel = @EmployeeLevel,
-              Designation = @Designation,
+              Level = @Level,
               EmploymentStatus = @EmploymentStatus,
               EmployeeStatus = @EmployeeStatus,
+              EmployeeRole = @EmployeeRole,
+              EmployeeCategory = @EmployeeCategory,
+              Facility = @Facility,
               WorkWeekType = @WorkWeekType,
               WorkArrangement = @WorkArrangement,
               RateClass = @RateClass,
@@ -734,8 +712,7 @@ const updateEmployeeInfoById = async (employeeId, updatedEmployeeData) => {
               HRANType = @HRANType,
               TITOType = @TITOType,
               Position = @Position,
-              IsDUHead = @IsDUHead,
-              PositionLevel = @PositionLevel
+              IsDUHead = @IsDUHead
           WHERE EmployeeId = @EmployeeId
         `);
 
@@ -992,59 +969,6 @@ const updateEmployeeDepartmentById = async (employeeId, updatedEmployeeData) => 
   }
 };
 // //update employee dependent details
-// const updateEmployeeDependentById = async (employeeId, updatedEmployeeData) => {
-//   try {
-//     let pool = await sql.connect(config);
-//     let result = await pool
-//       .request()
-//       .input("EmployeeId", sql.VarChar, employeeId)
-//       .input("FullName", sql.VarChar(255), updatedEmployeeData.FullName)
-//       .input("PhoneNum", sql.VarChar(255), updatedEmployeeData.PhoneNum)
-//       .input("Relationship", sql.VarChar(255), updatedEmployeeData.Relationship)
-//       .input("DateOfBirth", sql.VarChar(255), updatedEmployeeData.DateOfBirth)
-//       .input("Occupation", sql.VarChar(255), updatedEmployeeData.Occupation)
-//       .input("Address", sql.VarChar(255), updatedEmployeeData.Address)
-//       .input("City", sql.VarChar(255), updatedEmployeeData.City)
-//       .input("DepProvince", sql.VarChar(255), updatedEmployeeData.DepProvince)
-//       .input("PostalCode", sql.VarChar(255), updatedEmployeeData.PostalCode)
-//       .input("Beneficiary", sql.VarChar(255), updatedEmployeeData.Beneficiary)
-//       .input("BeneficiaryDate", sql.VarChar(255), updatedEmployeeData.BeneficiaryDate)
-//       .input("TypeOfCoverage", sql.VarChar(255), updatedEmployeeData.TypeOfCoverage)
-//       .input("Insurance", sql.VarChar(255), updatedEmployeeData.Insurance)
-//       .input("InsuranceDate", sql.VarChar(255), updatedEmployeeData.InsuranceDate)
-//       .input("Remarks", sql.VarChar(255), updatedEmployeeData.Remarks)
-//       .input("CompanyPaid", sql.VarChar(255), updatedEmployeeData.CompanyPaid)
-//       .input("HMOProvider", sql.VarChar(255), updatedEmployeeData.HMOProvider)
-//       .input("HMOPolicyNumber", sql.VarChar(255), updatedEmployeeData.HMOPolicyNumber)
-//       .query(`
-//           UPDATE Dependent 
-//           SET FullName = @FullName,
-//           PhoneNum = @PhoneNum,
-//           Relationship = @Relationship,
-//           DateOfBirth = @DateOfBirth,
-//           Occupation = @Occupation,
-//           Address = @Address,
-//           City = @City,
-//           DepProvince = @DepProvince,
-//           PostalCode = @PostalCode,
-//           Beneficiary = @Beneficiary,
-//           BeneficiaryDate = @BeneficiaryDate,
-//           TypeOfCoverage = @TypeOfCoverage,
-//           Insurance = @Insurance,
-//           InsuranceDate = @InsuranceDate,
-//           Remarks = @Remarks,
-//           CompanyPaid = @CompanyPaid,
-//           HMOProvider = @HMOProvider,
-//           HMOPolicyNumber = @HMOPolicyNumber
-//           WHERE EmployeeId = @EmployeeId
-//         `);
-
-//     return result;
-//   } catch (error) {
-//     console.error("Error updating employee delivery unit by ID:", error);
-//     throw error;
-//   }
-// };
 const updateDependentById = async (dependentId, updatedDependentData) => {
   try {
     let pool = await sql.connect(config);

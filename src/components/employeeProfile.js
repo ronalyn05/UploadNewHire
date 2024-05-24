@@ -42,6 +42,27 @@ function EmployeeProfile() {
     }
   };
 
+      // Define a function to determine the color based on EmployeeStatus value
+      const getStatusColor = (status) => {
+        switch (status) {
+          case 'Active': // Active
+            return 'green';
+          case 'Separated': // Separated
+            return 'red';
+          case 'Inactive - Maternity': // Inactive - Maternity
+          case 'Inactive - Sickness': // Inactive - Sickness
+          case 'Inactive - Absent with leave': // Inactive - Absent with leave
+          case 'Inactive - Absent Without Leave': // Inactive - Absent Without Leave
+          case 'Inactive - Suspension': // Inactive - Suspension
+            return 'gray';
+          default:
+            return 'black'; // Default color
+        }
+      };
+    
+      const statusColor = getStatusColor(employeeData.EmployeeStatus);
+    
+
   // Go back to the previous page in history
   const handleNavigateBack = () => {
     // Navigate back one step in history (equivalent to pressing the browser's back button)
@@ -205,17 +226,10 @@ function EmployeeProfile() {
                                   Employee Status:
                                 </label>
                                 <span
-                                  className={`valueCenter ${
-                                    employeeData.EmployeeStatus === "ACTIVE"
-                                      ? "text-success"
-                                      : "text-danger"
-                                  }`}
-                                  style={{
-                                    textDecoration: "underline",
-                                    textTransform: "capitalize",
-                                  }}
+                                style={{ color: statusColor, textDecoration: "underline",
+                                textTransform: "capitalize", }} 
                                 >
-                                  {employeeData.EmployeeStatus?.toLowerCase()}
+                                  {employeeData.EmployeeStatus}
                                 </span>
                                 <br />
                               </div>
@@ -295,7 +309,7 @@ function EmployeeProfile() {
                               <div className="form-group">
                                 <label>Level</label>
                                 <span className="form-control autoAdjustSpan">
-                                  {employeeData.EmployeeLevel}
+                                  {employeeData.Level}
                                 </span>
                               </div>
                             </div>
@@ -303,7 +317,7 @@ function EmployeeProfile() {
                           <div className="row justify-content-center">
                             <div className="col-md-6">
                               <div className="form-group">
-                                <label htmlFor="Shift">Employment Status</label>
+                                <label htmlFor="EmploymentStatus">Employment Status</label>
                                 <span className="form-control autoAdjustSpan">
                                   {employeeData.EmploymentStatus}
                                 </span>

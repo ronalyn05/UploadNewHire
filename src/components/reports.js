@@ -190,7 +190,7 @@ useEffect(() => {
                               <th scope="col">Employee Status</th>
                               <th scope="col">Employment Status</th>
                               <th scope="col">Date Hired</th>
-                              <th scope="col">Role</th>
+                              <th scope="col">Employee Role</th>
                               <th scope="col">Position</th>
                               <th scope="col">Level</th>
                               <th scope="col">Project Code</th>
@@ -200,7 +200,6 @@ useEffect(() => {
                               <th scope="col">Work Arrangement</th>
                               <th scope="col">Shift</th>
                               <th scope="col">Shift Type</th>
-                              <th scope="col">Designation</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -231,17 +230,17 @@ useEffect(() => {
                                   <td>{employee.EmployeeStatus}</td>
                                   <td>{employee.EmploymentStatus}</td>
                                   <td>{employee.DateHired}</td>
-                                  <td>{employee.Role}</td>
+                                  <td>{employee.EmployeeRole}</td>
                                   <td>{employee.Position}</td>
-                                  <td>{employee.EmployeeLevel}</td>
+                                  <td>{employee.Level}</td>
                                   <td>{employee.ProjectCode}</td>
                                   <td>{employee.DepartmentName}</td>
                                   <td>{employee.DUName}</td>
                                   <td>{employee.WorkWeekType}</td>
                                   <td>{employee.WorkArrangement}</td>
-                                  <td>{employee.ShiftName}</td>
+                                  {/* <td>{employee.ShiftName}</td> */}
+                                  <td>{employee.ShiftCode + ' ' + employee.ShiftName}</td>
                                   <td>{employee.ShiftType}</td>
-                                  <td>{employee.Designation}</td>
                                 </tr>
                               ))
                             ) : (
