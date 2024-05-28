@@ -428,26 +428,46 @@ await pool
     throw new Error('Failed to insert new data.');
   }
 };
-  // await pool
-  // .request()
-  // .input("EmployeeId", Employee.EmployeeId)
-  // .input("LastName", Employee.LastName)
-  // .input("FirstName", Employee.FirstName)
-  // .input("MiddleName", Employee.MiddleName)
-  // .input("EmailAddress", Employee.EmailAddress)
-  // .input("Password", Employee.Password)
-  // .input("Role", Employee.Role)
-  // .query(`
-  //         INSERT INTO UserAccount (EmployeeId, LastName, FirstName, MiddleName, EmailAddress, Password, Role)
-  //         VALUES (@EmployeeId, @LastName, @FirstName, @MiddleName, @EmailAddress, @Password, @Role)
-  //     `);
-    
-//     return "Data successfully uploaded and account has been created!";
+//update password / changing of password
+// const updateUserPassword = async (employeeId, NewPassword) => {
+//   try {
+//     const pool = await sql.connect(config); // Establish DB connection
+//     const request = pool.request();
+//     const query = `
+//       UPDATE UserAccount 
+//       SET Password = @Password
+//       WHERE EmployeeId = @EmployeeId
+//     `;
+//     request.input("EmployeeId", sql.VarChar, employeeId);
+//     request.input("Password", sql.VarChar, NewPassword);
+//     const result = await request.query(query); // Execute the query
+//     console.log("Password updated successfully");
+//     return result;
 //   } catch (error) {
-//     console.error("Error occurred while inserting new data:", error);
-//     throw new Error("Failed to insert new data.");
+//     console.error("Error updating password:", error);
+//     throw error;
 //   }
 // };
+const updateUserPassword = async (employeeId, newPassword) => {
+  try {
+    const pool = await sql.connect(config); // Establish DB connection
+    const request = pool.request();
+    const query = `
+      UPDATE UserAccount 
+      SET Password = @Password,
+          ChangePasswordRequired = 0  -- Set the flag to indicate password change is not required
+      WHERE EmployeeId = @EmployeeId
+    `;
+    request.input("EmployeeId", sql.VarChar, employeeId);
+    request.input("Password", sql.VarChar, newPassword);
+    const result = await request.query(query); // Execute the query
+    console.log("Password updated successfully");
+    return result;
+  } catch (error) {
+    console.error("Error updating password:", error);
+    throw error;
+  }
+};
 
 // Function to insert a new contact record into the database
 const getAddNewContactId = async (employeeId, newContactData) => {
@@ -1477,9 +1497,24 @@ const deleteAllEmployeeData = async () => {
     throw error;
   }
 };
-
+//INSERT NEW PASSWORD
+const getUserByEmployeeId = async (employeeId) => {
+  try {
+    const pool = await sql.connect(config);
+    const request = pool.request();
+    request.input("EmployeeId", sql.VarChar, employeeId);
+    const query = 'SELECT * FROM UserAccount WHERE EmployeeId = @EmployeeId';
+    const result = await request.query(query);
+    return result.recordset[0];
+  } catch (error) {
+    console.error('Error retrieving user by EmployeeId:', error);
+    throw error;
+  }
+};
 
 module.exports = {
+  updateUserPassword,
+  getUserByEmployeeId,
   insertEmployee,
   getEmployees,
   insertNewHire,

@@ -52,7 +52,7 @@ function TopNavbar() {
           </a>
           {/* Dropdown - User Information */}
           <div className="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-            {userRole === 'hrAdmin' && (
+            {userRole === 'HRAdmin' && (
               <Link className="dropdown-item" to={{ pathname: "/profile"}} state={data}>
                 <i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                 <span>Profile</span>

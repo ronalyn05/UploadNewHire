@@ -332,20 +332,22 @@ function EmployeeProfile() {
                               </div>
                             </div>
                           </div>
-                          <div className="row justify-content-center">
-                            <div className="col-md-6">
-                              <div className="form-group">
-                                <label htmlFor="Shift">Shift</label>
-                                <span className="form-control autoAdjustSpan">
-                                  {employeeData.ShiftName}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="col-md-6">
+                          <div className="row ">
+                            <div className="col-md-12">
                               <div className="form-group">
                                 <label>Position</label>
                                 <span className="form-control autoAdjustSpan">
                                   {employeeData.Position}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="row justify-content-center">
+                          <div className="col-md-12">
+                              <div className="form-group">
+                                <label htmlFor="Shift">Shift</label>
+                                <span className="form-control autoAdjustSpan">
+                                  {employeeData.ShiftName}
                                 </span>
                               </div>
                             </div>

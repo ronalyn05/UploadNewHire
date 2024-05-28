@@ -3026,7 +3026,7 @@ const handleAddContactForm = async (e) => {
                       </div>
                       <div className="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
                           {/* Address Form */}
-                          <div className="container">
+                        <div className="container">
                           <h5 className='text-primary'>Contact Details</h5>
                                 <hr className="hr-cobalt-blue"/>
                                 <br/>
@@ -3113,7 +3113,7 @@ const handleAddContactForm = async (e) => {
                                   </div>
                                     <hr/>
                           <form onSubmit={handleAddressFormSubmit}>
-                          <div className='card-body'>
+                          {/* <div className='card-body'> */}
                           <h5 className='text-primary'>Address Details</h5>
                                 <hr className="hr-cobalt-blue"/>
                                 <br/>
@@ -3243,7 +3243,7 @@ const handleAddContactForm = async (e) => {
                                             </select>
                                               </div>
                                             </div>
-                                </div>
+                                {/* </div> */}
                                 </div>
                                 <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
                             </form>
@@ -3444,7 +3444,7 @@ const handleAddContactForm = async (e) => {
                            {/* <div className="card"> */}
                                 <div className="card-body d-flex justify-content-between align-items-center">
                                   {/* New Record button */}
-                                  <button className="btn btn-xs btn-success mr-2" onClick={handleShowAddModal}>
+                                  <button className="btn btn-xs btn-primary mr-2" onClick={handleShowAddModal}>
                                     <i className="fas fa-plus"></i> New Record
                                   </button>
 

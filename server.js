@@ -247,30 +247,49 @@ app.post('/register', async (req, res) => {
   //     res.status(500).json({ error: 'Internal Server Error' });
   //   }
   // });
-
   app.post('/login', async (req, res) => {
     const { EmployeeId, Password } = req.body;
+    console.log('Login attempt:', { EmployeeId, Password });
   
     try {
+      // Check for static credentials
+      if (EmployeeId === STATIC_EMPLOYEE_ID) {
+        if (Password === ADMIN_PASSWORD) {
+          res.status(200).json({
+            EmployeeId: STATIC_EMPLOYEE_ID,
+            Role: 'HRAdmin'
+          });
+          return;
+        } else if (Password === EMPLOYEE_PASSWORD) {
+          res.status(200).json({
+            EmployeeId: STATIC_EMPLOYEE_ID,
+            Role: 'Employee'
+          });
+          return;
+        } else {
+          res.status(401).json({ error: 'Incorrect employee id or password' });
+          return;
+        }
+      }
+  
       // Retrieve user from the database based on EmployeeId
       const users = await dbOperation.getEmployees(EmployeeId);
-  
-      // If user exists
       if (users.length > 0) {
         const user = users[0];
+        console.log('User found:', user);
   
         // Compare provided password with the hashed password stored in the database
         const isValidPassword = await bcrypt.compare(Password, user.Password);
+        console.log('Password valid:', isValidPassword);
   
         if (isValidPassword) {
-          // Passwords match, login successful
           res.status(200).json(user);
         } else {
-          // Passwords do not match
+          console.log('Password mismatch:', { provided: Password, stored: user.Password });
+         // alert('Password mismatch. Please check your inputted password!');
           res.status(401).json({ error: 'Incorrect employee id or password' });
         }
       } else {
-        // User not found
         res.status(401).json({ error: 'User not found or invalid credentials. Register your account!' });
       }
     } catch (error) {
@@ -278,6 +297,66 @@ app.post('/register', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
     }
   });
+  // Change password endpoint
+  app.post('/changePassword', async (req, res) => {
+    const { EmployeeId, CurrentPassword, NewPassword } = req.body;
+  
+    try {
+      // Retrieve user from the database based on EmployeeId
+      const user = await dbOperation.getUserByEmployeeId(EmployeeId);
+      if (!user) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+  
+      // Compare provided current password with the hashed password stored in the database
+      const isValidPassword = await bcrypt.compare(CurrentPassword, user.Password);
+      if (!isValidPassword) {
+        res.status(401).json({ error: 'Invalid current password' });
+        return;
+      }
+  
+      // Hash the new password before storing it in the database
+      const hashedNewPassword = await bcrypt.hash(NewPassword, 10);
+  
+      // Update the user's password in the database
+      await dbOperation.updateUserPassword(EmployeeId, hashedNewPassword);
+  
+      res.status(200).json({ message: 'Password updated successfully' });
+    } catch (error) {
+      console.error('Password Change Failed:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
+  // app.post('/login', async (req, res) => {
+  //   const { EmployeeId, Password } = req.body;
+  //   console.log('Login attempt:', { EmployeeId, Password }); // Log login attempt
+  
+  //   try {
+  //     const users = await dbOperation.getEmployees(EmployeeId);
+  
+  //     if (users.length > 0) {
+  //       const user = users[0];
+  //       console.log('User found:', user); // Log user found
+  
+  //       const isValidPassword = await bcrypt.compare(Password, user.Password);
+  //       console.log('Password valid:', isValidPassword); // Log password comparison result
+  
+  //       if (isValidPassword) {
+  //         res.status(200).json(user);
+  //       } else {
+  //         res.status(401).json({ error: 'Incorrect employee id or password' });
+  //       }
+  //     } else {
+  //       res.status(401).json({ error: 'User not found or invalid credentials. Register your account!' });
+  //     }
+  //   } catch (error) {
+  //     console.error('Login Failed:', error);
+  //     res.status(500).json({ error: 'Internal Server Error' });
+  //   }
+  // });
+  
   
 
 // Multer storage configuration
@@ -335,45 +414,21 @@ app.get('/api/getUserData/:employeeId', async (req, res) => {
   }
 });
 // POST endpoint to handle Excel data upload
-// POST endpoint to handle Excel data upload
-app.post('/upload', async (req, res) => {
-  const excelData = req.body; // Assuming excelData is sent as JSON
-
-  try {
-    for (const row of excelData) {
-      // Generate a unique password for each employee
-       const uniquePassword = generateUniquePassword();
-
-      // Hash the password before storing it in the database
-       const hashedPassword = await bcrypt.hash(uniquePassword, 10);
-
-      // Insert row data along with the hashed password into the database
-       await dbOperation.insertNewHire(row, hashedPassword);
-      //await dbOperation.insertNewHire(row);
-
-      console.log('Employee inserted:', row);
-    }
-
-    // Respond with success message
-    res.status(200).json({ message: 'Data uploaded successfully' });
-  } catch (error) {
-    console.error("Error occurred while inserting data:", error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
+// // POST endpoint to handle Excel data upload
 // app.post('/upload', async (req, res) => {
 //   const excelData = req.body; // Assuming excelData is sent as JSON
-//   // const password = req.body;
 
 //   try {
-//     // Loop through each row of excelData
 //     for (const row of excelData) {
-//         // Generate a unique password for each new hire
-//         const uniquePassword = generateUniquePassword();
+//       // Generate a unique password for each employee
+//        const uniquePassword = generateUniquePassword();
 
-//          // Insert row data along with the generated password into the database
-//       await dbOperation.insertNewHire(row, uniquePassword);
+//       // Hash the password before storing it in the database
+//        const hashedPassword = await bcrypt.hash(uniquePassword, 10);
+
+//       // Insert row data along with the hashed password into the database
+//        await dbOperation.insertNewHire(row, hashedPassword);
+//       //await dbOperation.insertNewHire(row);
 
 //       console.log('Employee inserted:', row);
 //     }
@@ -385,6 +440,29 @@ app.post('/upload', async (req, res) => {
 //     res.status(500).json({ error: 'Internal server error' });
 //   }
 // });
+
+// POST endpoint to handle Excel data upload
+app.post('/upload', async (req, res) => {
+  const excelData = req.body; // Assuming excelData is sent as JSON
+
+  try {
+    for (const row of excelData) {
+      // Hash the password before storing it in the database
+      const hashedPassword = await bcrypt.hash(row.Password, 10);
+
+      // Insert row data along with the hashed password into the database
+      await dbOperation.insertNewHire(row, hashedPassword);
+      console.log('Employee inserted:', row);
+    }
+
+    // Respond with success message
+    res.status(200).json({ message: 'Data uploaded successfully' });
+  } catch (error) {
+    console.error("Error occurred while inserting data:", error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Endpoint to retrieve employee data
 app.get('/newHireEmp', async (req, res) => {
   try {
