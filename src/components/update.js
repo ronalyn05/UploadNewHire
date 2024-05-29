@@ -53,6 +53,44 @@ import 'jspdf-autotable';
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredDependents, setFilteredDependents] = useState([]);
   const educationRef = useRef(null);
+  const [compBenData, setcompBenData] = useState({
+    Salary: '',
+    DailyEquivalent: '',
+    MonthlyEquivalent: '',
+    AnnualEquivalent: '',
+    RiceMonthly: '',
+    RiceAnnual: '',
+    RiceDifferentialAnnual: '',
+    UniformAnnual: '',
+    LeaveDays: '',
+    LaundryAllowance: '',
+    CommAllowance: '',
+    CommAllowanceType: '',
+    CashGift: '',
+    MedicalInsurance: '',
+    FreeHMODependent: '',
+    MBL: '',
+    LifeInsurance: '',
+    Beneficiaries: '',
+    PersonalAccidentInsuranceBenefit: '',
+    PWDIDNumber: '',
+    TendopayRegistered: '',
+    CanteenUID: '',
+    CanteenCreditLimit: '',
+    CanteenBarcode: '',
+    DAPMembershipNumber: '',
+    DAPDependents: '',
+    Stat_SSSNumber: '',
+    Stat_SSSMonthlyContribution: '',
+    Stat_PagIbigNumber: '',
+    Stat_PagIbigMonthlyContribution: '',
+    Stat_PHICNumber: '',
+    Stat_PHICMonthlyContribution: '',
+    Stat_TINNumber: ''
+  });
+  const [errors, setErrors] = useState({});
+  const [compBen, setCompBen] = useState([]);
+  const [selectedCompBen, setSelectedCompBen] = useState(null);
 
     // Function to handle input change in the search field
     const handleSearchChange = (e) => {
@@ -85,11 +123,25 @@ import 'jspdf-autotable';
     console.error('Error fetching dependents:', error);
   }
 };
+ // Define the fetchCompBen function
+ const fetchCompBen = async () => {
+  try {
+    const response = await fetch(`http://localhost:5000/retrieve/compBen/${employeeId}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch compensation benefits details');
+    }
+    const data = await response.json();
+    setCompBen(data);
+  } catch (error) {
+    console.error('Error fetching compensation benefits details:', error);
+  }
+};
 
 // Call fetchDependents whenever employeeId changes
 useEffect(() => {
   fetchDependents();
   fetchEmployeeData();
+  fetchCompBen();
 }, [employeeId]);
 
 // Function to format date as 'MM/DD/YYYY'
@@ -133,14 +185,16 @@ const handleCloseAddModal = () => {
   setShowAddModal(false);
 };
   // Function to handle opening edit modal and set selected dependent
-  const handleShowEditModal = (dependent) => {
+  const handleShowEditModal = (dependent, compBen) => {
     // setShowEditModal(true);
     setSelectedDependent(dependent);
+    setSelectedCompBen(compBen);
   };
   // Function to handle closing edit modal
   const handleCloseEditModal = () => {
     // setShowEditModal(false);
     setSelectedDependent(null);
+    setSelectedCompBen(null);
   };
 //FETCHING ALL EMPLOYEE DATA EXCLUDING THE DEPENDENT RECORDS BASED ON EMPLOYEE ID
   const fetchEmployeeData = async () => {
@@ -398,7 +452,7 @@ const handleAddContactForm = async (e) => {
        // Reload the page after showing the alert
        window.location.reload();
        // Navigate to report.js
-    //    navigate("/reports");
+      // navigate("/reports");
   
         } catch (error) {
         console.error('Error updating employee address:', error);
@@ -842,7 +896,6 @@ const handleAddContactForm = async (e) => {
     const handleView = () => {
       navigate('/employeeProfile', { state: { employeeData, dependents } });
     };
-
   //handles the download of pdf file
   const handleDownloadPDF = () => {
     if (!employeeData) return;
@@ -1110,6 +1163,126 @@ const handleAddContactForm = async (e) => {
       });
       
     };
+
+  //array lists all the fields that are mandatory
+  const requiredFields = [
+    'Salary', 'DailyEquivalent', 'MonthlyEquivalent', 'AnnualEquivalent', 
+    'RiceMonthly', 'RiceAnnual', 'RiceDifferentialAnnual', 'UniformAnnual', 
+    'LeaveDays', 'LaundryAllowance', 'CommAllowance', 'CashGift', 
+    'MedicalInsurance', 'FreeHMODependent', 'MBL', 'LifeInsurance', 
+    'PersonalAccidentInsuranceBenefit', 'PWDIDNumber', 'TendopayRegistered', 
+    'CanteenUID', 'CanteenCreditLimit', 'CanteenBarcode', 'DAPMembershipNumber', 
+    'DAPDependents', 'Stat_SSSNumber', 'Stat_SSSMonthlyContribution', 
+    'Stat_PagIbigNumber', 'Stat_PagIbigMonthlyContribution', 'Stat_PHICNumber', 
+    'Stat_PHICMonthlyContribution', 'Stat_TINNumber'
+  ];
+  // function performs validation on each keystroke
+    const handleInputCompBenChange = (e) => {
+      const { name, value } = e.target;
+      let validatedValue = value;
+      let error = '';   
+  
+      switch (name) {
+        case 'Salary':
+        case 'DailyEquivalent':
+        case 'MonthlyEquivalent':
+        case 'AnnualEquivalent':
+        case 'RiceMonthly':
+        case 'RiceAnnual':
+        case 'RiceDifferentialAnnual':
+        case 'UniformAnnual':
+        case 'LeaveDays':
+        case 'LaundryAllowance':
+        case 'CommAllowance':
+        case 'CashGift':
+        case 'MedicalInsurance':
+        case 'FreeHMODependent':
+        case 'MBL':
+        case 'LifeInsurance':
+        case 'PersonalAccidentInsuranceBenefit':
+        case 'CanteenCreditLimit':
+        case 'Stat_SSSMonthlyContribution':
+        case 'Stat_PagIbigMonthlyContribution':
+        case 'Stat_PHICMonthlyContribution':
+                // Validation logic for numeric fields
+                validatedValue = validatedValue.replace(/[^\d]/g, ''); // Allow only digits
+                if (validatedValue === '') {
+                  error = `${name} must be a number.`;
+                }
+          break;
+        case 'PWDIDNumber':
+        case 'TendopayRegistered':
+        case 'CanteenUID':
+        case 'CanteenBarcode':
+        case 'DAPMembershipNumber':
+        case 'Stat_SSSNumber':
+        case 'Stat_PagIbigNumber':
+        case 'Stat_PHICNumber':
+        case 'Stat_TINNumber':
+        // Add cases for other alphanumeric fields
+        validatedValue = validatedValue.replace(/[^\w]/g, ''); // Allow alphanumeric
+        if (validatedValue === '') {
+          error = `${name} must be alphanumeric.`;
+        }
+          break;
+        default:
+          break;
+      }
+  
+  // Validate if field is required and check if it's empty
+  if (!validatedValue && requiredFields.includes(name)) {
+    error = `${name} is required.`;
+  }
+
+  setcompBenData({
+    ...compBenData,
+    [name]: validatedValue
+  });
+
+  setErrors({
+    ...errors,
+    [name]: error
+  });
+};    
+//function that handles in adding the compensation benefit record
+const handleAddCompBen = async (e) => {
+  e.preventDefault();
+
+  try {
+    console.log(compBenData);
+    const response = await fetch(`http://localhost:5000/addCompBen/${employeeId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(compBenData)
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to add compensation benefit details');
+    }
+
+    const data = await response.json();
+    alert(data.message); // Display success message from backend
+    handleCloseAddModal(); // Close modal after successful addition
+
+    //fetch the updated data after adding the compensation benefits details
+    fetchCompBen();
+
+    // Fetch updated dependents data after adding a new dependent
+    fetchDependents(); 
+
+   // Refresh employee data after successful addition
+   fetchEmployeeData();
+
+   // Reload the tab
+   window.location.reload();
+
+  } catch (error) {
+    console.error('Error adding compensation benefit:', error);
+    alert('Failed to add compensation benefit. Please try again.');
+  }
+};
   if (!employeeData) {
     return <div>Loading...</div>;
   }
@@ -1184,6 +1357,9 @@ const handleAddContactForm = async (e) => {
                       </li>
                       <li className="nav-item">
                           <a className="nav-link " id="dependent-tab" data-toggle="tab" href="#dependent" role="tab" aria-controls="dependent" aria-selected="false">Dependent</a>
+                      </li>
+                      <li className="nav-item">
+                          <a className="nav-link " id="compBen-tab" data-toggle="tab" href="#compBen" role="tab" aria-controls="compBen" aria-selected="false">CompBen</a>
                       </li>
                   </ul>
                   </div>
@@ -3813,6 +3989,960 @@ const handleAddContactForm = async (e) => {
                         ) : (
                           <tr>
                             <td colSpan="19">No dependents data yet.</td>
+                          </tr>
+                        )}
+                      </tbody>
+                                    </table>
+                                  </div>
+                           </div>
+                        {/* </div> */}
+                        {/* </div>  */}
+                      <br/>
+                      </div>
+                      <div className="tab-pane fade" id="compBen" role="tabpanel" aria-labelledby="compBen-tab">
+                                <div className="card-body d-flex justify-content-between align-items-center">
+                                  {/* New Record button */}
+                                  <button className="btn btn-xs btn-primary mr-2" onClick={handleShowAddModal}>
+                                    <i className="fas fa-plus"></i> New Record
+                                  </button>
+
+                                  {/* Search form */}
+                                  <form className="form-inline ml-auto">
+                                    <div className="input-group">
+                                      <input
+                                        type="text"
+                                        className="form-control bg-light border-0 small"
+                                        placeholder="Search by Name"
+                                        value={searchQuery}
+                                        onChange={handleSearchChange}
+                                      />
+                                      <div className="input-group-append">
+                                        <button className="btn btn-primary" type="button">
+                                          <i className="fas fa-search fa-sm"></i>
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </form>
+                                </div>
+                              {/* Add CompBen Modal */}
+                              <Modal show={showAddModal} onHide={handleCloseAddModal} dialogClassName="custom-modal">
+                                  <Modal.Header>
+                                      <Modal.Title>Add Compensation Benefit</Modal.Title>
+                                      <Button variant="default" onClick={handleCloseAddModal}> X </Button>
+                                  </Modal.Header>
+                                  <Modal.Body>
+                                      {/*  adding of  compensation benefit form*/}
+                                      <form>
+                                          <div className="row justify-content-center">
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Salary</label>
+                                                <input type="number" className="form-control" value={compBenData.Salary} placeholder="Enter Salary" name="Salary" onChange={handleInputCompBenChange} />
+                                                {errors.Salary && <div className="text-danger">{errors.Salary}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Daily Equivalent</label>
+                                                <input type="number" className="form-control" value={compBenData.DailyEquivalent} placeholder="Enter Daily Equivalent" name="DailyEquivalent" onChange={handleInputCompBenChange} />
+                                                {errors.DailyEquivalent && <div className="text-danger">{errors.DailyEquivalent}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Monthly Equivalent</label>
+                                                <input type="number" className="form-control" value={compBenData.MonthlyEquivalent} placeholder="Enter Monthly Equivalent" name="MonthlyEquivalent" onChange={handleInputCompBenChange} />
+                                                {errors.MonthlyEquivalent && <div className="text-danger">{errors.MonthlyEquivalent}</div>}
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div className="row justify-content-center">
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Annual Equivalent</label>
+                                                <input type="number" className="form-control" value={compBenData.AnnualEquivalent} placeholder="Enter Annual Equivalent" name="AnnualEquivalent" onChange={handleInputCompBenChange} />
+                                                {errors.AnnualEquivalent && <div className="text-danger">{errors.AnnualEquivalent}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Rice Monthly</label>
+                                                <input type="number" className="form-control" value={compBenData.RiceMonthly} placeholder="Enter Rice Monthly" name="RiceMonthly" onChange={handleInputCompBenChange} />
+                                                {errors.RiceMonthly && <div className="text-danger">{errors.RiceMonthly}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Rice Annual</label>
+                                                <input type="number" className="form-control" value={compBenData.RiceAnnual} placeholder="Enter Rice Annual" name="RiceAnnual" onChange={handleInputCompBenChange} />
+                                                {errors.RiceAnnual && <div className="text-danger">{errors.RiceAnnual}</div>}
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div className="row justify-content-center">
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Rice Differential Annual</label>
+                                                <input type="number" className="form-control" value={compBenData.RiceDifferentialAnnual} placeholder="Enter Rice Differential Annual" name="RiceDifferentialAnnual" onChange={handleInputCompBenChange} />
+                                                {errors.RiceDifferentialAnnual && <div className="text-danger">{errors.RiceDifferentialAnnual}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Uniform Annual</label>
+                                                <input type="number" className="form-control" value={compBenData.UniformAnnual} placeholder="Enter Uniform Annual" name="UniformAnnual" onChange={handleInputCompBenChange} />
+                                                {errors.UniformAnnual && <div className="text-danger">{errors.UniformAnnual}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Leave Days</label>
+                                                <input type="number" className="form-control" value={compBenData.LeaveDays} placeholder="Enter Leave Days" name="LeaveDays" onChange={handleInputCompBenChange} />
+                                                {errors.LeaveDays && <div className="text-danger">{errors.LeaveDays}</div>}
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div className="row justify-content-center">
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Laundry Allowance</label>
+                                                <input type="number" className="form-control" value={compBenData.LaundryAllowance} placeholder="Enter Laundry Allowance" name="LaundryAllowance" onChange={handleInputCompBenChange} />
+                                                {errors.LaundryAllowance && <div className="text-danger">{errors.LaundryAllowance}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Comm Allowance</label>
+                                                <input type="number" className="form-control" value={compBenData.CommAllowance} placeholder="Enter Comm Allowance" name="CommAllowance" onChange={handleInputCompBenChange} />
+                                                {errors.CommAllowance && <div className="text-danger">{errors.CommAllowance}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Comm Allowance Type</label>
+                                                <input type="text" className="form-control" value={compBenData.CommAllowanceType} placeholder="Enter Comm Allowance Type" name="CommAllowanceType" onChange={handleInputCompBenChange} />
+                                                {errors.CommAllowanceType && <div className="text-danger">{errors.CommAllowanceType}</div>}
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div className="row justify-content-center">
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Cash Gift</label>
+                                                <input type="number" className="form-control" value={compBenData.CashGift} placeholder="Enter Cash Gift" name="CashGift" onChange={handleInputCompBenChange} />
+                                                {errors.CashGift && <div className="text-danger">{errors.CashGift}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Medical Insurance</label>
+                                                <input type="number" className="form-control" value={compBenData.MedicalInsurance} placeholder="Enter Medical Insurance" name="MedicalInsurance" onChange={handleInputCompBenChange} />
+                                                {errors.MedicalInsurance && <div className="text-danger">{errors.MedicalInsurance}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Free HMO Dependent</label>
+                                                <input type="number" className="form-control" value={compBenData.FreeHMODependent} placeholder="Enter Free HMO Dependent" name="FreeHMODependent" onChange={handleInputCompBenChange} />
+                                                {errors.FreeHMODependent && <div className="text-danger">{errors.FreeHMODependent}</div>}
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div className="row justify-content-center">
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>MBL</label>
+                                                <input type="number" className="form-control" value={compBenData.MBL} placeholder="Enter MBL" name="MBL" onChange={handleInputCompBenChange} />
+                                                {errors.MBL && <div className="text-danger">{errors.MBL}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Life Insurance</label>
+                                                <input type="number" className="form-control" value={compBenData.LifeInsurance} placeholder="Enter Life Insurance" name="LifeInsurance" onChange={handleInputCompBenChange} />
+                                                {errors.LifeInsurance && <div className="text-danger">{errors.LifeInsurance}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Beneficiaries</label>
+                                                <input type="text" className="form-control" value={compBenData.Beneficiaries} placeholder="Enter Beneficiaries" name="Beneficiaries" onChange={handleInputCompBenChange} />
+                                                {errors.Beneficiaries && <div className="text-danger">{errors.Beneficiaries}</div>}
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div className="row justify-content-center">
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Personal Accident Insurance Benefit</label>
+                                                <input type="number" className="form-control" value={compBenData.PersonalAccidentInsuranceBenefit} placeholder="Enter Personal Accident Insurance Benefit" name="PersonalAccidentInsuranceBenefit" onChange={handleInputCompBenChange} />
+                                                {errors.PersonalAccidentInsuranceBenefit && <div className="text-danger">{errors.PersonalAccidentInsuranceBenefit}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>PWD ID Number</label>
+                                                <input type="text" className="form-control" value={compBenData.PWDIDNumber} placeholder="Enter PWD ID Number" name="PWDIDNumber" onChange={handleInputCompBenChange} />
+                                                {errors.PWDIDNumber && <div className="text-danger">{errors.PWDIDNumber}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Tendopay Registered</label>
+                                                <input type="text" className="form-control" value={compBenData.TendopayRegistered} placeholder="Enter Tendopay Registered" name="TendopayRegistered" onChange={handleInputCompBenChange} />
+                                                {errors.TendopayRegistered && <div className="text-danger">{errors.TendopayRegistered}</div>}
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div className="row justify-content-center">
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Canteen UID</label>
+                                                <input type="text" className="form-control" value={compBenData.CanteenUID} placeholder="Enter Canteen UID" name="CanteenUID" onChange={handleInputCompBenChange} />
+                                                {errors.CanteenUID && <div className="text-danger">{errors.CanteenUID}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Canteen Credit Limit</label>
+                                                <input type="number" className="form-control" value={compBenData.CanteenCreditLimit} placeholder="Enter Canteen Credit Limit" name="CanteenCreditLimit" onChange={handleInputCompBenChange} />
+                                                {errors.CanteenCreditLimit && <div className="text-danger">{errors.CanteenCreditLimit}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Canteen Barcode</label>
+                                                <input type="text" className="form-control" value={compBenData.CanteenBarcode} placeholder="Enter Canteen Barcode" name="CanteenBarcode" onChange={handleInputCompBenChange} />
+                                                {errors.CanteenBarcode && <div className="text-danger">{errors.CanteenBarcode}</div>}
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div className="row justify-content-center">
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>DAP Membership Number</label>
+                                                <input type="text" className="form-control" value={compBenData.DAPMembershipNumber} placeholder="Enter DAP Membership Number" name="DAPMembershipNumber" onChange={handleInputCompBenChange} />
+                                                {errors.DAPMembershipNumber && <div className="text-danger">{errors.DAPMembershipNumber}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>DAP Dependents</label>
+                                                <input type="text" className="form-control" value={compBenData.DAPDependents} placeholder="Enter DAP Dependents" name="DAPDependents" onChange={handleInputCompBenChange} />
+                                                {errors.DAPDependents && <div className="text-danger">{errors.DAPDependents}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>SSS Number</label>
+                                                <input type="text" className="form-control" value={compBenData.Stat_SSSNumber} placeholder="Enter SSS Number" name="Stat_SSSNumber" onChange={handleInputCompBenChange} />
+                                                {errors.Stat_SSSNumber && <div className="text-danger">{errors.Stat_SSSNumber}</div>}
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div className="row justify-content-center">
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>SSS Monthly Contribution</label>
+                                                <input type="number" className="form-control" value={compBenData.Stat_SSSMonthlyContribution} placeholder="Enter SSS Monthly Contribution" name="Stat_SSSMonthlyContribution" onChange={handleInputCompBenChange} />
+                                                {errors.Stat_SSSMonthlyContribution && <div className="text-danger">{errors.Stat_SSSMonthlyContribution}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Pag-IBIG Number</label>
+                                                <input type="text" className="form-control" value={compBenData.Stat_PagIbigNumber} placeholder="Enter Pag-IBIG Number" name="Stat_PagIbigNumber" onChange={handleInputCompBenChange} />
+                                                {errors.Stat_PagIbigNumber && <div className="text-danger">{errors.Stat_PagIbigNumber}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>Pag-IBIG Monthly Contribution</label>
+                                                <input type="number" className="form-control" value={compBenData.Stat_PagIbigMonthlyContribution} placeholder="Enter Pag-IBIG Monthly Contribution" name="Stat_PagIbigMonthlyContribution" onChange={handleInputCompBenChange} />
+                                                {errors.Stat_PagIbigMonthlyContribution && <div className="text-danger">{errors.Stat_PagIbigMonthlyContribution}</div>}
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div className="row justify-content-center">
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>PHIC Number</label>
+                                                <input type="text" className="form-control" value={compBenData.Stat_PHICNumber} placeholder="Enter PHIC Number" name="Stat_PHICNumber" onChange={handleInputCompBenChange} />
+                                                {errors.Stat_PHICNumber && <div className="text-danger">{errors.Stat_PHICNumber}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>PHIC Monthly Contribution</label>
+                                                <input type="number" className="form-control" value={compBenData.Stat_PHICMonthlyContribution} placeholder="Enter PHIC Monthly Contribution" name="Stat_PHICMonthlyContribution" onChange={handleInputCompBenChange} />
+                                                {errors.Stat_PHICMonthlyContribution && <div className="text-danger">{errors.Stat_PHICMonthlyContribution}</div>}
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                                <label>TIN Number</label>
+                                                <input type="text" className="form-control" value={compBenData.Stat_TINNumber} placeholder="Enter TIN Number" name="Stat_TINNumber" onChange={handleInputCompBenChange} />
+                                                {errors.Stat_TINNumber && <div className="text-danger">{errors.Stat_TINNumber}</div>}
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <br/>
+                                        </form>
+
+                                  </Modal.Body>
+                                  <Modal.Footer>
+                                      <Button variant="secondary" onClick={handleCloseAddModal}>
+                                          Close
+                                      </Button>
+                                      <Button variant="primary" onClick={handleAddCompBen}>
+                                          Add Compensation Benefit
+                                      </Button>
+                                  </Modal.Footer>
+                              </Modal>
+                              {/* Edit Dependent Modal */}
+                            <Modal show={!!selectedCompBen} onHide={handleCloseEditModal} dialogClassName="custom-modal">
+                              <Modal.Header>
+                                <Modal.Title>Update CompBen Records</Modal.Title>
+                                <Button variant="default" onClick={handleCloseEditModal}> X </Button>
+                              </Modal.Header>
+                              <Modal.Body>
+                                      {/*  edit compensation benefits form*/}
+                                      <form>
+                                      <div className="row justify-content-center">
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Salary</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Salary"
+                                              value={selectedCompBen?.Salary || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({ ...selectedCompBen, Salary: e.target.value })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Daily Equivalent</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Daily Equivalent"
+                                              value={selectedCompBen?.DailyEquivalent || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  DailyEquivalent: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Monthly Equivalent</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Monthly Equivalent"
+                                              value={selectedCompBen?.MonthlyEquivalent || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  MonthlyEquivalent: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="row justify-content-center">
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Annual Equivalent</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Annual Equivalent"
+                                              value={selectedCompBen?.AnnualEquivalent || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  AnnualEquivalent: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Rice Monthly</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Rice Monthly"
+                                              value={selectedCompBen?.RiceMonthly || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  RiceMonthly: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Rice Annual</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Rice Annual"
+                                              value={selectedCompBen?.RiceAnnual || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({ ...selectedCompBen, RiceAnnual: e.target.value })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="row justify-content-center">
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Rice Differential Annual</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Rice Differential Annual"
+                                              value={selectedCompBen?.RiceDifferentialAnnual || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  RiceDifferentialAnnual: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Uniform Annual</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Uniform Annual"
+                                              value={selectedCompBen?.UniformAnnual || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  UniformAnnual: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Leave Days</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Leave Days"
+                                              value={selectedCompBen?.LeaveDays || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({ ...selectedCompBen, LeaveDays: e.target.value })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="row justify-content-center">
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Laundry Allowance</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Laundry Allowance"
+                                              value={selectedCompBen?.LaundryAllowance || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  LaundryAllowance: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Comm Allowance</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Comm Allowance"
+                                              value={selectedCompBen?.CommAllowance || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  CommAllowance: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Cash Gift</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Cash Gift"
+                                              value={selectedCompBen?.CashGift || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({ ...selectedCompBen, CashGift: e.target.value })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="row justify-content-center">
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Medical Insurance</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Medical Insurance"
+                                              value={selectedCompBen?.MedicalInsurance || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  MedicalInsurance: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Free HMO Dependent</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Free HMO Dependent"
+                                              value={selectedCompBen?.FreeHMODependent || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  FreeHMODependent: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>MBL</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter MBL"
+                                              value={selectedCompBen?.MBL || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({ ...selectedCompBen, MBL: e.target.value })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="row justify-content-center">
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Life Insurance</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Life Insurance"
+                                              value={selectedCompBen?.LifeInsurance || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  LifeInsurance: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Personal Accident Insurance Benefit</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Personal Accident Insurance Benefit"
+                                              value={selectedCompBen?.PersonalAccidentInsuranceBenefit || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  PersonalAccidentInsuranceBenefit: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>PWD ID Number</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter PWD ID Number"
+                                              value={selectedCompBen?.PWDIDNumber || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  PWDIDNumber: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="row justify-content-center">
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Tendopay Registered</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Tendopay Registered"
+                                              value={selectedCompBen?.TendopayRegistered || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  TendopayRegistered: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Canteen UID</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Canteen UID"
+                                              value={selectedCompBen?.CanteenUID || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  CanteenUID: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Canteen Credit Limit</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Canteen Credit Limit"
+                                              value={selectedCompBen?.CanteenCreditLimit || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  CanteenCreditLimit: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="row justify-content-center">
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Canteen Barcode</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Canteen Barcode"
+                                              value={selectedCompBen?.CanteenBarcode || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  CanteenBarcode: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>DAP Membership Number</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter DAP Membership Number"
+                                              value={selectedCompBen?.DAPMembershipNumber || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  DAPMembershipNumber: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>DAP Dependents</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter DAP Dependents"
+                                              value={selectedCompBen?.DAPDependents || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  DAPDependents: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="row justify-content-center">
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Stat SSS Number</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Stat SSS Number"
+                                              value={selectedCompBen?.Stat_SSSNumber || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  Stat_SSSNumber: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Stat SSS Monthly Contribution</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Stat SSS Monthly Contribution"
+                                              value={selectedCompBen?.Stat_SSSMonthlyContribution || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  Stat_SSSMonthlyContribution: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Stat PagIbig Number</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Stat PagIbig Number"
+                                              value={selectedCompBen?.Stat_PagIbigNumber || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  Stat_PagIbigNumber: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="row justify-content-center">
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Stat PagIbig Monthly Contribution</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Stat PagIbig Monthly Contribution"
+                                              value={selectedCompBen?.Stat_PagIbigMonthlyContribution || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  Stat_PagIbigMonthlyContribution: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Stat PHIC Number</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Stat PHIC Number"
+                                              value={selectedCompBen?.Stat_PHICNumber || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  Stat_PHICNumber: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Stat PHIC Monthly Contribution</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Stat PHIC Monthly Contribution"
+                                              value={selectedCompBen?.Stat_PHICMonthlyContribution || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  Stat_PHICMonthlyContribution: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="row justify-content-center">
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label>Stat TIN Number</label>
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Stat TIN Number"
+                                              value={selectedCompBen?.Stat_TINNumber || ''}
+                                              onChange={(e) =>
+                                                setSelectedCompBen({
+                                                  ...selectedCompBen,
+                                                  Stat_TINNumber: e.target.value,
+                                                })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <br />
+                                    </form>
+
+                                  </Modal.Body>
+                                  <Modal.Footer>
+                                      <Button variant="secondary" onClick={handleCloseEditModal}>
+                                          Close
+                                      </Button>
+                                      <Button variant="primary" onClick={handleDependentFormSubmit}>
+                                          Save Changes
+                                      </Button>
+                                  </Modal.Footer>
+                              </Modal>
+                          {/* </div> */}
+                                 {/* Dependent Table */}
+                                 <div className='card-body'>
+                                {/* <div className="card-body"> */}
+                                  <div className="table-responsive">
+                                    <table className="table">
+                                      <thead>
+                                        <tr>
+                                        <th scope="col">Action</th>
+                                        <th scope="col">Salary</th>
+                                        <th scope="col">Daily Equivalent</th>
+                                        <th scope="col">Monthly Equivalent</th>
+                                        <th scope="col">Annual Equivalent</th>
+                                        <th scope="col">Rice Monthly</th>
+                                        <th scope="col">Rice Annual</th>
+                                        <th scope="col">Rice Differential Annual</th>
+                                        <th scope="col">Uniform Annual</th>
+                                        <th scope="col">Leave Days</th>
+                                        <th scope="col">Laundry Allowance</th>
+                                        <th scope="col">Comm Allowance</th>
+                                        <th scope="col">Cash Gift</th>
+                                        <th scope="col">Medical Insurance</th>
+                                        <th scope="col">Free HMO Dependent</th>
+                                        <th scope="col">MBL</th>
+                                        <th scope="col">Life Insurance</th>
+                                        <th scope="col">Personal Accident Insurance Benefit</th>
+                                        <th scope="col">PWD ID Number</th>
+                                        <th scope="col">Tendopay Registered</th>
+                                        <th scope="col">Canteen UID</th>
+                                        <th scope="col">Canteen Credit Limit</th>
+                                        <th scope="col">Canteen Barcode</th>
+                                        <th scope="col">DAP Membership Number</th>
+                                        <th scope="col">DAP Dependents</th>
+                                        <th scope="col">Stat SSS Number</th>
+                                        <th scope="col">Stat SSS Monthly Contribution</th>
+                                        <th scope="col">Stat PagIbig Number</th>
+                                        <th scope="col">Stat PagIbig Monthly Contribution</th>
+                                        <th scope="col">Stat PHIC Number</th>
+                                        <th scope="col">Stat PHIC Monthly Contribution</th>
+                                        <th scope="col">Stat TIN Number</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                        {filteredDependents.length > 0 ? (
+                          filteredDependents.map((dependent, index) => (
+                            <tr key={index}>
+                              <td>
+                              <button className="btn btn-xs btn-primary mr-2" onClick={() => handleShowEditModal(compBen)}>
+                                              <i className="fas fa-pencil-alt"></i>
+                                            </button>
+                                {/* <button className="btn btn-xs btn-primary mr-2" onClick={handleShowEditModal}>
+                                  <i className="fas fa-pencil-alt"></i>Edit
+                                </button> */}
+                                </td>
+                                <td>{compBen.Salary}</td>
+                                <td>{compBen.DailyEquivalent}</td>
+                                <td>{compBen.MonthlyEquivalent}</td>
+                                <td>{compBen.AnnualEquivalent}</td>
+                                <td>{compBen.RiceMonthly}</td>
+                                <td>{compBen.RiceAnnual}</td>
+                                <td>{compBen.RiceDifferentialAnnual}</td>
+                                <td>{compBen.UniformAnnual}</td>
+                                <td>{compBen.LeaveDays}</td>
+                                <td>{compBen.LaundryAllowance}</td>
+                                <td>{compBen.CommAllowance}</td>
+                                <td>{compBen.CashGift}</td>
+                                <td>{compBen.MedicalInsurance}</td>
+                                <td>{compBen.FreeHMODependent}</td>
+                                <td>{compBen.MBL}</td>
+                                <td>{compBen.LifeInsurance}</td>
+                                <td>{compBen.PersonalAccidentInsuranceBenefit}</td>
+                                <td>{compBen.PWDIDNumber}</td>
+                                <td>{compBen.TendopayRegistered}</td>
+                                <td>{compBen.CanteenUID}</td>
+                                <td>{compBen.CanteenCreditLimit}</td>
+                                <td>{compBen.CanteenBarcode}</td>
+                                <td>{compBen.DAPMembershipNumber}</td>
+                                <td>{compBen.DAPDependents}</td>
+                                <td>{compBen.Stat_SSSNumber}</td>
+                                <td>{compBen.Stat_SSSMonthlyContribution}</td>
+                                <td>{compBen.Stat_PagIbigNumber}</td>
+                                <td>{compBen.Stat_PagIbigMonthlyContribution}</td>
+                                <td>{compBen.Stat_TINNumber}</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan="19">No compensation benefit data yet.</td>
                           </tr>
                         )}
                       </tbody>

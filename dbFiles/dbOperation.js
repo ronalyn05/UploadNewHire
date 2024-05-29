@@ -429,25 +429,6 @@ await pool
   }
 };
 //update password / changing of password
-// const updateUserPassword = async (employeeId, NewPassword) => {
-//   try {
-//     const pool = await sql.connect(config); // Establish DB connection
-//     const request = pool.request();
-//     const query = `
-//       UPDATE UserAccount 
-//       SET Password = @Password
-//       WHERE EmployeeId = @EmployeeId
-//     `;
-//     request.input("EmployeeId", sql.VarChar, employeeId);
-//     request.input("Password", sql.VarChar, NewPassword);
-//     const result = await request.query(query); // Execute the query
-//     console.log("Password updated successfully");
-//     return result;
-//   } catch (error) {
-//     console.error("Error updating password:", error);
-//     throw error;
-//   }
-// };
 const updateUserPassword = async (employeeId, newPassword) => {
   try {
     const pool = await sql.connect(config); // Establish DB connection
@@ -988,7 +969,7 @@ const updateEmployeeDepartmentById = async (employeeId, updatedEmployeeData) => 
     throw error;
   }
 };
-// //update employee dependent details
+ //update employee dependent details
 const updateDependentById = async (dependentId, updatedDependentData) => {
   try {
     let pool = await sql.connect(config);
@@ -1292,20 +1273,6 @@ const deleteEmployeeById = async (employeeId) => {
     throw error;
   }
 };
-// const deleteEmployeeById = async (employeeId) => {
-//   try {
-//     let pool = await sql.connect(config);
-//     let result = await pool
-//       .request()
-//       .input("EmployeeId", sql.VarChar, employeeId)
-//       .query("DELETE FROM EmpPersonalDetails WHERE EmployeeId = @EmployeeId");
-
-//     return result;
-//   } catch (error) {
-//     console.error("Error deleting employee:", error);
-//     throw error;
-//   }
-// };
 
 //route to delete employee by ID from the database
 const deleteUsersById = async (userId) => {
@@ -1511,6 +1478,63 @@ const getUserByEmployeeId = async (employeeId) => {
     throw error;
   }
 };
+// Function to insert a new dependent record into the database
+const insertCompBen = async (employeeId, newCompBenData) => {
+  try {
+    let pool = await sql.connect(config);
+    let result = await pool
+      .request()
+      .input("EmployeeId", sql.VarChar, employeeId)
+      .input("Salary", sql.VarChar(255), newCompBenData.Salary)
+      .input("DailyEquivalent", sql.VarChar(255), newCompBenData.DailyEquivalent)
+      .input("MonthlyEquivalent", sql.VarChar(255), newCompBenData.MonthlyEquivalent)
+      .input("AnnualEquivalent", sql.VarChar(255), newCompBenData.AnnualEquivalent)
+      .input("RiceMonthly", sql.VarChar(255), newCompBenData.RiceMonthly)
+      .input("RiceAnnual", sql.VarChar(255), newCompBenData.RiceAnnual)
+      .input("RiceDifferentialAnnual", sql.VarChar(255), newCompBenData.RiceDifferentialAnnual)
+      .input("UniformAnnual", sql.VarChar(255), newCompBenData.UniformAnnual)
+      .input("LeaveDays", sql.VarChar(255), newCompBenData.LeaveDays)
+      .input("LaundryAllowance", sql.VarChar(255), newCompBenData.LaundryAllowance)
+      .input("CommAllowance", sql.VarChar(255), newCompBenData.CommAllowance)
+      .input("CashGift", sql.VarChar(255), newCompBenData.CashGift)
+      .input("MedicalInsurance", sql.VarChar(255), newCompBenData.MedicalInsurance)
+      .input("FreeHMODependent", sql.VarChar(255), newCompBenData.FreeHMODependent)
+      .input("MBL", sql.VarChar(255), newCompBenData.MBL)
+      .input("LifeInsurance", sql.VarChar(255), newCompBenData.LifeInsurance)
+      .input("PersonalAccidentInsuranceBenefit", sql.VarChar(255), newCompBenData.PersonalAccidentInsuranceBenefit)
+      .input("PWDIDNumber", sql.VarChar(255), newCompBenData.PWDIDNumber)
+      .input("TendopayRegistered", sql.VarChar(255), newCompBenData.TendopayRegistered)
+      .input("CanteenUID", sql.VarChar(255), newCompBenData.CanteenUID)
+      .input("CanteenCreditLimit", sql.VarChar(255), newCompBenData.CanteenCreditLimit)
+      .input("CanteenBarcode", sql.VarChar(255), newCompBenData.CanteenBarcode)
+      .input("DAPMembershipNumber", sql.VarChar(255), newCompBenData.DAPMembershipNumber)
+      .input("DAPDependents", sql.VarChar(255), newCompBenData.DAPDependents)
+      .input("Stat_SSSNumber", sql.VarChar(255), newCompBenData.Stat_SSSNumber)
+      .input("Stat_SSSMonthlyContribution", sql.VarChar(255), newCompBenData.Stat_SSSMonthlyContribution)
+      .input("Stat_PagIbigNumber", sql.VarChar(255), newCompBenData.Stat_PagIbigNumber)
+      .input("Stat_PagIbigMonthlyContribution", sql.VarChar(255), newCompBenData.Stat_PagIbigMonthlyContribution)
+      .input("Stat_PHICNumber", sql.VarChar(255), newCompBenData.Stat_PHICNumber)
+      .input("Stat_PHICMonthlyContribution", sql.VarChar(255), newCompBenData.Stat_PHICMonthlyContribution)
+      .input("Stat_TINNumber", sql.VarChar(255), newCompBenData.Stat_TINNumber)
+      .query(`
+          INSERT INTO CompensationBenefits (EmployeeId, Salary, DailyEquivalent, MonthlyEquivalent, AnnualEquivalent, RiceMonthly, 
+            RiceAnnual, RiceDifferentialAnnual, UniformAnnual, LeaveDays, LaundryAllowance, CommAllowance, CashGift, MedicalInsurance, FreeHMODependent, 
+            MBL, LifeInsurance, PersonalAccidentInsuranceBenefit, PWDIDNumber, TendopayRegistered, CanteenUID, CanteenCreditLimit, CanteenBarcode, 
+            DAPMembershipNumber, DAPDependents, Stat_SSSNumber, Stat_SSSMonthlyContribution, Stat_PagIbigNumber, 
+            Stat_PagIbigMonthlyContribution, Stat_PHICNumber, Stat_PHICMonthlyContribution, Stat_TINNumber )
+          VALUES (@EmployeeId, @Salary, @DailyEquivalent, @MonthlyEquivalent, @AnnualEquivalent, @RiceMonthly, @RiceAnnual,
+             @RiceDifferentialAnnual, @UniformAnnual, @LeaveDays, @LaundryAllowance, @CommAllowance, @CashGift, @MedicalInsurance, 
+             @FreeHMODependent, @MBL, @LifeInsurance, @PersonalAccidentInsuranceBenefit, @PWDIDNumber, @TendopayRegistered, @CanteenUID, @CanteenCreditLimit, 
+             @CanteenBarcode, @DAPMembershipNumber, @DAPDependents, @Stat_SSSNumber, @Stat_SSSMonthlyContribution, @Stat_PagIbigNumber, 
+             @Stat_PagIbigMonthlyContribution, @Stat_PHICNumber, @Stat_PHICMonthlyContribution, @Stat_TINNumber)
+        `);
+
+    return result;
+  } catch (error) {
+    console.error("Error inserting compensation benefit record:", error);
+    throw error;
+  }
+};
 
 module.exports = {
   updateUserPassword,
@@ -1536,7 +1560,6 @@ module.exports = {
   updateEmployeeShiftById,
   updateEmployeeDUById,
   updateEmployeeDepartmentById,
-  // updateEmployeeDependentById,
   updateProductById, 
   deleteEmContactById,
   updateEmergencyContactById,
@@ -1546,5 +1569,6 @@ module.exports = {
   deleteAllEmployeeData,
   getDependentsByEmployeeId,
   updateDependentById,
-  getAddNewContactId
+  getAddNewContactId,
+  insertCompBen
 };

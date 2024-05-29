@@ -13,10 +13,10 @@ import bcrypt from 'bcryptjs';
 const { generateUniquePassword } = require('./utils');
 
   // Initialize EmailJS with your user ID
-  emailjs.init("LyI5kmeBThcSVOeOH");
+  emailjs.init("5CED_P6z3JRHEcgVq");
   // Define email service ID and template ID
-const emailServiceID = 'service_uvba40x';
-const emailTemplateID = 'template_m9rebak';
+const emailServiceID = 'service_xfudh5t';
+const emailTemplateID = 'template_j6qm7ym';
 
 const NewHireUpload = () => {
   const [file, setFile] = useState(null);
@@ -300,11 +300,12 @@ const sendEmailNotification = async ( templateParams) => {
         // Send email notifications after successful upload
         for (const row of dataWithPasswords) {
           const templateParams = {
+            from_name: 'Innodata - HRAdmin',
             firstName: row.FirstName,
             employeeId: row.EmployeeId,
             temporaryPassword: row.Password,
             to_email: row.EmailAddress,
-            subject: 'Your Account Details',
+            // subject: 'Your Account Details',
           };
     
           // Send email notification with account details

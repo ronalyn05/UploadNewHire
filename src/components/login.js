@@ -15,170 +15,66 @@ function LoginPage() {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-//Frontend: handleSubmit function in login.js
-// const handleSubmit = async (e) => {
-//   e.preventDefault();
+  //function that handles the login
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-//   try {
-//     const response = await fetch('/login', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify({
-//         EmployeeId: formData.EmployeeId,
-//         Password: formData.Password // Ensure only the password string is sent
-//       }),
-//     });
+    // Trim whitespace from form data
+    const trimmedFormData = Object.fromEntries(
+      Object.entries(formData).map(([key, value]) => [key, value.trim()])
+    );
 
-//     if (!response.ok) {
-//       if (response.status === 401) {
-//         const responseData = await response.json();
-//         alert(responseData.error);
-//       } else {
-//         throw new Error('Login Failed');
-//       }
-//       return;
-//     }
+    try {
+      const response = await fetch("/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(trimmedFormData),
+      });
 
-//     const data = await response.json();
-//     console.log('Login Successful:', data);
-
-//     sessionStorage.setItem('userId', data.UserId);
-//     sessionStorage.setItem('employeeId', data.EmployeeId);
-//     sessionStorage.setItem('firstName', data.FirstName);
-//     sessionStorage.setItem('lastName', data.LastName);
-//     sessionStorage.setItem('email', data.EmailAddress);
-//     sessionStorage.setItem('middleName', data.MiddleName);
-//     sessionStorage.setItem('profilePhoto', data.ProfilePhoto);
-//     sessionStorage.setItem('role', data.Role);
-
-//     if (data.Role === 'HRAdmin' || data.Role === 'Employee') {
-//       // Navigate to change password page if the user is HRAdmin or Employee
-//       navigate('/changePassword');
-//     } else {
-//       throw new Error('Invalid user role');
-//     }
-//   } catch (error) {
-//     console.error('Login Failed', error);
-//     setErrorMessage(error.message || 'Login Failed.');
-//   }
-// };
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  // Trim whitespace from form data
-  const trimmedFormData = Object.fromEntries(
-    Object.entries(formData).map(([key, value]) => [key, value.trim()])
-  );
-
-  try {
-    const response = await fetch('/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(trimmedFormData),
-    });
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        const responseData = await response.json();
-        alert(responseData.error);
-      } else {
-        throw new Error('Login Failed');
+      if (!response.ok) {
+        if (response.status === 401) {
+          const responseData = await response.json();
+          alert(responseData.error);
+        } else {
+          throw new Error("Login Failed");
+        }
+        return;
       }
-      return;
+
+      const data = await response.json();
+      console.log("Login Successful:", data);
+
+      sessionStorage.setItem("userId", data.UserId);
+      sessionStorage.setItem("employeeId", data.EmployeeId);
+      sessionStorage.setItem("firstName", data.FirstName);
+      sessionStorage.setItem("lastName", data.LastName);
+      sessionStorage.setItem("email", data.EmailAddress);
+      sessionStorage.setItem("middleName", data.MiddleName);
+      sessionStorage.setItem("profilePhoto", data.ProfilePhoto);
+      sessionStorage.setItem("role", data.Role);
+
+      if (data.Role === "HRAdmin") {
+        if (data.ChangePasswordRequired) {
+          navigate("/changePassword", { state: data });
+        } else {
+          navigate("/dashboard", { state: data });
+        }
+      } else if (data.Role === "Employee") {
+        if (data.ChangePasswordRequired) {
+          navigate("/changePassword", { state: data });
+        } else {
+          navigate("/employee", { state: data });
+        }
+      } else {
+        throw new Error("Invalid user role");
+      }
+    } catch (error) {
+      console.error("Login Failed", error);
+      setErrorMessage(error.message || "Login Failed.");
     }
-
-    const data = await response.json();
-    console.log('Login Successful:', data);
-
-    sessionStorage.setItem('userId', data.UserId);
-    sessionStorage.setItem('employeeId', data.EmployeeId);
-    sessionStorage.setItem('firstName', data.FirstName);
-    sessionStorage.setItem('lastName', data.LastName);
-    sessionStorage.setItem('email', data.EmailAddress);
-    sessionStorage.setItem('middleName', data.MiddleName);
-    sessionStorage.setItem('profilePhoto', data.ProfilePhoto);
-    sessionStorage.setItem('role', data.Role);
-
-    if (data.Role === "HRAdmin") {
-      if (data.ChangePasswordRequired) {
-        navigate("/changePassword", { state: data });
-      } else {
-        navigate("/dashboard", { state: data });
-      }
-    } else if (data.Role === "Employee") {
-      if (data.ChangePasswordRequired) {
-        navigate("/changePassword", { state: data });
-      } else {
-        navigate("/employee", { state: data });
-      }
-    } else {
-      throw new Error("Invalid user role");
-    }
-  } catch (error) {
-    console.error("Login Failed", error);
-    setErrorMessage(error.message || "Login Failed.");
-  }
-};
-
-
-  
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-
-  //    // Trim whitespace from form data
-  // const trimmedFormData = Object.fromEntries(
-  //   Object.entries(formData).map(([key, value]) => [key, value.trim()])
-  // );
-  
-  //   try {
-  //     const response = await fetch('/login', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify(trimmedFormData),
-  //     });
-  
-  //     if (!response.ok) {
-  //       if (response.status === 401) {
-  //         const responseData = await response.json();
-  //         alert(responseData.error);
-  //       } else {
-  //         throw new Error('Login Failed');
-  //       }
-  //       return;
-  //     }
-  
-  //     const data = await response.json();
-  //     console.log('Login Successful:', data);
-  
-  //     sessionStorage.setItem('userId', data.UserId);
-  //     sessionStorage.setItem('employeeId', data.EmployeeId);
-  //     sessionStorage.setItem('firstName', data.FirstName);
-  //     sessionStorage.setItem('lastName', data.LastName);
-  //     sessionStorage.setItem('email', data.EmailAddress);
-  //     sessionStorage.setItem('middleName', data.MiddleName);
-  //     sessionStorage.setItem('profilePhoto', data.ProfilePhoto);
-  //     sessionStorage.setItem('role', data.Role);
-  
-  //     if (data.Role === "HRAdmin") {
-  //       navigate("/dashboard" , { state: data });
-  //     } else if (data.Role === "Employee") {
-  //       navigate("/employee", { state: data });
-  //     } else {
-  //       throw new Error("Invalid user role");
-  //     }
-  //   } catch (error) {
-  //     console.error("Login Failed", error);
-  //     setErrorMessage(error.message || "Login Failed.");
-  //   }
-  // };
-  
+  };
 
   useEffect(() => {
     // Manipulate browser history on component mount
@@ -220,14 +116,16 @@ const handleSubmit = async (e) => {
                   />
                 </div>
                 <form className="user" onSubmit={handleSubmit}>
-                  {/* <div className="form-group">
+                  <div className="form-group">
                     <input
                       type="text"
                       className="form-control form-control-user"
                       id="EmployeeId"
-                      placeholder="Enter Employee Id..."
-                      onChange={handleChange}
+                      name="EmployeeId"
+                      placeholder="Employee ID"
                       value={formData.EmployeeId}
+                      onChange={handleChange}
+                      required
                     />
                   </div>
                   <div className="form-group">
@@ -235,35 +133,13 @@ const handleSubmit = async (e) => {
                       type="password"
                       className="form-control form-control-user"
                       id="Password"
+                      name="Password"
                       placeholder="Password"
-                      onChange={handleChange}
                       value={formData.Password}
+                      onChange={handleChange}
+                      autoComplete="current-password"
+                      required
                     />
-                  </div> */}
-                  <div className="form-group">
-                    <input
-                    type="text"
-                    className="form-control form-control-user"
-                    id="EmployeeId"
-                    name="EmployeeId"
-                    placeholder="Employee ID"
-                    value={formData.EmployeeId}
-                    onChange={handleChange}
-                    required
-                  />
-                  </div>
-                  <div className="form-group">
-                  <input
-                    type="password"
-                    className="form-control form-control-user"
-                    id="Password"
-                    name="Password"
-                    placeholder="Password"
-                    value={formData.Password}
-                    onChange={handleChange}
-                    autoComplete="current-password"
-                    required
-                  />
                   </div>
                   <button
                     type="submit"
@@ -273,11 +149,6 @@ const handleSubmit = async (e) => {
                   </button>
                 </form>
                 <hr />
-                {/* <div className="text-center">
-                  <Link className="small" to="/forgotpassword">
-                    Forgot Password?
-                  </Link>
-                </div> */}
                 <div className="text-center">
                   <Link className="small" to="/changePassword">
                     Change Password!

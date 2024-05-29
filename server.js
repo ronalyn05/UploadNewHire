@@ -6,8 +6,6 @@ const cors = require('cors');
 const multer = require('multer');
 const crypto = require('crypto');
 const session = require('express-session');
-// Import the generateUniquePassword function
-const { generateUniquePassword } = require('./src/components/utils');
 const bcrypt = require('bcryptjs');
 
 const app = express();
@@ -32,51 +30,6 @@ const generateRandomString = (length) => {
 const secretKey = generateRandomString(32); // You can adjust the length as needed
 
 console.log('Secret key:', secretKey);
-
-
-// const emailServiceID = 'service_uvba40x';
-// const emailTemplateID = 'template_m9rebak';
-// const publicKey = 'LyI5kmeBThcSVOeOH';
-
-// emailjs.init(publicKey);
-
-// const generateRandomPassword = () => {
-//     return Math.random().toString(36).slice(-8);
-// };
-
-// app.post('/upload', async (req, res) => {
-//     const excelData = req.body;
-
-//     try {
-//         for (const row of excelData) {
-//             const plainPassword = generateRandomPassword();
-//             const hashedPassword = await bcrypt.hash(plainPassword, 10);
-
-//             const employeeData = {
-//                 ...row,
-//                 Password: hashedPassword,
-//                 Role: row.Role || 'Employee'
-//             };
-
-//             await dbOperation.insertNewHire(employeeData);
-
-//             const emailParams = {
-//                 to_name: `${row.FirstName} ${row.LastName}`,
-//                 employee_id: row.EmployeeId,
-//                 password: plainPassword,
-//                 link: 'http://your-app-login-link.com'
-//             };
-
-//             await emailjs.send(emailServiceID, emailTemplateID, emailParams);
-//             console.log(`Email sent to ${row.EmailAddress}`);
-//         }
-
-//         res.status(200).json({ message: 'Data uploaded successfully' });
-//     } catch (error) {
-//         console.error("Error occurred while inserting data:", error);
-//         res.status(500).json({ error: 'Internal server error' });
-//     }
-// });
 
 // Using the secret key in the session middleware
 app.use(
@@ -146,107 +99,8 @@ app.post('/register', async (req, res) => {
       res.status(500).json({ error: 'Failed to insert employee' });
   }
 });
-//post endpoint for user login
-// app.post('/login', async (req, res) => {
-//   const { EmployeeId, Password } = req.body;
-
-//   try {
-//     // Check for static credentials
-//     if (EmployeeId === STATIC_EMPLOYEE_ID) {
-//       if (Password === ADMIN_PASSWORD) {
-//         res.status(200).json({
-//           EmployeeId: STATIC_EMPLOYEE_ID,
-//           Role: 'hrAdmin'
-//         });
-//         return;
-//       } else if (Password === EMPLOYEE_PASSWORD) {
-//         res.status(200).json({
-//           EmployeeId: STATIC_EMPLOYEE_ID,
-//           Role: 'employee'
-//         });
-//         return;
-//       } else {
-//         res.status(401).json({ error: 'Incorrect employee id or password' });
-//         return;
-//       }
-//     } else {
-//       res.status(401).json({ error: 'User not found or invalid credentials. Register your account!' });
-//     }
-//   } catch (error) {
-//     console.error('Login Failed:', error);
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// });
 
 //post endpoint for user login
-// app.post('/login', async (req, res) => {
-//   const { EmployeeId, Password } = req.body;
-
-//   try {
-//     const users = await dbOperation.getEmployees(EmployeeId);
-
-//     if (users.length > 0) {
-//       const user = users[0];
-//       if (Password === user.Password) {
-//         // Passwords match, login successful
-//         res.status(200).json(user);
-//       } else {
-//         // Passwords don't match
-//         res.status(401).json({ error: 'Incorrect employee id or password' });
-//       }
-//     } else {
-//       // User not found
-//       res.status(401).json({ error: 'User not found or invalid credentials. Register your account!' });
-//     }
-//   } catch (error) {
-//     console.error('Login Failed:', error);
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// });
-
-  // app.post('/login', async (req, res) => {
-  //   const { EmployeeId, Password } = req.body;
-
-  //   try {
-  //     // Check for static credentials
-  //     if (EmployeeId === STATIC_EMPLOYEE_ID) {
-  //       if (Password === ADMIN_PASSWORD) {
-  //         res.status(200).json({
-  //           EmployeeId: STATIC_EMPLOYEE_ID,
-  //           Role: 'HRAdmin'
-  //         });
-  //         return;
-  //       } else if (Password === EMPLOYEE_PASSWORD) {
-  //         res.status(200).json({
-  //           EmployeeId: STATIC_EMPLOYEE_ID,
-  //           Role: 'Employee'
-  //         });
-  //         return;
-  //       } else {
-  //         res.status(401).json({ error: 'Incorrect employee id or password' });
-  //         return;
-  //       }
-  //     } else {
-  //       const users = await dbOperation.getEmployees(EmployeeId);
-
-  //       if (users.length > 0) {
-  //         const user = users[0];
-  //         const isValidPassword = await bcrypt.compare(Password, user.Password);
-
-  //         if (isValidPassword) {
-  //           res.status(200).json(user);
-  //         } else {
-  //           res.status(401).json({ error: 'Incorrect employee id or password' });
-  //         }
-  //       } else {
-  //         res.status(401).json({ error: 'User not found or invalid credentials. Register your account!' });
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error('Login Failed:', error);
-  //     res.status(500).json({ error: 'Internal Server Error' });
-  //   }
-  // });
   app.post('/login', async (req, res) => {
     const { EmployeeId, Password } = req.body;
     console.log('Login attempt:', { EmployeeId, Password });
@@ -329,38 +183,7 @@ app.post('/register', async (req, res) => {
     }
   });
   
-  // app.post('/login', async (req, res) => {
-  //   const { EmployeeId, Password } = req.body;
-  //   console.log('Login attempt:', { EmployeeId, Password }); // Log login attempt
-  
-  //   try {
-  //     const users = await dbOperation.getEmployees(EmployeeId);
-  
-  //     if (users.length > 0) {
-  //       const user = users[0];
-  //       console.log('User found:', user); // Log user found
-  
-  //       const isValidPassword = await bcrypt.compare(Password, user.Password);
-  //       console.log('Password valid:', isValidPassword); // Log password comparison result
-  
-  //       if (isValidPassword) {
-  //         res.status(200).json(user);
-  //       } else {
-  //         res.status(401).json({ error: 'Incorrect employee id or password' });
-  //       }
-  //     } else {
-  //       res.status(401).json({ error: 'User not found or invalid credentials. Register your account!' });
-  //     }
-  //   } catch (error) {
-  //     console.error('Login Failed:', error);
-  //     res.status(500).json({ error: 'Internal Server Error' });
-  //   }
-  // });
-  
-  
-
 // Multer storage configuration
-
 const upload = multer();
 // API endpoint to update profile photo
 app.post('/api/updatePhoto/:employeeId', upload.single('profilePhoto'), async (req, res) => {
@@ -413,33 +236,6 @@ app.get('/api/getUserData/:employeeId', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-// POST endpoint to handle Excel data upload
-// // POST endpoint to handle Excel data upload
-// app.post('/upload', async (req, res) => {
-//   const excelData = req.body; // Assuming excelData is sent as JSON
-
-//   try {
-//     for (const row of excelData) {
-//       // Generate a unique password for each employee
-//        const uniquePassword = generateUniquePassword();
-
-//       // Hash the password before storing it in the database
-//        const hashedPassword = await bcrypt.hash(uniquePassword, 10);
-
-//       // Insert row data along with the hashed password into the database
-//        await dbOperation.insertNewHire(row, hashedPassword);
-//       //await dbOperation.insertNewHire(row);
-
-//       console.log('Employee inserted:', row);
-//     }
-
-//     // Respond with success message
-//     res.status(200).json({ message: 'Data uploaded successfully' });
-//   } catch (error) {
-//     console.error("Error occurred while inserting data:", error);
-//     res.status(500).json({ error: 'Internal server error' });
-//   }
-// });
 
 // POST endpoint to handle Excel data upload
 app.post('/upload', async (req, res) => {
@@ -474,21 +270,6 @@ app.get('/newHireEmp', async (req, res) => {
   }
 });
 // Endpoint for adding a new contact number
-// app.post('/addContactNumber/:employeeId', async (req, res) => {
-//   try {
-//     const employeeId = req.params.employeeId;
-//     const newContactNumber = req.body.newContactNumber;
-
-//     // Call the function to insert new contact into the database
-//     const result = await getAddNewContactId(employeeId, newContactNumber);
-
-//     // Send response
-//     res.status(200).json({ message: 'Contact number added successfully' });
-//   } catch (error) {
-//     console.error('Error adding contact number:', error);
-//     res.status(500).json({ error: 'Failed to add contact number' });
-//   }
-// });
 app.post('/addContactNumber/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
   const newContactData = req.body;
@@ -687,20 +468,7 @@ app.put('/updateDependent/:dependentId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-// app.put('/updateDependent/:employeeId', async (req, res) => {
-//   const { employeeId } = req.params;
-//   const updatedEmployeeData = req.body;
-//   try {
-//     const result = await dbOperation.updateEmployeeDependentById(employeeId, updatedEmployeeData);
-//     if (!result) {
-//       return res.status(404).json({ message: 'Employee department details not found' });
-//     }
-//     res.json({ message: 'Employee department details updated successfully' });
-//   } catch (error) {
-//     console.error('Error updating department details:', error);
-//     res.status(500).json({ message: 'Internal server error' });
-//   }
-// });
+
 // API endpoint for updating emergency contact details
 app.put('/updateEmerContact/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
@@ -781,6 +549,18 @@ app.delete('/deleteEmContact/:emergencyNumId', async (req, res) => {
   } catch (error) {
       console.error('Error deleting emergency Contac:', error);
       res.status(500).json({ message: 'Internal server error' });
+  }
+});
+// API endpoint for inserting a new compesation benefits record
+app.post('/addCompBen/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  const newCompBenData = req.body;
+  try {
+    await dbOperation.insertCompBen(employeeId, newCompBenData); // No need to assign to result if not used
+    res.json({ message: 'Compensation benefit added successfully' });
+  } catch (error) {
+    console.error('Error adding compensation benefit record:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 

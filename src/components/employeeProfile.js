@@ -4,7 +4,7 @@ import Navbar from "./navbar";
 import TopNavbar from "./topnavbar";
 import Footer from "./footer";
 import jsPDF from "jspdf";
-import html2canvas from 'html2canvas';
+import html2canvas from "html2canvas";
 
 function EmployeeProfile() {
   const { employeeId } = useParams();
@@ -42,105 +42,31 @@ function EmployeeProfile() {
     }
   };
 
-      // Define a function to determine the color based on EmployeeStatus value
-      const getStatusColor = (status) => {
-        switch (status) {
-          case 'Active': // Active
-            return 'green';
-          case 'Separated': // Separated
-            return 'red';
-          case 'Inactive - Maternity': // Inactive - Maternity
-          case 'Inactive - Sickness': // Inactive - Sickness
-          case 'Inactive - Absent with leave': // Inactive - Absent with leave
-          case 'Inactive - Absent Without Leave': // Inactive - Absent Without Leave
-          case 'Inactive - Suspension': // Inactive - Suspension
-            return 'gray';
-          default:
-            return 'black'; // Default color
-        }
-      };
-    
-      const statusColor = getStatusColor(employeeData.EmployeeStatus);
-    
+  // Define a function to determine the color based on EmployeeStatus value
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Active": // Active
+        return "green";
+      case "Separated": // Separated
+        return "red";
+      case "Inactive - Maternity": // Inactive - Maternity
+      case "Inactive - Sickness": // Inactive - Sickness
+      case "Inactive - Absent with leave": // Inactive - Absent with leave
+      case "Inactive - Absent Without Leave": // Inactive - Absent Without Leave
+      case "Inactive - Suspension": // Inactive - Suspension
+        return "gray";
+      default:
+        return "black"; // Default color
+    }
+  };
+
+  const statusColor = getStatusColor(employeeData.EmployeeStatus);
 
   // Go back to the previous page in history
   const handleNavigateBack = () => {
     // Navigate back one step in history (equivalent to pressing the browser's back button)
     navigate(-1);
   };
-  // const handleDownloadPDF = async () => {
-  //   const pdf = new jsPDF();
-  
-  //   try {
-  //     // Add Personal Details section to PDF
-  //     await addSectionToPDF(employeeProfileRef, 'Employee Profile', pdf);
-  
-  
-  //     // Save PDF
-  //     pdf.save('employee_profile.pdf');
-  //   } catch (error) {
-  //     console.error('Error generating PDF:', error);
-  //   }
-  // };
-  
-  // const addSectionToPDF = async (ref, title, pdf) => {
-  //   try {
-  //     console.log(`Capturing section: ${title}`);
-  
-  //     await new Promise((resolve) => setTimeout(resolve, 1000));
-  
-  //     const element = ref.current;
-  
-  //     if (!element) {
-  //       console.error('Element not found:', ref);
-  //       return;
-  //     }
-  
-  //     console.log('Element:', element);
-  //     console.log('Element dimensions:', element.offsetWidth, 'x', element.offsetHeight);
-  
-  //     const canvas = await html2canvas(element, {
-  //       useCORS: true,
-  //       logging: true,
-  //       scale: 2,
-  //     });
-  
-  //     if (!canvas) {
-  //       console.error('Canvas not created for element:', element);
-  //       return;
-  //     }
-  
-  //     const imageData = canvas.toDataURL('image/png');
-  
-  //     if (!imageData || !imageData.startsWith('data:image/png')) {
-  //       console.error('Invalid image data for element:', element);
-  //       return;
-  //     }
-  
-  //     if (pdf.internal.getNumberOfPages() > 0) {
-  //       // pdf.addPage();
-  //     }
-  
-  //     const pdfWidth = pdf.internal.pageSize.getWidth();
-  //     const titleWidth = pdf.getStringUnitWidth(title) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
-  //     const titleX = (pdfWidth - titleWidth) / 2;
-  
-  //     // Draw the background rectangle for the title
-  //     pdf.setFillColor(0, 71, 171); // Cobalt blue background
-  //     pdf.rect(10, 5, pdfWidth - 15, 15, 'F');
-  
-  //     // Add the title text
-  //     pdf.setTextColor(255, 255, 255); // White text color
-  //     pdf.text(title, titleX, 15, { align: 'center' });
-  
-  //     // Add the captured image
-  //     pdf.addImage(imageData, 'PNG', 10, 30, 180, 0);
-  
-  //     console.log(`Section '${title}' added to PDF successfully.`);
-  //   } catch (error) {
-  //     console.error(`Error capturing section '${title}':`, error);
-  //   }
-  // };
 
   if (!employeeData) {
     return <div>Loading...</div>;
@@ -170,7 +96,7 @@ function EmployeeProfile() {
                       <h5 className="m-0 font-weight-bold text-primary">
                         Employee Profile
                       </h5>
-                     {/* <div className="d-flex align-items-center">
+                      {/* <div className="d-flex align-items-center">
                          <button
                           className="update-button btn btn-xs mr-2"
                           onClick={handleNavigateBack}
@@ -226,8 +152,11 @@ function EmployeeProfile() {
                                   Employee Status:
                                 </label>
                                 <span
-                                style={{ color: statusColor, textDecoration: "underline",
-                                textTransform: "capitalize", }} 
+                                  style={{
+                                    color: statusColor,
+                                    textDecoration: "underline",
+                                    textTransform: "capitalize",
+                                  }}
                                 >
                                   {employeeData.EmployeeStatus}
                                 </span>
@@ -317,7 +246,9 @@ function EmployeeProfile() {
                           <div className="row justify-content-center">
                             <div className="col-md-6">
                               <div className="form-group">
-                                <label htmlFor="EmploymentStatus">Employment Status</label>
+                                <label htmlFor="EmploymentStatus">
+                                  Employment Status
+                                </label>
                                 <span className="form-control autoAdjustSpan">
                                   {employeeData.EmploymentStatus}
                                 </span>
@@ -343,7 +274,7 @@ function EmployeeProfile() {
                             </div>
                           </div>
                           <div className="row justify-content-center">
-                          <div className="col-md-12">
+                            <div className="col-md-12">
                               <div className="form-group">
                                 <label htmlFor="Shift">Shift</label>
                                 <span className="form-control autoAdjustSpan">
