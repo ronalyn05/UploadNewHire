@@ -13,7 +13,8 @@ import 'jspdf-autotable';
   const { employeeId } = useParams();
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [showAddDependentModal, setShowAddDependentModal] = useState(false);
+  const [showAddCompBenModal, setShowAddCompBenModal] = useState(false);
   const [employeeData, setEmployeeData] = useState({
     EmployeeId: '',
     EmployeeName: '',
@@ -88,6 +89,7 @@ import 'jspdf-autotable';
     Stat_PHICMonthlyContribution: '',
     Stat_TINNumber: ''
   });
+  const [filteredCompBen, setFilteredCompBen] = useState([]);
   const [errors, setErrors] = useState({});
   const [compBen, setCompBen] = useState([]);
   const [selectedCompBen, setSelectedCompBen] = useState(null);
@@ -104,11 +106,22 @@ import 'jspdf-autotable';
 
     // Effect to filter dependents based on search query
     useEffect(() => {
-      const filtered = dependents.filter((dependent) =>
-        dependent.FullName.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredDependents(filtered);
+      if (dependents && dependents.length > 0) {
+        const filtered = dependents.filter((dependent) =>
+          dependent.FullName && dependent.FullName.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setFilteredDependents(filtered);
+      } else {
+        setFilteredDependents([]);
+      }
     }, [searchQuery, dependents]);
+    
+    // useEffect(() => {
+    //   const filtered = dependents.filter((dependent) =>
+    //     dependent.FullName.toLowerCase().includes(searchQuery.toLowerCase())
+    //   );
+    //   setFilteredDependents(filtered);
+    // }, [searchQuery, dependents]);
     
  // Define the fetchDependents function
  const fetchDependents = async () => {
@@ -123,19 +136,25 @@ import 'jspdf-autotable';
     console.error('Error fetching dependents:', error);
   }
 };
- // Define the fetchCompBen function
- const fetchCompBen = async () => {
+// Define the fetchCompBen function
+const fetchCompBen = async () => {
+  console.log(employeeId);
   try {
+    console.log(compBenData);
     const response = await fetch(`http://localhost:5000/retrieve/compBen/${employeeId}`);
     if (!response.ok) {
-      throw new Error('Failed to fetch compensation benefits details');
+      throw new Error(`Failed to fetch compensation benefits details: ${response.statusText}`);
     }
     const data = await response.json();
-    setCompBen(data);
+
+        // setcompBenData(data);
+        // setCompBen(data); 
+        setFilteredCompBen(data);
   } catch (error) {
     console.error('Error fetching compensation benefits details:', error);
   }
 };
+
 
 // Call fetchDependents whenever employeeId changes
 useEffect(() => {
@@ -155,6 +174,7 @@ const formatDate = (date) => {
   // Function to reset form data
   const resetFormData = () => {
     setEmployeeData({
+      //Dependent fields
       FullName: '',
       PhoneNum: '',
       Relationship: '',
@@ -175,14 +195,58 @@ const formatDate = (date) => {
       HMOPolicyNumber: ''
     });
   };
+    // Function to reset form data
+    const resetCompBenForm = () => {
+      setcompBenData({
+        //Compensation Benefits
+        Salary: '',
+        DailyEquivalent: '',
+        MonthlyEquivalent: '',
+        AnnualEquivalent: '',
+        RiceMonthly: '',
+        RiceAnnual: '',
+        RiceDifferentialAnnual: '',
+        UniformAnnual: '',
+        LeaveDays: '',
+        LaundryAllowance: '',
+        CommAllowance: '',
+        CommAllowanceType: '',
+        CashGift: '',
+        MedicalInsurance: '',
+        FreeHMODependent: '',
+        MBL: '',
+        LifeInsurance: '',
+        Beneficiaries: '',
+        PersonalAccidentInsuranceBenefit: '',
+        PWDIDNumber: '',
+        TendopayRegistered: '',
+        CanteenUID: '',
+        CanteenCreditLimit: '',
+        CanteenBarcode: '',
+        DAPMembershipNumber: '',
+        DAPDependents: '',
+        Stat_SSSNumber: '',
+        Stat_SSSMonthlyContribution: '',
+        Stat_PagIbigNumber: '',
+        Stat_PagIbigMonthlyContribution: '',
+        Stat_PHICNumber: '',
+        Stat_PHICMonthlyContribution: '',
+        Stat_TINNumber: ''
+      });
+    };
   //Function to handle opening add modal for new dependent records
-const handleShowAddModal = () => {
+const handleShowAddDependentModal = () => {
   resetFormData(); // Clear form data
-  setShowAddModal(true);
+  setShowAddDependentModal(true);
+};
+const handleShowAddCompBenModal = () => {
+  resetCompBenForm(); // Clear form data
+  setShowAddCompBenModal(true);
 };
 //Function to handle closing add modal for new dependent records
 const handleCloseAddModal = () => {
-  setShowAddModal(false);
+  setShowAddDependentModal(false); // Corrected line
+  setShowAddCompBenModal(false);
 };
   // Function to handle opening edit modal and set selected dependent
   const handleShowEditModal = (dependent, compBen) => {
@@ -773,7 +837,9 @@ const handleAddContactForm = async (e) => {
      fetchEmployeeData();
 
      // Reload the tab
-     window.location.reload();
+    //  window.location.reload();
+     // Close modal
+     handleCloseAddModal();
 
     } catch (error) {
       console.error('Error adding dependent:', error);
@@ -1249,7 +1315,7 @@ const handleAddCompBen = async (e) => {
   e.preventDefault();
 
   try {
-    console.log(compBenData);
+    // console.log(compBenData);
     const response = await fetch(`http://localhost:5000/addCompBen/${employeeId}`, {
       method: 'POST',
       headers: {
@@ -1276,7 +1342,10 @@ const handleAddCompBen = async (e) => {
    fetchEmployeeData();
 
    // Reload the tab
-   window.location.reload();
+  //  window.location.reload();
+  
+  // Close modal
+  handleCloseAddModal();
 
   } catch (error) {
     console.error('Error adding compensation benefit:', error);
@@ -3219,7 +3288,8 @@ const handleAddCompBen = async (e) => {
                                         name="ContactNumber" 
                                         onChange={handleInputChange} 
                                       />
-                                      <button type="submit" className="btn btn-primary">Update</button>
+                                      <button type="submit" className="btn btn-primary">
+                                      <i className="fas fa-pencil-alt"></i></button>
                                     </div>
                                   </div>
                                 </form>
@@ -3253,7 +3323,7 @@ const handleAddCompBen = async (e) => {
                                       <div className="form-group">
                                         {employeeData.SecondaryContactNum ? (
                                           <>
-                                            <label>Update New Contact Number</label>
+                                            <label>Update Secondary Contact Number</label>
                                             <div className="d-flex align-items-center">
                                               <input 
                                                 type="tel" 
@@ -3263,7 +3333,9 @@ const handleAddCompBen = async (e) => {
                                                 name="newContactNumber" 
                                                 onChange={handleInputChange} 
                                               />
-                                              <button type="submit" className="btn btn-primary">Update</button>
+                                              <button type="submit" className="btn btn-primary" >
+                                              <i className="fas fa-pencil-alt"></i>
+                                              </button>
                                             </div>
                                           </>
                                         ) : (
@@ -3278,7 +3350,9 @@ const handleAddCompBen = async (e) => {
                                                 name="newContactNumber" 
                                                 onChange={handleInputChange} 
                                               />
-                                              <button type="submit" className="btn btn-primary">Add</button>
+                                              <button type="submit" className="btn btn-primary">
+                                              <i className="fas fa-plus"></i>
+                                              </button>
                                             </div>
                                           </>
                                         )}
@@ -3293,7 +3367,7 @@ const handleAddCompBen = async (e) => {
                           <h5 className='text-primary'>Address Details</h5>
                                 <hr className="hr-cobalt-blue"/>
                                 <br/>
-                                <div className="row justify-content-center">
+                                <div className="row ">
                                     {/* <div className="col-md-4">
                                         <div className="form-group">
                                             <label>Employee ID</label>
@@ -3620,7 +3694,7 @@ const handleAddCompBen = async (e) => {
                            {/* <div className="card"> */}
                                 <div className="card-body d-flex justify-content-between align-items-center">
                                   {/* New Record button */}
-                                  <button className="btn btn-xs btn-primary mr-2" onClick={handleShowAddModal}>
+                                  <button className="btn btn-xs btn-primary mr-2" onClick={handleShowAddDependentModal}>
                                     <i className="fas fa-plus"></i> New Record
                                   </button>
 
@@ -3643,7 +3717,7 @@ const handleAddCompBen = async (e) => {
                                   </form>
                                 </div>
                               {/* Add Dependent Modal */}
-                              <Modal show={showAddModal} onHide={handleCloseAddModal} dialogClassName="custom-modal">
+                              <Modal show={showAddDependentModal} onHide={handleCloseAddModal} dialogClassName="custom-modal">
                                   <Modal.Header>
                                       <Modal.Title>Add New Dependent</Modal.Title>
                                       <Button variant="default" onClick={handleCloseAddModal}> X </Button>
@@ -3952,6 +4026,7 @@ const handleAddCompBen = async (e) => {
                                           <th scope="col">Company Paid</th>
                                           <th scope="col">HMO Provider</th>
                                           <th scope="col">HMO Policy Number</th>
+                                          <th scope="col">Timestamp</th>
                                         </tr>
                                       </thead>
                                       <tbody>
@@ -3984,6 +4059,7 @@ const handleAddCompBen = async (e) => {
                               <td>{dependent.CompanyPaid}</td>
                               <td>{dependent.HMOProvider}</td>
                               <td>{dependent.HMOPolicyNumber}</td>
+                              <td>{dependent.CreatedAt}</td>
                             </tr>
                           ))
                         ) : (
@@ -4002,12 +4078,12 @@ const handleAddCompBen = async (e) => {
                       <div className="tab-pane fade" id="compBen" role="tabpanel" aria-labelledby="compBen-tab">
                                 <div className="card-body d-flex justify-content-between align-items-center">
                                   {/* New Record button */}
-                                  <button className="btn btn-xs btn-primary mr-2" onClick={handleShowAddModal}>
+                                  <button className="btn btn-xs btn-primary mr-2" onClick={handleShowAddCompBenModal}>
                                     <i className="fas fa-plus"></i> New Record
                                   </button>
 
                                   {/* Search form */}
-                                  <form className="form-inline ml-auto">
+                                  {/* <form className="form-inline ml-auto">
                                     <div className="input-group">
                                       <input
                                         type="text"
@@ -4022,10 +4098,10 @@ const handleAddCompBen = async (e) => {
                                         </button>
                                       </div>
                                     </div>
-                                  </form>
+                                  </form> */}
                                 </div>
                               {/* Add CompBen Modal */}
-                              <Modal show={showAddModal} onHide={handleCloseAddModal} dialogClassName="custom-modal">
+                              <Modal show={showAddCompBenModal} onHide={handleCloseAddModal} dialogClassName="custom-modal">
                                   <Modal.Header>
                                       <Modal.Title>Add Compensation Benefit</Modal.Title>
                                       <Button variant="default" onClick={handleCloseAddModal}> X </Button>
@@ -4299,7 +4375,7 @@ const handleAddCompBen = async (e) => {
                                       </Button>
                                   </Modal.Footer>
                               </Modal>
-                              {/* Edit Dependent Modal */}
+                              {/* Edit Compensation Benefit Modal */}
                             <Modal show={!!selectedCompBen} onHide={handleCloseEditModal} dialogClassName="custom-modal">
                               <Modal.Header>
                                 <Modal.Title>Update CompBen Records</Modal.Title>
@@ -4875,11 +4951,13 @@ const handleAddCompBen = async (e) => {
                                         <th scope="col">Leave Days</th>
                                         <th scope="col">Laundry Allowance</th>
                                         <th scope="col">Comm Allowance</th>
+                                        <th scope="col">Comm Allowance Type</th>
                                         <th scope="col">Cash Gift</th>
                                         <th scope="col">Medical Insurance</th>
                                         <th scope="col">Free HMO Dependent</th>
                                         <th scope="col">MBL</th>
                                         <th scope="col">Life Insurance</th>
+                                        <th scope="col">Beneficiaries</th>
                                         <th scope="col">Personal Accident Insurance Benefit</th>
                                         <th scope="col">PWD ID Number</th>
                                         <th scope="col">Tendopay Registered</th>
@@ -4895,11 +4973,12 @@ const handleAddCompBen = async (e) => {
                                         <th scope="col">Stat PHIC Number</th>
                                         <th scope="col">Stat PHIC Monthly Contribution</th>
                                         <th scope="col">Stat TIN Number</th>
+                                        <th scope="col">Created at</th>
                                         </tr>
                                       </thead>
                                       <tbody>
-                        {filteredDependents.length > 0 ? (
-                          filteredDependents.map((dependent, index) => (
+                        {filteredCompBen.length > 0 ? (
+                          filteredCompBen.map((compBen, index) => (
                             <tr key={index}>
                               <td>
                               <button className="btn btn-xs btn-primary mr-2" onClick={() => handleShowEditModal(compBen)}>
@@ -4920,11 +4999,13 @@ const handleAddCompBen = async (e) => {
                                 <td>{compBen.LeaveDays}</td>
                                 <td>{compBen.LaundryAllowance}</td>
                                 <td>{compBen.CommAllowance}</td>
+                                <td>{compBen.CommAllowanceType}</td>
                                 <td>{compBen.CashGift}</td>
                                 <td>{compBen.MedicalInsurance}</td>
                                 <td>{compBen.FreeHMODependent}</td>
                                 <td>{compBen.MBL}</td>
                                 <td>{compBen.LifeInsurance}</td>
+                                <td>{compBen.Beneficiaries}</td>
                                 <td>{compBen.PersonalAccidentInsuranceBenefit}</td>
                                 <td>{compBen.PWDIDNumber}</td>
                                 <td>{compBen.TendopayRegistered}</td>
@@ -4937,7 +5018,10 @@ const handleAddCompBen = async (e) => {
                                 <td>{compBen.Stat_SSSMonthlyContribution}</td>
                                 <td>{compBen.Stat_PagIbigNumber}</td>
                                 <td>{compBen.Stat_PagIbigMonthlyContribution}</td>
+                                <td>{compBen.Stat_PHICNumber}</td>
+                                <td>{compBen.Stat_PHICMonthlyContribution}</td>
                                 <td>{compBen.Stat_TINNumber}</td>
+                                <td>{compBen.CreatedAt}</td>
                             </tr>
                           ))
                         ) : (

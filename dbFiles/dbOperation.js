@@ -1049,9 +1049,14 @@ const insertDependent = async (employeeId, newDependentData) => {
       .input("CompanyPaid", sql.VarChar(255), newDependentData.CompanyPaid)
       .input("HMOProvider", sql.VarChar(255), newDependentData.HMOProvider)
       .input("HMOPolicyNumber", sql.VarChar(255), newDependentData.HMOPolicyNumber)
+      .input("CreatedAt", sql.DateTime, new Date())
       .query(`
-          INSERT INTO Dependent (EmployeeId, FullName, PhoneNum, Relationship, DateOfBirth, Occupation, Address, City, DepProvince, PostalCode, Beneficiary, BeneficiaryDate, TypeOfCoverage, Insurance, InsuranceDate, Remarks, CompanyPaid, HMOProvider, HMOPolicyNumber)
-          VALUES (@EmployeeId, @FullName, @PhoneNum, @Relationship, @DateOfBirth, @Occupation, @Address, @City, @DepProvince, @PostalCode, @Beneficiary, @BeneficiaryDate, @TypeOfCoverage, @Insurance, @InsuranceDate, @Remarks, @CompanyPaid, @HMOProvider, @HMOPolicyNumber)
+          INSERT INTO Dependent (EmployeeId, FullName, PhoneNum, Relationship, DateOfBirth, Occupation, Address, City, DepProvince, 
+            PostalCode, Beneficiary, BeneficiaryDate, TypeOfCoverage, Insurance, InsuranceDate, Remarks, CompanyPaid, HMOProvider, 
+            HMOPolicyNumber, CreatedAt)
+          VALUES (@EmployeeId, @FullName, @PhoneNum, @Relationship, @DateOfBirth, @Occupation, @Address, @City, @DepProvince, @PostalCode, 
+            @Beneficiary, @BeneficiaryDate, @TypeOfCoverage, @Insurance, @InsuranceDate, @Remarks, @CompanyPaid, @HMOProvider, 
+            @HMOPolicyNumber, @CreatedAt)
         `);
 
     return result;
@@ -1496,11 +1501,13 @@ const insertCompBen = async (employeeId, newCompBenData) => {
       .input("LeaveDays", sql.VarChar(255), newCompBenData.LeaveDays)
       .input("LaundryAllowance", sql.VarChar(255), newCompBenData.LaundryAllowance)
       .input("CommAllowance", sql.VarChar(255), newCompBenData.CommAllowance)
+      .input("CommAllowanceType", sql.VarChar(255), newCompBenData.CommAllowanceType)
       .input("CashGift", sql.VarChar(255), newCompBenData.CashGift)
       .input("MedicalInsurance", sql.VarChar(255), newCompBenData.MedicalInsurance)
       .input("FreeHMODependent", sql.VarChar(255), newCompBenData.FreeHMODependent)
       .input("MBL", sql.VarChar(255), newCompBenData.MBL)
       .input("LifeInsurance", sql.VarChar(255), newCompBenData.LifeInsurance)
+      .input("Beneficiaries", sql.VarChar(255), newCompBenData.Beneficiaries)
       .input("PersonalAccidentInsuranceBenefit", sql.VarChar(255), newCompBenData.PersonalAccidentInsuranceBenefit)
       .input("PWDIDNumber", sql.VarChar(255), newCompBenData.PWDIDNumber)
       .input("TendopayRegistered", sql.VarChar(255), newCompBenData.TendopayRegistered)
@@ -1516,17 +1523,19 @@ const insertCompBen = async (employeeId, newCompBenData) => {
       .input("Stat_PHICNumber", sql.VarChar(255), newCompBenData.Stat_PHICNumber)
       .input("Stat_PHICMonthlyContribution", sql.VarChar(255), newCompBenData.Stat_PHICMonthlyContribution)
       .input("Stat_TINNumber", sql.VarChar(255), newCompBenData.Stat_TINNumber)
+      .input("CreatedAt", sql.DateTime, new Date())
       .query(`
           INSERT INTO CompensationBenefits (EmployeeId, Salary, DailyEquivalent, MonthlyEquivalent, AnnualEquivalent, RiceMonthly, 
-            RiceAnnual, RiceDifferentialAnnual, UniformAnnual, LeaveDays, LaundryAllowance, CommAllowance, CashGift, MedicalInsurance, FreeHMODependent, 
-            MBL, LifeInsurance, PersonalAccidentInsuranceBenefit, PWDIDNumber, TendopayRegistered, CanteenUID, CanteenCreditLimit, CanteenBarcode, 
+            RiceAnnual, RiceDifferentialAnnual, UniformAnnual, LeaveDays, LaundryAllowance, CommAllowance, CommAllowanceType, 
+            CashGift, MedicalInsurance, FreeHMODependent, MBL, LifeInsurance, Beneficiaries, PersonalAccidentInsuranceBenefit, PWDIDNumber, 
+            TendopayRegistered, CanteenUID, CanteenCreditLimit, CanteenBarcode, 
             DAPMembershipNumber, DAPDependents, Stat_SSSNumber, Stat_SSSMonthlyContribution, Stat_PagIbigNumber, 
-            Stat_PagIbigMonthlyContribution, Stat_PHICNumber, Stat_PHICMonthlyContribution, Stat_TINNumber )
+            Stat_PagIbigMonthlyContribution, Stat_PHICNumber, Stat_PHICMonthlyContribution, Stat_TINNumber, CreatedAt )
           VALUES (@EmployeeId, @Salary, @DailyEquivalent, @MonthlyEquivalent, @AnnualEquivalent, @RiceMonthly, @RiceAnnual,
-             @RiceDifferentialAnnual, @UniformAnnual, @LeaveDays, @LaundryAllowance, @CommAllowance, @CashGift, @MedicalInsurance, 
-             @FreeHMODependent, @MBL, @LifeInsurance, @PersonalAccidentInsuranceBenefit, @PWDIDNumber, @TendopayRegistered, @CanteenUID, @CanteenCreditLimit, 
-             @CanteenBarcode, @DAPMembershipNumber, @DAPDependents, @Stat_SSSNumber, @Stat_SSSMonthlyContribution, @Stat_PagIbigNumber, 
-             @Stat_PagIbigMonthlyContribution, @Stat_PHICNumber, @Stat_PHICMonthlyContribution, @Stat_TINNumber)
+             @RiceDifferentialAnnual, @UniformAnnual, @LeaveDays, @LaundryAllowance, @CommAllowance, @CommAllowanceType, @CashGift, @MedicalInsurance, 
+             @FreeHMODependent, @MBL, @LifeInsurance, @Beneficiaries, @PersonalAccidentInsuranceBenefit, @PWDIDNumber, @TendopayRegistered, @CanteenUID,  
+             @CanteenCreditLimit, @CanteenBarcode, @DAPMembershipNumber, @DAPDependents, @Stat_SSSNumber, @Stat_SSSMonthlyContribution, @Stat_PagIbigNumber, 
+             @Stat_PagIbigMonthlyContribution, @Stat_PHICNumber, @Stat_PHICMonthlyContribution, @Stat_TINNumber, @CreatedAt )
         `);
 
     return result;
@@ -1535,7 +1544,28 @@ const insertCompBen = async (employeeId, newCompBenData) => {
     throw error;
   }
 };
+// Retrieve compensation benefits by Employee ID from the database
+const getCompBenByEmployeeId = async (employeeId) => {
+  try {
+    let pool = await sql.connect(config);
+    let result = await pool
+      .request()
+      .input("EmployeeId", sql.VarChar, employeeId)
+      .query(`
+        SELECT *
+        FROM CompensationBenefits
+        WHERE EmployeeId = @EmployeeId;
+      `);
 
+      console.log(`Query result for Employee ID ${employeeId}:`, result.recordset);
+
+    return result.recordset; // Return compensation benefits found with the given EmployeeId
+
+  } catch (error) {
+    console.error("Error fetching compensation benefits by Employee ID:", error);
+    throw error;
+  }
+}
 module.exports = {
   updateUserPassword,
   getUserByEmployeeId,
@@ -1570,5 +1600,6 @@ module.exports = {
   getDependentsByEmployeeId,
   updateDependentById,
   getAddNewContactId,
-  insertCompBen
+  insertCompBen,
+  getCompBenByEmployeeId
 };

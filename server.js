@@ -426,19 +426,19 @@ app.put('/updateDepartment/:employeeId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-// API endpoint for inserting a new dependent record
-app.post('/addDependent/:employeeId', async (req, res) => {
-  const { employeeId } = req.params;
-  const newDependentData = req.body;
-  try {
-    // const result = await dbOperation.insertDependent(employeeId, newDependentData);
-    await dbOperation.insertDependent(employeeId, newDependentData); // No need to assign to result if not used
-    res.json({ message: 'Dependent record added successfully' });
-  } catch (error) {
-    console.error('Error adding dependent record:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
+  // API endpoint for inserting a new dependent record
+  app.post('/addDependent/:employeeId', async (req, res) => {
+    const { employeeId } = req.params;
+    const newDependentData = req.body;
+    try {
+      // const result = await dbOperation.insertDependent(employeeId, newDependentData);
+      await dbOperation.insertDependent(employeeId, newDependentData); 
+      res.json({ message: 'Dependent record added successfully' });
+    } catch (error) {
+      console.error('Error adding dependent record:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
 // Endpoint to retrieve dependents by Employee ID
 app.get('/retrieve/dependents/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
@@ -551,18 +551,37 @@ app.delete('/deleteEmContact/:emergencyNumId', async (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
   }
 });
-// API endpoint for inserting a new compesation benefits record
+// API endpoint for inserting a new compensation benefits record
 app.post('/addCompBen/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
   const newCompBenData = req.body;
   try {
-    await dbOperation.insertCompBen(employeeId, newCompBenData); // No need to assign to result if not used
+    await dbOperation.insertCompBen(employeeId, newCompBenData); 
     res.json({ message: 'Compensation benefit added successfully' });
   } catch (error) {
     console.error('Error adding compensation benefit record:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+// Endpoint to retrieve compensation benefits by Employee ID
+app.get('/retrieve/compBen/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  if (!employeeId) {
+    return res.status(400).json({ message: 'Employee ID is required' });
+  }
+
+  try {
+    const compBen = await dbOperation.getCompBenByEmployeeId(employeeId);
+    if (compBen.length === 0) {
+      return res.status(404).json({ message: 'No compensation benefits found for the given Employee ID' });
+    }
+    res.json(compBen);
+  } catch (error) {
+    console.error('Error fetching compensation benefits:', error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+});
+
 
 // Start the server
 app.listen(port, () => {
