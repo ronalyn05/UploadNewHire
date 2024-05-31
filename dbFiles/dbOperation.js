@@ -547,6 +547,7 @@ const getEmployeeById = async (employeeId) => {
           A.LandMark AS EmContactLandMark,
           A.IsPermanent AS Is_Permanent,
           A.IsEmergency AS Is_Emergency,
+          UA.Role,
           UA.ProfilePhoto -- Include ProfilePhoto from UserAccount table
         FROM EmpPersonalDetails AS PD
         INNER JOIN EmployeeInfo AS EI ON PD.EmployeeId = EI.EmployeeId
@@ -576,6 +577,43 @@ const getEmployeeById = async (employeeId) => {
     throw error;
   }
 }
+// Update password query 
+const updateEmployeePassword = async (employeeId, hashedPassword) => {
+  try {
+    let pool = await sql.connect(config);
+    await pool
+      .request()
+      .input("EmployeeId", sql.VarChar, employeeId)
+      .input("Password", sql.VarChar, hashedPassword) // Store hashed password
+      .query(`
+        UPDATE UserAccount
+        SET Password = @Password
+        WHERE EmployeeId = @EmployeeId;
+      `);
+  } catch (error) {
+    console.error("Error updating password:", error);
+    throw error;
+  }
+}
+// Update role type query 
+const updateEmployeeRole = async (employeeId, role) => {
+  try {
+    let pool = await sql.connect(config);
+    await pool
+      .request()
+      .input("EmployeeId", sql.VarChar, employeeId)
+      .input("Role", sql.VarChar, role)
+      .query(`
+        UPDATE UserAccount
+        SET Role = @Role
+        WHERE EmployeeId = @EmployeeId;
+      `);
+  } catch (error) {
+    console.error("Error updating role:", error);
+    throw error;
+  }
+}
+
 //update employee personal details  by id
 const updateEmployeeById = async (employeeId, updatedEmployeeData) => {
   try {
@@ -1023,7 +1061,6 @@ const updateDependentById = async (dependentId, updatedDependentData) => {
     throw error;
   }
 };
-
 // Function to insert a new dependent record into the database
 const insertDependent = async (employeeId, newDependentData) => {
   try {
@@ -1085,7 +1122,6 @@ const getDependentsByEmployeeId = async (employeeId) => {
     throw error;
   }
 }
-
 //update employee product details
 const updateProductById = async (employeeId, updatedEmployeeData) => {
   try {
@@ -1278,7 +1314,6 @@ const deleteEmployeeById = async (employeeId) => {
     throw error;
   }
 };
-
 //route to delete employee by ID from the database
 const deleteUsersById = async (userId) => {
   try {
@@ -1566,6 +1601,88 @@ const getCompBenByEmployeeId = async (employeeId) => {
     throw error;
   }
 }
+ //update employee compensation benefits details
+ const updateCompBenById = async (compBenId, updatedcompBenData) => {
+  try {
+    let pool = await sql.connect(config);
+    let result = await pool
+      .request()
+      .input("CompBenId", sql.Int, compBenId)
+      .input("Salary", sql.VarChar(255), updatedcompBenData.Salary)
+      .input("DailyEquivalent", sql.VarChar(255), updatedcompBenData.DailyEquivalent)
+      .input("MonthlyEquivalent", sql.VarChar(255), updatedcompBenData.MonthlyEquivalent)
+      .input("AnnualEquivalent", sql.VarChar(255), updatedcompBenData.AnnualEquivalent)
+      .input("RiceMonthly", sql.VarChar(255), updatedcompBenData.RiceMonthly)
+      .input("RiceAnnual", sql.VarChar(255), updatedcompBenData.RiceAnnual)
+      .input("RiceDifferentialAnnual", sql.VarChar(255), updatedcompBenData.RiceDifferentialAnnual)
+      .input("LeaveDays", sql.VarChar(255), updatedcompBenData.LeaveDays)
+      .input("LaundryAllowance", sql.VarChar(255), updatedcompBenData.LaundryAllowance)
+      .input("CommAllowance", sql.VarChar(255), updatedcompBenData.CommAllowance)
+      .input("CommAllowanceType", sql.VarChar(255), updatedcompBenData.CommAllowanceType)
+      .input("CashGift", sql.VarChar(255), updatedcompBenData.CashGift)
+      .input("MedicalInsurance", sql.VarChar(255), updatedcompBenData.MedicalInsurance)
+      .input("FreeHMODependent", sql.VarChar(255), updatedcompBenData.FreeHMODependent)
+      .input("MBL", sql.VarChar(255), updatedcompBenData.MBL)
+      .input("LifeInsurance", sql.VarChar(255), updatedcompBenData.LifeInsurance)
+      .input("Beneficiaries", sql.VarChar(255), updatedcompBenData.Beneficiaries)
+      .input("PersonalAccidentInsuranceBenefit", sql.VarChar(255), updatedcompBenData.PersonalAccidentInsuranceBenefit)
+      .input("PWDIDNumber", sql.VarChar(255), updatedcompBenData.PWDIDNumber)
+      .input("TendopayRegistered", sql.VarChar(255), updatedcompBenData.TendopayRegistered)
+      .input("CanteenUID", sql.VarChar(255), updatedcompBenData.CanteenUID)
+      .input("CanteenCreditLimit", sql.VarChar(255), updatedcompBenData.CanteenCreditLimit)
+      .input("CanteenBarcode", sql.VarChar(255), updatedcompBenData.CanteenBarcode)
+      .input("DAPMembershipNumber", sql.VarChar(255), updatedcompBenData.DAPMembershipNumber)
+      .input("DAPDependents", sql.VarChar(255), updatedcompBenData.DAPDependents)
+      .input("Stat_SSSNumber", sql.VarChar(255), updatedcompBenData.Stat_SSSNumber)
+      .input("Stat_SSSMonthlyContribution", sql.VarChar(255), updatedcompBenData.Stat_SSSMonthlyContribution)
+      .input("Stat_PagIbigNumber", sql.VarChar(255), updatedcompBenData.PersonalAccidentInsuranceBenefit)
+      .input("Stat_PagIbigMonthlyContribution", sql.VarChar(255), updatedcompBenData.Stat_PagIbigMonthlyContribution)
+      .input("Stat_PHICNumber", sql.VarChar(255), updatedcompBenData.Stat_PHICNumber)
+      .input("Stat_PHICMonthlyContribution", sql.VarChar(255), updatedcompBenData.Stat_PHICMonthlyContribution)
+      .input("Stat_TINNumber", sql.VarChar(255), updatedcompBenData.Stat_TINNumber)
+      .query(`
+          UPDATE CompensationBenefits 
+          SET Salary = @Salary,
+              DailyEquivalent = @DailyEquivalent,
+              MonthlyEquivalent = @MonthlyEquivalent,
+              AnnualEquivalent = @AnnualEquivalent,
+              RiceMonthly = @RiceMonthly,
+              RiceAnnual = @RiceAnnual,
+              RiceDifferentialAnnual = @RiceDifferentialAnnual,
+              LeaveDays = @LeaveDays,
+              LaundryAllowance = @LaundryAllowance,
+              CommAllowance = @CommAllowance,
+              CommAllowanceType = @CommAllowanceType,
+              CashGift = @CashGift,
+              MedicalInsurance = @MedicalInsurance,
+              FreeHMODependent = @FreeHMODependent,
+              MBL = @MBL,
+              LifeInsurance = @LifeInsurance,
+              Beneficiaries = @Beneficiaries,
+              PersonalAccidentInsuranceBenefit = @PersonalAccidentInsuranceBenefit,
+              PWDIDNumber = @PWDIDNumber,
+              TendopayRegistered = @TendopayRegistered,
+              CanteenUID = @CanteenUID,
+              CanteenCreditLimit = @CanteenCreditLimit,
+              CanteenBarcode = @CanteenBarcode,
+              DAPMembershipNumber = @DAPMembershipNumber,
+              DAPDependents = @DAPDependents,
+              Stat_SSSNumber = @Stat_SSSNumber,
+              Stat_SSSMonthlyContribution = @Stat_SSSMonthlyContribution,
+              Stat_PagIbigNumber = @Stat_PagIbigNumber,
+              Stat_PagIbigMonthlyContribution = @Stat_PagIbigMonthlyContribution,
+              Stat_PHICNumber = @Stat_PHICNumber,
+              Stat_PHICMonthlyContribution = @Stat_PHICMonthlyContribution,
+              Stat_TINNumber = Stat_TINNumber
+          WHERE CompBenId = @CompBenId
+        `);
+
+    return result;
+  } catch (error) {
+    console.error("Error updating compensation benefits by ID:", error);
+    throw error;
+  }
+};
 module.exports = {
   updateUserPassword,
   getUserByEmployeeId,
@@ -1601,5 +1718,8 @@ module.exports = {
   updateDependentById,
   getAddNewContactId,
   insertCompBen,
-  getCompBenByEmployeeId
+  getCompBenByEmployeeId,
+  updateCompBenById,
+  updateEmployeePassword,
+  updateEmployeeRole
 };

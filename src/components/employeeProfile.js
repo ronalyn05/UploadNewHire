@@ -3,8 +3,6 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "./navbar";
 import TopNavbar from "./topnavbar";
 import Footer from "./footer";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 
 function EmployeeProfile() {
   const { employeeId } = useParams();
@@ -12,61 +10,169 @@ function EmployeeProfile() {
   const [employeeData, setEmployeeData] = useState({
     ProfilePhoto: "/img/user.png",
   });
+  // const [password, setPassword] = useState('');
+  // const [role, setRole] = useState('');
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const employeeProfileRef = useRef(null);
+  const [formData, setFormData] = useState({
+    Password: "",
+    Role: ""
+  });
 
   useEffect(() => {
     if (state && state.employeeData) {
       setEmployeeData(state.employeeData);
+      // setRole(state.employeeData.Role || '');
     } else {
-      // Fetch employee data based on employeeId
       fetchEmployeeData(employeeId);
     }
   }, [employeeId, state]);
 
-  const fetchEmployeeData = async () => {
-    // console.log("Employee Data:", employeeData);
+  const fetchEmployeeData = async (employeeId) => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/retrieve/${employeeId}`
-      );
+      const response = await fetch(`http://localhost:5000/retrieve/${employeeId}`);
       if (!response.ok) {
         throw new Error("Failed to fetch employee data");
       }
       const data = await response.json();
       setEmployeeData(data);
+      // setRole(data.Role || '');
     } catch (error) {
       console.error("Error fetching employee data:", error);
       setErrorMessage("Error fetching employee data");
     }
   };
 
-  // Define a function to determine the color based on EmployeeStatus value
   const getStatusColor = (status) => {
     switch (status) {
-      case "Active": // Active
+      case "Active":
         return "green";
-      case "Separated": // Separated
+      case "Separated":
         return "red";
-      case "Inactive - Maternity": // Inactive - Maternity
-      case "Inactive - Sickness": // Inactive - Sickness
-      case "Inactive - Absent with leave": // Inactive - Absent with leave
-      case "Inactive - Absent Without Leave": // Inactive - Absent Without Leave
-      case "Inactive - Suspension": // Inactive - Suspension
+      case "Inactive - Maternity":
+      case "Inactive - Sickness":
+      case "Inactive - Absent with leave":
+      case "Inactive - Absent Without Leave":
+      case "Inactive - Suspension":
         return "gray";
       default:
-        return "black"; // Default color
+        return "black";
     }
   };
 
   const statusColor = getStatusColor(employeeData.EmployeeStatus);
 
-  // Go back to the previous page in history
   const handleNavigateBack = () => {
-    // Navigate back one step in history (equivalent to pressing the browser's back button)
     navigate(-1);
   };
+
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+//function to reset the employee password
+  const handlePasswordUpdate = async (e) => {
+    e.preventDefault();
+  console.log(employeeId);
+    try {
+      const response = await fetch(`http://localhost:5000/update/password/${employeeId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          EmployeeId: sessionStorage.getItem('employeeId'),
+          Password: formData.password,
+          
+        }),
+      });
+  
+      if (!response.ok) {
+        const responseData = await response.json();
+        setErrorMessage(responseData.error || 'Password Change Failed');
+        return;
+      }
+
+      alert('Password has successfully changed!');
+
+      //window reload
+      window.location.reload();
+      
+      // navigate('/');
+    } catch (error) {
+      console.error("Password Change Failed", error);
+      setErrorMessage(error.message || "Password Change Failed.");
+    }
+  };
+  //function to update the employee role type
+  const handleRoleUpdate = async (e) => {
+    e.preventDefault();
+  console.log(employeeId);
+    try {
+        const response = await fetch(`http://localhost:5000/update/role/${employeeId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          EmployeeId: sessionStorage.getItem('employeeId'),
+          Role: formData.role,
+          
+        }),
+      });
+  
+      if (!response.ok) {
+        const responseData = await response.json();
+        setErrorMessage(responseData.error || 'Role Change Failed');
+        return;
+      }
+
+      alert('Role has successfully changed!');
+
+      //window reload
+      window.location.reload();
+      fetchEmployeeData();
+      
+      // navigate('/');
+    } catch (error) {
+      console.error("Role Change Failed", error);
+      setErrorMessage(error.message || "Role Change Failed.");
+    }
+  };
+
+  // const handleRoleUpdate = async (e) => {
+  //   e.preventDefault();
+  //   console.log(employeeId);
+  //   console.log(formData);
+  //   try {
+  //     const response = await fetch(`http://localhost:5000/update/role/${employeeId}`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         EmployeeId: sessionStorage.getItem('employeeId'),
+  //         Role: formData.role,
+  //       }),
+  //     });
+  //     if (!response.ok) {
+  //       throw new Error('Failed to update role');
+  //     }
+  //     const updatedData = await response.json();
+  //     setEmployeeData(updatedData);
+  //     // Fetch updated employee data after role update
+  //     await fetchEmployeeData(employeeId);
+  //     alert('Role updated successfully');
+  //   } catch (error) {
+  //     console.error('Error updating role:', error);
+  //     setErrorMessage('Error updating role');
+  //   }
+  // };
 
   if (!employeeData) {
     return <div>Loading...</div>;
@@ -96,26 +202,9 @@ function EmployeeProfile() {
                       <h5 className="m-0 font-weight-bold text-primary">
                         Employee Profile
                       </h5>
-                      {/* <div className="d-flex align-items-center">
-                         <button
-                          className="update-button btn btn-xs mr-2"
-                          onClick={handleNavigateBack}
-                        >
-                          <i className="fas fa-arrow-left"></i> Back
-                        </button>
-                      </div> */}
-                      {/* <div className="d-flex align-items-center">
-                        <button
-                        className="update-button btn btn-xs mr-2"
-                        onClick={handleDownloadPDF}
-                        >
-                        <i className="fas fa-arrow-down"></i> Download Profile
-                        </button>
-                    </div> */}
                     </div>
                     <div className="card-body" ref={employeeProfileRef}>
                       <div className="row">
-                        {/* Profile Container */}
                         <div className="col-md-4">
                           <div className="profile-container">
                             {employeeData.ProfilePhoto ? (
@@ -126,7 +215,7 @@ function EmployeeProfile() {
                               />
                             ) : (
                               <img
-                                src="/img/user.png" // Default profile photo
+                                src="/img/user.png"
                                 alt="Default Profile"
                                 className="img-fluid rounded-circle profile-photo"
                               />
@@ -181,6 +270,17 @@ function EmployeeProfile() {
                                 </label>
                                 <span className="valueCenter">
                                   {employeeData.EmailAddress}
+                                </span>
+                                <br />
+                              </div>
+                            </div>
+                            <div className="col-md-9">
+                              <div className="form-group">
+                                <label className="blueLabel labelWithSpacing">
+                                  Current Role Type:
+                                </label>
+                                <span className="valueCenter">
+                                  {employeeData.Role}
                                 </span>
                                 <br />
                               </div>
@@ -257,7 +357,7 @@ function EmployeeProfile() {
                             <div className="col-md-6">
                               <div className="form-group">
                                 <label>Work Arrangement</label>
-                                <span className="form-control autoAdjustSpanz">
+                                <span className="form-control autoAdjustSpan">
                                   {employeeData.WorkArrangement}
                                 </span>
                               </div>
@@ -287,13 +387,52 @@ function EmployeeProfile() {
                             <div className="col-md-12">
                               <div className="form-group">
                                 <label>Department</label>
-                                <span className="form-control autoAdjustSpan ">
+                                <span className="form-control autoAdjustSpan">
                                   {employeeData.DepartmentName}
                                 </span>
                               </div>
                             </div>
                           </div>
-                          <br />
+                          <hr/>
+                                  <h5 className='text-primary'>Change employee password / role type here</h5>
+                                  <hr className="hr-change-Pass"/>
+                                <br/>
+                                <form>
+                                  <div className="form-group">
+                                  <label className="blueLabel labelWithSpacing">
+                                  Reset Password
+                                </label>
+                                    <div className="d-flex align-items-center">
+                                      <input 
+                                        type="password" 
+                                        className="form-control mr-2" 
+                                        value={formData.password}
+                                        placeholder="Reset Employee Password" 
+                                        name="password" 
+                                        onChange={handleInputChange}
+                                      />
+                                      <button type="submit" className="btn btn-primary" onClick={handlePasswordUpdate}>
+                                      <i className="fas fa-pencil-alt"></i></button>
+                                    </div>
+                                  </div>
+                                </form> 
+                                <form>
+                                  <div className="form-group">
+                                  <label className="blueLabel labelWithSpacing">
+                                  Update Role Type
+                                </label>
+                                    <div className="d-flex align-items-center">
+                                    <select className= 'form-control mr-2' 
+                                                    value={formData.role} name="Update Employee Role" onChange={handleInputChange}>
+                                                      <option>Select Role Type</option>
+                                                        <option value="HRAdmin">HRAdmin</option>
+                                                        <option value="Employee">Employee</option>
+                                                    </select>
+                                      <button type="submit" className="btn btn-primary"  onClick={handleRoleUpdate}>
+                                      <i className="fas fa-pencil-alt"></i></button>
+                                    </div>
+                                  </div>
+                                </form>
                         </form>
                       </div>
                     </div>
@@ -310,3 +449,4 @@ function EmployeeProfile() {
 }
 
 export default EmployeeProfile;
+

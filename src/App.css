@@ -76,6 +76,13 @@
   margin: 5px 0;
   width: 10%;
 }
+.hr-change-Pass {
+  border: 0;
+  height: 1px;
+  background: #0275d8;
+  margin: 5px 0;
+  width: 70%;
+}
 
 
 

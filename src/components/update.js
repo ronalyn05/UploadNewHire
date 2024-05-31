@@ -249,17 +249,23 @@ const handleCloseAddModal = () => {
   setShowAddCompBenModal(false);
 };
   // Function to handle opening edit modal and set selected dependent
-  const handleShowEditModal = (dependent, compBen) => {
+  const handleShowEditModal = (dependent) => {
     // setShowEditModal(true);
     setSelectedDependent(dependent);
-    setSelectedCompBen(compBen);
   };
   // Function to handle closing edit modal
   const handleCloseEditModal = () => {
     // setShowEditModal(false);
     setSelectedDependent(null);
-    setSelectedCompBen(null);
   };
+    // Function to handle opening edit modal and set selected dependent
+    const handleShowEditCompBenModal = (compBen) => {
+      setSelectedCompBen(compBen);
+    };
+    // Function to handle closing edit modal
+    const handleCloseEditCompBenModal = () => {
+      setSelectedCompBen(null);
+    };
 //FETCHING ALL EMPLOYEE DATA EXCLUDING THE DEPENDENT RECORDS BASED ON EMPLOYEE ID
   const fetchEmployeeData = async () => {
     try {
@@ -1352,6 +1358,35 @@ const handleAddCompBen = async (e) => {
     alert('Failed to add compensation benefit. Please try again.');
   }
 };
+  // Function to handle compensation benefits form submission for update
+  const handleEditCompBenFormSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedCompBen || !selectedCompBen.CompBenId) return;
+      console.log(selectedCompBen);
+    try {
+      const response = await fetch(`http://localhost:5000/updateCompBen/${selectedCompBen.CompBenId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(selectedCompBen) // Send updated compensation benefits data
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update compensation benefits details');
+      }
+
+      const data = await response.json();
+      alert(data.message); // Display success message from backend
+      fetchCompBen();
+      handleCloseEditCompBenModal(); // Close modal after successful update
+       // Refresh compensation benefits data after update
+
+    } catch (error) {
+      console.error('Error updating compensation benefits details:', error);
+      alert('Failed to update compensation benefits details. Please try again later.');
+    }
+  };
   if (!employeeData) {
     return <div>Loading...</div>;
   }
@@ -1370,7 +1405,7 @@ const handleAddCompBen = async (e) => {
               <button
                 className="seeProfile btn btn-xs mr-2"
                 onClick={handleView} >
-                <i className="fas fa-eye"></i> See Profile
+                <i className="fas fa-eye"></i> View Profile
                </button>
                <div className="d-flex align-items-center">
                 <button
@@ -4376,10 +4411,10 @@ const handleAddCompBen = async (e) => {
                                   </Modal.Footer>
                               </Modal>
                               {/* Edit Compensation Benefit Modal */}
-                            <Modal show={!!selectedCompBen} onHide={handleCloseEditModal} dialogClassName="custom-modal">
+                            <Modal show={!!selectedCompBen} onHide={handleCloseEditCompBenModal} dialogClassName="custom-modal">
                               <Modal.Header>
                                 <Modal.Title>Update CompBen Records</Modal.Title>
-                                <Button variant="default" onClick={handleCloseEditModal}> X </Button>
+                                <Button variant="default" onClick={handleCloseEditCompBenModal}> X </Button>
                               </Modal.Header>
                               <Modal.Body>
                                       {/*  edit compensation benefits form*/}
@@ -4923,10 +4958,10 @@ const handleAddCompBen = async (e) => {
 
                                   </Modal.Body>
                                   <Modal.Footer>
-                                      <Button variant="secondary" onClick={handleCloseEditModal}>
+                                      <Button variant="secondary" onClick={handleCloseEditCompBenModal}>
                                           Close
                                       </Button>
-                                      <Button variant="primary" onClick={handleDependentFormSubmit}>
+                                      <Button variant="primary" onClick={handleEditCompBenFormSubmit}>
                                           Save Changes
                                       </Button>
                                   </Modal.Footer>
@@ -4981,7 +5016,7 @@ const handleAddCompBen = async (e) => {
                           filteredCompBen.map((compBen, index) => (
                             <tr key={index}>
                               <td>
-                              <button className="btn btn-xs btn-primary mr-2" onClick={() => handleShowEditModal(compBen)}>
+                              <button className="btn btn-xs btn-primary mr-2" onClick={() => handleShowEditCompBenModal(compBen)}>
                                               <i className="fas fa-pencil-alt"></i>
                                             </button>
                                 {/* <button className="btn btn-xs btn-primary mr-2" onClick={handleShowEditModal}>

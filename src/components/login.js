@@ -151,7 +151,7 @@ function LoginPage() {
                 <hr />
                 <div className="text-center">
                   <Link className="small" to="/changePassword">
-                    Change Password!
+                    Forgot Password?
                   </Link>
                 </div>
                 {errorMessage && (

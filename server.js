@@ -306,6 +306,42 @@ app.get('/retrieve/:employeeId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+// Update password endpoint
+app.post('/update/password/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  const { Password } = req.body;
+
+  try {
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(Password, 10);
+
+    // Perform the update operation in your database
+    await dbOperation.updateEmployeePassword(employeeId, hashedPassword);
+
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Error updating password:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Update role type endpoint
+app.post('/update/role/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  const { Role } = req.body;
+  try {
+    // Perform the update operation in your database here
+    await dbOperation.updateEmployeeRole(employeeId, Role);
+    // Assuming updateEmployeeRole doesn't return the updated data, you can send a success response
+    res.json({ message: 'Role updated successfully' });
+  } catch (error) {
+    console.error('Error updating role:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
 // Endpoint to update employee by ID
 app.put('/updateEmployee/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
@@ -579,6 +615,24 @@ app.get('/retrieve/compBen/:employeeId', async (req, res) => {
   } catch (error) {
     console.error('Error fetching compensation benefits:', error);
     res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+});
+// Endpoint to update compensation benefits details by CompBenId
+app.put('/updateCompBen/:compBenId', async (req, res) => {
+  const { compBenId } = req.params;
+  const updatedcompBenData = req.body;
+
+  try {
+    const result = await dbOperation.updateCompBenById(compBenId, updatedcompBenData);
+
+    if (!result) {
+      return res.status(404).json({ message: 'Compensation benefit details not found' });
+    }
+
+    res.json({ message: 'Compensation benefit details updated successfully' });
+  } catch (error) {
+    console.error('Error updating compensation benefit:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
