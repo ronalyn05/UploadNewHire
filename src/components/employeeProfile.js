@@ -78,6 +78,7 @@ function EmployeeProfile() {
 //function to reset the employee password
   const handlePasswordUpdate = async (e) => {
     e.preventDefault();
+    console.log(this);
   console.log(employeeId);
     try {
       const response = await fetch(`http://localhost:5000/update/password/${employeeId}`, {

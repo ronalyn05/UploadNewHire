@@ -333,7 +333,7 @@ app.post('/update/role/:employeeId', async (req, res) => {
   try {
     // Perform the update operation in your database here
     await dbOperation.updateEmployeeRole(employeeId, Role);
-    // Assuming updateEmployeeRole doesn't return the updated data, you can send a success response
+    // updateEmployeeRole doesn't return the updated data, you can send a success response
     res.json({ message: 'Role updated successfully' });
   } catch (error) {
     console.error('Error updating role:', error);
@@ -370,6 +370,21 @@ app.put('/updateEmployeeInfo/:employeeId', async (req, res) => {
   } catch (error) {
     console.error('Error updating employee information:', error);
     res.status(500).json({ message: 'Internal server error' });
+  }
+});
+// API endpoint for adding records to the History table
+app.post('/addToHistory', async (req, res) => {
+  const historyData = req.body;
+
+  try {
+      // Insert the record into the History table
+      const result = await dbOperation.addToHistory(historyData);
+
+      // Respond with success message
+      res.status(201).json({ message: 'Record added to History successfully' });
+  } catch (error) {
+      console.error('Error adding record to History:', error);
+      res.status(500).json({ message: 'Failed to add record to History' });
   }
 });
 //api endpoint for updating employee address by id

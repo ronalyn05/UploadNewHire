@@ -46,8 +46,25 @@ import 'jspdf-autotable';
     Is_Emergency: false,
     Is_Permanent: false,
     ProfilePhoto: "/img/user.png",
-    EmploymentStatus: '0'
+    HRANType: ''
   });
+      // Define initialOptions first
+  const initialOptions = [
+        'Re - Hire',
+        'Recall',
+        'Resignation',
+        'Change of Position Title',
+        'Salary Adjustment',
+        'Transfer',
+        'Force Leave',
+        'End of Contract',
+        'Extension of Fixed Term',
+        'Revert Developmental',
+        'Developmental Assignment',
+        'Others'
+  ];
+  const [otherHRANType, setOtherHRANType] = useState('');
+  const [options, setOptions] = useState(initialOptions);
   const [initialEmployeeData, setInitialEmployeeData] = useState({});
   const [dependents, setDependents] = useState([]);
   const [selectedDependent, setSelectedDependent] = useState(null);
@@ -338,8 +355,28 @@ const handleInputChange = (e) => {
       ...employeeData,
       [name]: newValue
     });
+
+      // Reset otherHRANType if it's not the "Others" option
+      if (name === 'HRANType' && value !== 'Others') {
+        setOtherHRANType('');
+    }
   };
 
+  //function to handle the additional input for hran type
+  const handleOtherInputChange = (event) => {
+    setOtherHRANType(event.target.value);
+};
+
+const addOtherHRANType = () => {
+    if (otherHRANType && !options.includes(otherHRANType)) {
+        setOptions([...options, otherHRANType]);
+        setEmployeeData({ ...employeeData, HRANType: otherHRANType });
+        setOtherHRANType('');
+    }
+};
+
+
+  
 // Handle form submission for adding new contact
 const handleAddContactForm = async (e) => {
   e.preventDefault();
@@ -423,58 +460,156 @@ const handleAddContactForm = async (e) => {
         alert('Failed to update employee personal details. Please try again later.');
       }
   };
-  //UPDATE EMPLOYEE INFORMATION
-    const handleFormEmpInfoSubmit = async (e) => {
-        e.preventDefault(); // Prevent the default form submission
-        
-        try {
+   //UPDATE EMPLOYEE INFORMATION
+// Define a variable to store the previous position
+let previousPosition = '';
+
+// Function to handle form submission
+const handleFormEmpInfoSubmit = async (e) => {
+    e.preventDefault(); // Prevent the default form submission
+    
+    try {
+        // Fetch call to update employee information
         const response = await fetch(`http://localhost:5000/updateEmployeeInfo/${employeeId}`, {
             method: 'PUT',
             headers: {
-            'Content-Type': 'application/json'
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(employeeData)
         });
-    
+
         if (!response.ok) {
             throw new Error('Failed to update employee');
         }
-    
-    // Retrieve the name of the employee from employeeData
-    const { FirstName, LastName } = employeeData;
-    const employeeName = `${FirstName} ${LastName}`;
 
-    // Compare initial employeeData with updated employeeData
-    const updatedFields = [];
-    Object.entries(employeeData).forEach(([key, value]) => {
-      if (value !== initialEmployeeData[key]) {
-        updatedFields.push(key);
-      }
-    });
+        // Retrieve the name of the employee from employeeData
+        const { FirstName, LastName } = employeeData;
+        const employeeName = `${FirstName} ${LastName}`;
 
-    // Filter out fields that contain EmployeeName, FirstName, MiddleName, LastName
-    const filteredFields = updatedFields.filter(field => !['EmployeeName', 'FirstName', 'MiddleName', 'LastName'].includes(field));
+        // Compare initial employeeData with updated employeeData
+        const updatedFields = [];
+        Object.entries(employeeData).forEach(([key, value]) => {
+            if (value !== initialEmployeeData[key]) {
+                updatedFields.push(key);
+            }
+        });
 
-    // Generate success message based on updated fields
-    let successMessage;
-    if (filteredFields.length === 0) {
-      successMessage = `No employee information has been updated for ${employeeName}.`;
-    } else {
-      successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
-    }
-  
-      // Display the success message
-      alert(successMessage);
+        // Filter out fields that contain EmployeeName, FirstName, MiddleName, LastName
+        const filteredFields = updatedFields.filter(field => !['EmployeeName', 'FirstName', 'MiddleName', 'LastName'].includes(field));
 
-       // Reload the page after showing the alert
-       window.location.reload();
+        // Generate success message based on updated fields
+        let successMessage;
+        if (filteredFields.length === 0) {
+            successMessage = `No employee information has been updated for ${employeeName}.`;
+        } else {
+            successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
+        }
 
-      } catch (error) {
+        // Retrieve user's role and first name from session storage
+        const updatedBy = {
+            Role: sessionStorage.getItem('role'),
+            FirstName: sessionStorage.getItem('firstName')
+        };
+
+        // Get the chosen HRANType from the employeeData
+        const chosenHRANType = employeeData.HRANType;
+
+        // Insert into History table
+        const historyData = {
+            EmployeeName: employeeName,
+            Action: chosenHRANType, // Use the chosen HRANType as Action
+            OldValue: previousPosition, // Use the previous position as OldValue
+            NewValue: JSON.stringify(employeeData),
+            DateCreated: new Date().toISOString(),
+            UpdatedBy: updatedBy,
+            EmployeeId: employeeId
+        };
+
+        const historyResponse = await fetch('http://localhost:5000/addToHistory', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(historyData)
+        });
+
+        if (!historyResponse.ok) {
+            throw new Error('Failed to add record to History');
+        }
+
+        // Display the success message
+        alert(successMessage);
+
+        // Reload the page after showing the alert
+        window.location.reload();
+
+    } catch (error) {
         console.error('Error updating employee information:', error);
         // Send alert message for failure
         alert('Failed to update employee information. Please try again later.');
-      }
-    };
+    }
+};
+
+// Function to handle input change for Position
+const handlePositionChange = (e) => {
+    // Update previousPosition when the position changes
+    previousPosition = employeeData.Position;
+    // Call the generic handleInputChange function
+    handleInputChange(e);
+};
+
+
+    //   const handleFormEmpInfoSubmit = async (e) => {
+    //       e.preventDefault(); // Prevent the default form submission
+          
+    //       try {
+    //       const response = await fetch(`http://localhost:5000/updateEmployeeInfo/${employeeId}`, {
+    //           method: 'PUT',
+    //           headers: {
+    //           'Content-Type': 'application/json'
+    //           },
+    //           body: JSON.stringify(employeeData)
+    //       });
+      
+    //       if (!response.ok) {
+    //           throw new Error('Failed to update employee');
+    //       }
+      
+    //   // Retrieve the name of the employee from employeeData
+    //   const { FirstName, LastName } = employeeData;
+    //   const employeeName = `${FirstName} ${LastName}`;
+
+    //   // Compare initial employeeData with updated employeeData
+    //   const updatedFields = [];
+    //   Object.entries(employeeData).forEach(([key, value]) => {
+    //     if (value !== initialEmployeeData[key]) {
+    //       updatedFields.push(key);
+    //     }
+    //   });
+
+    //   // Filter out fields that contain EmployeeName, FirstName, MiddleName, LastName
+    //   const filteredFields = updatedFields.filter(field => !['EmployeeName', 'FirstName', 'MiddleName', 'LastName'].includes(field));
+
+    //   // Generate success message based on updated fields
+    //   let successMessage;
+    //   if (filteredFields.length === 0) {
+    //     successMessage = `No employee information has been updated for ${employeeName}.`;
+    //   } else {
+    //     successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
+    //   }
+    
+    //     // Display the success message
+    //     alert(successMessage);
+
+    //     // Reload the page after showing the alert
+    //     window.location.reload();
+
+    //     } catch (error) {
+    //       console.error('Error updating employee information:', error);
+    //       // Send alert message for failure
+    //       alert('Failed to update employee information. Please try again later.');
+    //     }
+    //   };
       //UPDATE ADDRESS DETAILS
     const handleAddressFormSubmit = async (e) => {
         e.preventDefault(); // Prevent the default form submission
@@ -1465,6 +1600,9 @@ const handleAddCompBen = async (e) => {
                       <li className="nav-item">
                           <a className="nav-link " id="compBen-tab" data-toggle="tab" href="#compBen" role="tab" aria-controls="compBen" aria-selected="false">CompBen</a>
                       </li>
+                      <li className='nav-item'>
+                        <a className='nav-link' id='history-tab' data-toggle='tab' href='#history' role='tab' aria-controls='history' aria-selected='false'>History</a>                       
+                      </li>
                   </ul>
                   </div>
                  <br/>
@@ -1704,11 +1842,19 @@ const handleAddCompBen = async (e) => {
                                             <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="position">Position</label>
-                                              {/* <input type="text" className="form-control" value={employeeData.Position} placeholder="enter tito type" name="TitoType" onChange={handleInputChange} /> */}
-                                              <select className='form-control' 
+                                              {/* <select className='form-control' 
                                                       value={employeeData.Position} 
                                                       name="Position" 
-                                                      onChange={handleInputChange}>
+                                                      onChange={handleInputChange}> */}
+                                                      <select 
+                                                        className='form-control' 
+                                                        value={employeeData.Position} 
+                                                        name="Position" 
+                                                        onChange={(e) => { 
+                                                            handlePositionChange(e); 
+                                                            handleInputChange(e); 
+                                                        }}
+                                                      >
                                                   <option value="Associate">Associate</option>
                                                   <option value="Lead Associate">Lead Associate</option>
                                                   <option value="VP-Country Head, Philippines">VP-Country Head, Philippines</option>
@@ -3243,11 +3389,35 @@ const handleAddCompBen = async (e) => {
                                   <h5 className='text-primary'>Section 4</h5>
                                   <hr className="hr-cobalt-blue"/>
                                 <br/>
-                                <div className="row justify-content-center">
-                                            <div className="col-md-4">
-                                              <div className="form-group">
-                                              <label htmlFor="HRANType">HRAN Type</label>
-                                              <input type="text" className="form-control" value={employeeData.HRANType} placeholder="enter HRAN Type" name="HRANTYPE" onChange={handleInputChange} />     
+                                  <div className="row justify-content-center">
+                                              <div className="col-md-4">
+                                                <div className="form-group">
+                                                <label htmlFor="HRANType">HRAN Type</label>
+                                                            <select
+                                                                className="form-control"
+                                                                value={employeeData.HRANType}
+                                                                name="HRANType"
+                                                                onChange={handleInputChange}
+                                                            >
+                                                                {options.map((option, index) => (
+                                                                    <option key={index} value={option}>
+                                                                        {option}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                            <br />
+                                                            {employeeData.HRANType === 'Others' && (
+                                                                <div className="d-flex align-items-center">
+                                                                  <input
+                                                                      type="text"
+                                                                      className="form-control mr-2"
+                                                                      placeholder="Please specify"
+                                                                      value={otherHRANType}
+                                                                      onChange={handleOtherInputChange}
+                                                                  />
+                                                                     <button type="button" className="btn btn-primary" onClick={addOtherHRANType}>Add</button>
+                                                                </div>
+                                                            )}
                                               </div>
                                             </div>
                                             <div className="col-md-4">
@@ -5071,6 +5241,54 @@ const handleAddCompBen = async (e) => {
                         {/* </div> */}
                         {/* </div>  */}
                       <br/>
+                      </div>
+                      <div className='tab-pane fade' id='history' role='tabpanel' aria-labelledby='history-tab'>
+                         {/* Dependent Table */}
+                         <div className='card-body'>
+                                {/* <div className="card-body"> */}
+                                  <div className="table-responsive">
+                                    <table className="table">
+                                      <thead>
+                                        <tr>
+                                        <th scope="col">Employee ID</th>
+                                        <th scope="col">Employee Name</th>
+                                        <th scope="col">Action</th>
+                                        <th scope="col">Old</th>
+                                        <th scope="col">New</th>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">Updated By</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                        {filteredCompBen.length > 0 ? (
+                          filteredCompBen.map((compBen, index) => (
+                            <tr key={index}>
+                              {/* <td> */}
+                              {/* <button className="btn btn-xs btn-primary mr-2" onClick={() => handleShowEditCompBenModal(compBen)}>
+                                              <i className="fas fa-pencil-alt"></i>
+                                            </button> */}
+                                {/* <button className="btn btn-xs btn-primary mr-2" onClick={handleShowEditModal}>
+                                  <i className="fas fa-pencil-alt"></i>Edit
+                                </button> */}
+                                {/* </td> */}
+                                <td>{compBen.Salary}</td>
+                                <td>{compBen.DailyEquivalent}</td>
+                                <td>{compBen.MonthlyEquivalent}</td>
+                                <td>{compBen.AnnualEquivalent}</td>
+                                <td>{compBen.RiceMonthly}</td>
+                                <td>{compBen.RiceAnnual}</td>
+                                <td>{compBen.RiceDifferentialAnnual}</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan="19">No compensation benefit data yet.</td>
+                          </tr>
+                        )}
+                      </tbody>
+                                    </table>
+                                  </div>
+                           </div>
                       </div>
                   </div>
                   

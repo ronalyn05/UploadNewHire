@@ -830,6 +830,29 @@ const updateEmployeeInfoById = async (employeeId, updatedEmployeeData) => {
     throw error;
   }
 };
+// SQL query to insert a record into the History table
+const addToHistory = async (historyData) => {
+  try {
+      let pool = await sql.connect(config);
+      let result = await pool.request()
+          .input('EmployeeName', sql.VarChar(100), historyData.EmployeeName)
+          .input('Action', sql.VarChar(100), historyData.Action)
+          .input('OldValue', sql.VarChar(100), historyData.OldValue)
+          .input('NewValue', sql.VarChar(100), historyData.NewValue)
+          .input('DateCreated', sql.DateTime, historyData.DateCreated)
+          .input('UpdatedBy', sql.VarChar(100), historyData.UpdatedBy)
+          .input('EmployeeId', sql.VarChar(100), historyData.EmployeeId)
+          .query(`
+              INSERT INTO History (EmployeeName, Action, OldValue, NewValue, DateCreated, UpdatedBy, EmployeeId)
+              VALUES (@EmployeeName, @Action, @OldValue, @NewValue, @DateCreated, @UpdatedBy, @EmployeeId)
+          `);
+      
+      return result;
+  } catch (error) {
+      console.error('Error adding record to History:', error);
+      throw error;
+  }
+};
 //update employee address by id
 const updateEmployeeAddressById = async (employeeId, updatedEmployeeData) => {
   try {
@@ -1721,5 +1744,6 @@ module.exports = {
   getCompBenByEmployeeId,
   updateCompBenById,
   updateEmployeePassword,
-  updateEmployeeRole
+  updateEmployeeRole,
+  addToHistory
 };
