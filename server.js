@@ -357,24 +357,33 @@ app.put('/updateEmployee/:employeeId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-//api endpoint for updating employee information by id
+// API endpoint for updating employee information by id
 app.put('/updateEmployeeInfo/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
   const updatedEmployeeData = req.body;
+
+  // Validate HRANType is chosen
+  if (!updatedEmployeeData.HRANType) {
+      return res.status(400).json({ message: 'HRANType is required when updating the employee information.' });
+  }
+
   try {
-    const result = await dbOperation.updateEmployeeInfoById(employeeId, updatedEmployeeData);
-    if (!result) {
-      return res.status(404).json({ message: 'Employee information not found' });
-    }
-    res.json({ message: 'Employee information updated successfully' });
+      const result = await dbOperation.updateEmployeeInfoById(employeeId, updatedEmployeeData);
+      if (!result) {
+          return res.status(404).json({ message: 'Employee information not found' });
+      }
+      res.json({ message: 'Employee information updated successfully' });
   } catch (error) {
-    console.error('Error updating employee information:', error);
-    res.status(500).json({ message: 'Internal server error' });
+      console.error('Error updating employee information:', error);
+      res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 // API endpoint for adding records to the History table
 app.post('/addToHistory', async (req, res) => {
   const historyData = req.body;
+
+  console.log('Received historyData:', historyData); // Debugging statement
 
   try {
       // Insert the record into the History table
@@ -387,6 +396,37 @@ app.post('/addToHistory', async (req, res) => {
       res.status(500).json({ message: 'Failed to add record to History' });
   }
 });
+// API endpoint for getting current employee information by ID
+app.get('/getEmployeeInfo/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  try {
+    const employeeData = await dbOperation.getEmployeeInfoById(employeeId);
+    if (!employeeData) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+    res.json(employeeData);
+  } catch (error) {
+    console.error('Error fetching employee information:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+// //api endpoint for updating employee information by id
+// app.put('/updateEmployeeInfo/:employeeId', async (req, res) => {
+//   const { employeeId } = req.params;
+//   const updatedEmployeeData = req.body;
+//   try {
+//     const result = await dbOperation.updateEmployeeInfoById(employeeId, updatedEmployeeData);
+//     if (!result) {
+//       return res.status(404).json({ message: 'Employee information not found' });
+//     }
+//     res.json({ message: 'Employee information updated successfully' });
+//   } catch (error) {
+//     console.error('Error updating employee information:', error);
+//     res.status(500).json({ message: 'Internal server error' });
+//   }
+// });
 //api endpoint for updating employee address by id
 app.put('/updateEmployeeAddress/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
@@ -650,6 +690,29 @@ app.put('/updateCompBen/:compBenId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+// Endpoint to retrieve history by Employee ID
+app.get('/retrieve/history/:employeeId', async (req, res) => {
+  // Retrieve employeeId from request parameters
+  const { employeeId } = req.params;
+
+  // Check if employeeId is provided
+  if (!employeeId) {
+    return res.status(400).json({ message: 'Employee ID is required' });
+  }
+
+  try {
+    // Fetch history data from the database based on the employee ID
+    const history = await dbOperation.getHistoryByEmployeeId(employeeId);
+    if (history.length === 0) {
+      return res.status(404).json({ message: 'No history found for the given Employee ID' });
+    }
+    res.json(history);
+  } catch (error) {
+    console.error('Error fetching history:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 
 
 // Start the server

@@ -107,8 +107,9 @@ import 'jspdf-autotable';
     Stat_TINNumber: ''
   });
   const [filteredCompBen, setFilteredCompBen] = useState([]);
+  const [filteredHistory, setFilteredHistory] = useState([]);
   const [errors, setErrors] = useState({});
-  const [compBen, setCompBen] = useState([]);
+  // const [compBen, setCompBen] = useState([]);
   const [selectedCompBen, setSelectedCompBen] = useState(null);
 
     // Function to handle input change in the search field
@@ -171,7 +172,24 @@ const fetchCompBen = async () => {
     console.error('Error fetching compensation benefits details:', error);
   }
 };
-
+// Define the History function
+const fetchHistory = async () => {
+  console.log(employeeId);
+  try {
+    const response = await fetch(`http://localhost:5000/retrieve/history/${employeeId}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch history details: ${response.statusText}`);
+    }
+    const data = await response.json();
+    setFilteredHistory(data); // Update the state with fetched data
+  } catch (error) {
+    console.error('Error fetching history details:', error);
+    // Handle error if needed
+  }
+};
+useEffect(() => {
+  fetchHistory();
+}, [employeeId]);
 
 // Call fetchDependents whenever employeeId changes
 useEffect(() => {
@@ -375,8 +393,6 @@ const addOtherHRANType = () => {
     }
 };
 
-
-  
 // Handle form submission for adding new contact
 const handleAddContactForm = async (e) => {
   e.preventDefault();
@@ -461,102 +477,214 @@ const handleAddContactForm = async (e) => {
       }
   };
    //UPDATE EMPLOYEE INFORMATION
-// Define a variable to store the previous position
-let previousPosition = '';
-
 // Function to handle form submission
 const handleFormEmpInfoSubmit = async (e) => {
-    e.preventDefault(); // Prevent the default form submission
-    
-    try {
-        // Fetch call to update employee information
-        const response = await fetch(`http://localhost:5000/updateEmployeeInfo/${employeeId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(employeeData)
-        });
+  e.preventDefault(); // Prevent the default form submission
 
-        if (!response.ok) {
-            throw new Error('Failed to update employee');
-        }
+  // Validate HRANType is chosen
+  if (!employeeData.HRANType) {
+    alert('Please choose an HRANType before updating the employee information.');
+    return;
+  }
 
-        // Retrieve the name of the employee from employeeData
-        const { FirstName, LastName } = employeeData;
-        const employeeName = `${FirstName} ${LastName}`;
-
-        // Compare initial employeeData with updated employeeData
-        const updatedFields = [];
-        Object.entries(employeeData).forEach(([key, value]) => {
-            if (value !== initialEmployeeData[key]) {
-                updatedFields.push(key);
-            }
-        });
-
-        // Filter out fields that contain EmployeeName, FirstName, MiddleName, LastName
-        const filteredFields = updatedFields.filter(field => !['EmployeeName', 'FirstName', 'MiddleName', 'LastName'].includes(field));
-
-        // Generate success message based on updated fields
-        let successMessage;
-        if (filteredFields.length === 0) {
-            successMessage = `No employee information has been updated for ${employeeName}.`;
-        } else {
-            successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
-        }
-
-        // Retrieve user's role and first name from session storage
-        const updatedBy = {
-            Role: sessionStorage.getItem('role'),
-            FirstName: sessionStorage.getItem('firstName')
-        };
-
-        // Get the chosen HRANType from the employeeData
-        const chosenHRANType = employeeData.HRANType;
-
-        // Insert into History table
-        const historyData = {
-            EmployeeName: employeeName,
-            Action: chosenHRANType, // Use the chosen HRANType as Action
-            OldValue: previousPosition, // Use the previous position as OldValue
-            NewValue: JSON.stringify(employeeData),
-            DateCreated: new Date().toISOString(),
-            UpdatedBy: updatedBy,
-            EmployeeId: employeeId
-        };
-
-        const historyResponse = await fetch('http://localhost:5000/addToHistory', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(historyData)
-        });
-
-        if (!historyResponse.ok) {
-            throw new Error('Failed to add record to History');
-        }
-
-        // Display the success message
-        alert(successMessage);
-
-        // Reload the page after showing the alert
-        window.location.reload();
-
-    } catch (error) {
-        console.error('Error updating employee information:', error);
-        // Send alert message for failure
-        alert('Failed to update employee information. Please try again later.');
+  try {
+    // Fetch the current employee data
+    const currentDataResponse = await fetch(`http://localhost:5000/getEmployeeInfo/${employeeId}`);
+    if (!currentDataResponse.ok) {
+      throw new Error('Failed to fetch current employee data');
     }
+    const currentData = await currentDataResponse.json();
+
+    // Store previous values for the fields being updated
+    const previousValues = {
+      Position: currentData.Position,
+      // Add other fields as needed
+    };
+
+    // Fetch call to update employee information
+    const response = await fetch(`http://localhost:5000/updateEmployeeInfo/${employeeId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(employeeData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update employee');
+    }
+
+    // Retrieve the name of the employee from employeeData
+    const { FirstName, LastName } = employeeData;
+    const employeeName = `${FirstName} ${LastName}`;
+
+    // Compare initial employeeData with updated employeeData
+    const updatedFields = [];
+    Object.entries(employeeData).forEach(([key, value]) => {
+      if (value !== initialEmployeeData[key]) {
+        updatedFields.push(key);
+      }
+    });
+
+    // Filter out fields that contain EmployeeName, FirstName, MiddleName, LastName
+    const filteredFields = updatedFields.filter(
+      (field) => !['EmployeeName', 'FirstName', 'MiddleName', 'LastName'].includes(field)
+    );
+
+    // Generate success message based on updated fields
+    let successMessage;
+    if (filteredFields.length === 0) {
+      successMessage = `No employee information has been updated for ${employeeName}.`;
+    } else {
+      successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
+    }
+
+    // Retrieve user's first name from session storage
+    const updatedByFirstName = sessionStorage.getItem('firstName');
+    const updatedByLastName = sessionStorage.getItem('lastName');
+    const updatedByRole = sessionStorage.getItem('role');
+    const updatedBy = `${updatedByRole} ${updatedByFirstName} ${updatedByLastName}`;
+
+    // Get the chosen HRANType from the employeeData
+    const chosenHRANType = employeeData.HRANType;
+
+    // Insert into History table
+    const historyData = {
+      EmployeeName: employeeName,
+      Action: 'Update',
+      FieldName: chosenHRANType,
+      OldValue: previousValues.Position, // Use the previous position value
+      NewValue: employeeData.Position,
+      DateCreated: new Date().toISOString(),
+      UpdatedBy: updatedBy,
+      EmployeeId: employeeId,
+    };
+
+    const historyResponse = await fetch('http://localhost:5000/addToHistory', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(historyData),
+    });
+
+    if (!historyResponse.ok) {
+      throw new Error('Failed to add record to History');
+    }
+
+    // Display the success message
+    alert(successMessage);
+
+    // Reload the page after showing the alert
+    window.location.reload();
+  } catch (error) {
+    console.error('Error updating employee information:', error);
+    // Send alert message for failure
+    alert('Failed to update employee information. Please try again later.');
+  }
 };
+
+  // const handleFormEmpInfoSubmit = async (e) => {
+  //   e.preventDefault(); // Prevent the default form submission
+
+  //   // Validate HRANType is chosen
+  //   if (!employeeData.HRANType) {
+  //       alert('Please choose an HRANType before updating the employee information.');
+  //       return;
+  //   }
+
+  //   try {
+  //       // Fetch call to update employee information
+  //       const response = await fetch(`http://localhost:5000/updateEmployeeInfo/${employeeId}`, {
+  //           method: 'PUT',
+  //           headers: {
+  //               'Content-Type': 'application/json'
+  //           },
+  //           body: JSON.stringify(employeeData)
+  //       });
+
+  //       if (!response.ok) {
+  //           throw new Error('Failed to update employee');
+  //       }
+
+  //       // Retrieve the name of the employee from employeeData
+  //       const { FirstName, LastName } = employeeData;
+  //       const employeeName = `${FirstName} ${LastName}`;
+
+  //       // Compare initial employeeData with updated employeeData
+  //       const updatedFields = [];
+  //       Object.entries(employeeData).forEach(([key, value]) => {
+  //           if (value !== initialEmployeeData[key]) {
+  //               updatedFields.push(key);
+  //           }
+  //       });
+
+  //       // Filter out fields that contain EmployeeName, FirstName, MiddleName, LastName
+  //       const filteredFields = updatedFields.filter(field => !['EmployeeName', 'FirstName', 'MiddleName', 'LastName'].includes(field));
+
+  //       // Generate success message based on updated fields
+  //       let successMessage;
+  //       if (filteredFields.length === 0) {
+  //           successMessage = `No employee information has been updated for ${employeeName}.`;
+  //       } else {
+  //           successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
+  //       }
+
+  //       // Retrieve user's role and first name from session storage
+  //       // const updatedBy = {
+  //       //     Role: sessionStorage.getItem('role'),
+  //       //     FirstName: sessionStorage.getItem('firstName')
+  //       // };
+
+  //       // Get the chosen HRANType from the employeeData
+  //       const chosenHRANType = employeeData.HRANType;
+
+  //       // Insert into History table
+  //       const historyData = {
+  //           EmployeeName: employeeName,
+  //           Action: 'Update', 
+  //           FieldName: chosenHRANType,
+  //           OldValue: previousPosition, 
+  //           NewValue: employeeData.Position,
+  //           DateCreated: new Date().toISOString(),
+  //           UpdatedBy: 'Hr Admin' + '' + sessionStorage.getItem('firstName'), 
+  //           EmployeeId: employeeId
+  //       };
+
+  //       const historyResponse = await fetch('http://localhost:5000/addToHistory', {
+  //           method: 'POST',
+  //           headers: {
+  //               'Content-Type': 'application/json'
+  //           },
+  //           body: JSON.stringify(historyData)
+  //       });
+
+  //       if (!historyResponse.ok) {
+  //           throw new Error('Failed to add record to History');
+  //       }
+
+  //       // Display the success message
+  //       alert(successMessage);
+
+  //       // Reload the page after showing the alert
+  //       window.location.reload();
+
+  //   } catch (error) {
+  //       console.error('Error updating employee information:', error);
+  //       // Send alert message for failure
+  //       alert('Failed to update employee information. Please try again later.');
+  //   }
+  // };
+
+
 
 // Function to handle input change for Position
-const handlePositionChange = (e) => {
-    // Update previousPosition when the position changes
-    previousPosition = employeeData.Position;
-    // Call the generic handleInputChange function
-    handleInputChange(e);
-};
+// const handlePositionChange = (e) => {
+//     // Update previousPosition when the position changes
+//     previousPosition = employeeData.Position;
+//     // Call the generic handleInputChange function
+//     handleInputChange(e);
+// };
 
 
     //   const handleFormEmpInfoSubmit = async (e) => {
@@ -752,12 +880,9 @@ const handlePositionChange = (e) => {
     } else {
       successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
     }
-
-          // Display the success message
-          alert(successMessage);
+        // Display the success message
+        alert(successMessage);
       
-        //   // Navigate to report.js
-        //   navigate("/reports");
          // Reload the page after showing the alert
         window.location.reload();
 
@@ -856,7 +981,6 @@ const handlePositionChange = (e) => {
               successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
             }
         
-          
               // Display the success message
               alert(successMessage);
         
@@ -907,8 +1031,6 @@ const handlePositionChange = (e) => {
             } else {
               successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
             }
-        
-          
               // Display the success message
               alert(successMessage);
         
@@ -1026,7 +1148,6 @@ const handlePositionChange = (e) => {
               successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
             }
         
-          
               // Display the success message
               alert(successMessage);
 
@@ -1042,10 +1163,6 @@ const handlePositionChange = (e) => {
   const handleECFormSubmit = async (e) => {
     e.preventDefault();
     try {
-      //to be removed
-      console.log(this);
-  // console.log(employeeData.AddressID);
-
       const response = await fetch(`http://localhost:5000/updateEmerContact/${employeeId}`, {
         method: 'PUT',
         headers: {
@@ -1522,6 +1639,17 @@ const handleAddCompBen = async (e) => {
       alert('Failed to update compensation benefits details. Please try again later.');
     }
   };
+// Function to format text into sentence case
+const toSentenceCase = (text) => {
+  if (!text) return ''; // Handle null or undefined input
+  return text
+    .toLowerCase() // Convert the text to lowercase first
+    .split(' ') // Split the text into an array of words
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+    .join(' '); // Join the words back together
+};
+
+
   if (!employeeData) {
     return <div>Loading...</div>;
   }
@@ -1842,18 +1970,11 @@ const handleAddCompBen = async (e) => {
                                             <div className="col-md-4">
                                               <div className="form-group">
                                               <label htmlFor="position">Position</label>
-                                              {/* <select className='form-control' 
-                                                      value={employeeData.Position} 
-                                                      name="Position" 
-                                                      onChange={handleInputChange}> */}
                                                       <select 
                                                         className='form-control' 
                                                         value={employeeData.Position} 
                                                         name="Position" 
-                                                        onChange={(e) => { 
-                                                            handlePositionChange(e); 
-                                                            handleInputChange(e); 
-                                                        }}
+                                                        onChange={handleInputChange}
                                                       >
                                                   <option value="Associate">Associate</option>
                                                   <option value="Lead Associate">Lead Associate</option>
@@ -1968,7 +2089,6 @@ const handleAddCompBen = async (e) => {
                                               </div>
                                             </div>
                                 </div>
-                                
                                 <hr/>
                                   <h5 className='text-primary'>Section 2</h5>
                                   <hr className="hr-cobalt-blue"/>
@@ -5243,52 +5363,45 @@ const handleAddCompBen = async (e) => {
                       <br/>
                       </div>
                       <div className='tab-pane fade' id='history' role='tabpanel' aria-labelledby='history-tab'>
-                         {/* Dependent Table */}
+                         {/* History Table */}
                          <div className='card-body'>
-                                {/* <div className="card-body"> */}
-                                  <div className="table-responsive">
-                                    <table className="table">
-                                      <thead>
-                                        <tr>
-                                        <th scope="col">Employee ID</th>
-                                        <th scope="col">Employee Name</th>
-                                        <th scope="col">Action</th>
-                                        <th scope="col">Old</th>
-                                        <th scope="col">New</th>
-                                        <th scope="col">Date</th>
-                                        <th scope="col">Updated By</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                        {filteredCompBen.length > 0 ? (
-                          filteredCompBen.map((compBen, index) => (
-                            <tr key={index}>
-                              {/* <td> */}
-                              {/* <button className="btn btn-xs btn-primary mr-2" onClick={() => handleShowEditCompBenModal(compBen)}>
-                                              <i className="fas fa-pencil-alt"></i>
-                                            </button> */}
-                                {/* <button className="btn btn-xs btn-primary mr-2" onClick={handleShowEditModal}>
-                                  <i className="fas fa-pencil-alt"></i>Edit
-                                </button> */}
-                                {/* </td> */}
-                                <td>{compBen.Salary}</td>
-                                <td>{compBen.DailyEquivalent}</td>
-                                <td>{compBen.MonthlyEquivalent}</td>
-                                <td>{compBen.AnnualEquivalent}</td>
-                                <td>{compBen.RiceMonthly}</td>
-                                <td>{compBen.RiceAnnual}</td>
-                                <td>{compBen.RiceDifferentialAnnual}</td>
-                            </tr>
-                          ))
-                        ) : (
-                          <tr>
-                            <td colSpan="19">No compensation benefit data yet.</td>
-                          </tr>
-                        )}
-                      </tbody>
-                                    </table>
-                                  </div>
-                           </div>
+                          <div className="table-responsive">
+                            <table className="table">
+                              <thead>
+                                <tr>
+                                  <th scope="col">Employee ID</th>
+                                  <th scope="col">Employee Name</th>
+                                  <th scope="col">Field Name</th>
+                                  <th scope="col">Action</th>
+                                  <th scope="col">Old</th>
+                                  <th scope="col">New</th>
+                                  <th scope="col">Date Created</th>
+                                  <th scope="col">Updated By</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {filteredHistory.length > 0 ? (
+                                  filteredHistory.map((history, index) => (
+                                    <tr key={index}>
+                                    <td>{history.EmployeeId}</td>
+                                    <td>{toSentenceCase(history.EmployeeName)}</td>
+                                    <td>{toSentenceCase(history.FieldName)}</td>
+                                    <td>{toSentenceCase(history.Action)}</td>
+                                    <td>{history.OldValue}</td>
+                                    <td>{history.NewValue}</td>
+                                    <td>{history.DateCreated}</td>
+                                    <td>{toSentenceCase(history.UpdatedBy)}</td>
+                                    </tr>
+                                  ))
+                                ) : (
+                                  <tr>
+                                    <td colSpan="8">No history data available.</td>
+                                  </tr>
+                                )}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
                       </div>
                   </div>
                   

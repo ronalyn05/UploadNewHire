@@ -837,22 +837,40 @@ const addToHistory = async (historyData) => {
       let result = await pool.request()
           .input('EmployeeName', sql.VarChar(100), historyData.EmployeeName)
           .input('Action', sql.VarChar(100), historyData.Action)
+          .input('FieldName', sql.VarChar(100), historyData.FieldName)
           .input('OldValue', sql.VarChar(100), historyData.OldValue)
           .input('NewValue', sql.VarChar(100), historyData.NewValue)
           .input('DateCreated', sql.DateTime, historyData.DateCreated)
           .input('UpdatedBy', sql.VarChar(100), historyData.UpdatedBy)
           .input('EmployeeId', sql.VarChar(100), historyData.EmployeeId)
           .query(`
-              INSERT INTO History (EmployeeName, Action, OldValue, NewValue, DateCreated, UpdatedBy, EmployeeId)
-              VALUES (@EmployeeName, @Action, @OldValue, @NewValue, @DateCreated, @UpdatedBy, @EmployeeId)
+              INSERT INTO History (EmployeeName, Action, FieldName, OldValue, NewValue, DateCreated, UpdatedBy, EmployeeId)
+              VALUES (@EmployeeName, @Action, @FieldName, @OldValue, @NewValue, @DateCreated, @UpdatedBy, @EmployeeId)
           `);
-      
+
       return result;
   } catch (error) {
       console.error('Error adding record to History:', error);
       throw error;
   }
 };
+const getEmployeeInfoById = async (employeeId) => {
+  try {
+    let pool = await sql.connect(config);
+    let result = await pool.request()
+      .input('EmployeeId', sql.VarChar, employeeId)
+      .query(`
+        SELECT *
+        FROM EmployeeInfo
+        WHERE EmployeeId = @EmployeeId
+      `);
+    return result.recordset[0];
+  } catch (error) {
+    console.error('Error fetching employee information by ID:', error);
+    throw error;
+  }
+};
+
 //update employee address by id
 const updateEmployeeAddressById = async (employeeId, updatedEmployeeData) => {
   try {
@@ -1513,6 +1531,7 @@ const deleteAllEmployeeData = async () => {
     await deleteAllFromTable(transaction, "Education");
     await deleteAllFromTable(transaction, "Address");
     await deleteAllFromTable(transaction, "UserAccount");
+    await deleteAllFromTable(transaction, "History");
     // await deleteAllFromTable(transaction, "CompensationBenefits");
     
     await deleteAllFromTable(transaction, "EmpPersonalDetails");
@@ -1706,6 +1725,32 @@ const getCompBenByEmployeeId = async (employeeId) => {
     throw error;
   }
 };
+// Retrieve history by Employee ID from the database
+const getHistoryByEmployeeId = async (employeeId) => {
+  try {
+    // Connect to the database
+    let pool = await sql.connect(config);
+    
+    // Query history data based on employeeId
+    let result = await pool
+      .request()
+      .input("EmployeeId", sql.VarChar, employeeId)
+      .query(`
+        SELECT *
+        FROM History
+        WHERE EmployeeId = @EmployeeId;
+      `);
+
+    // Log the query result
+    console.log(`Query result for Employee ID ${employeeId}:`, result.recordset);
+
+    return result.recordset; // Return history data
+  } catch (error) {
+    console.error("Error fetching history by Employee ID:", error);
+    throw error;
+  }
+};
+
 module.exports = {
   updateUserPassword,
   getUserByEmployeeId,
@@ -1745,5 +1790,7 @@ module.exports = {
   updateCompBenById,
   updateEmployeePassword,
   updateEmployeeRole,
-  addToHistory
+  addToHistory,
+  getEmployeeInfoById,
+  getHistoryByEmployeeId
 };
