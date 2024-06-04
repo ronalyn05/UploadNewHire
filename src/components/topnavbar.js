@@ -25,6 +25,15 @@ function TopNavbar() {
     localStorage.removeItem('user');
     navigate('../');
   };
+  // Function to format text into sentence case
+const toSentenceCase = (text) => {
+  if (!text) return ''; // Handle null or undefined input
+  return text
+    .toLowerCase() // Convert the text to lowercase first
+    .split(' ') // Split the text into an array of words
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+    .join(' '); // Join the words back together
+};
 
   return (
     <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
@@ -46,7 +55,7 @@ function TopNavbar() {
         {/* Nav Item - User Information */}
         <li className="nav-item dropdown no-arrow">
           <a className="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span className="mr-2 d-none d-lg-inline text-gray-600 small">{firstName} {lastName}</span>
+            <span className="mr-2 d-none d-lg-inline text-gray-600 small">{toSentenceCase(firstName)} {toSentenceCase(lastName)}</span>
             {/* <img className="img-profile rounded-circle" src="img/undraw_profile.svg" alt="User Profile" /> */}
             <img className="img-profile rounded-circle" src={profilePhoto || defaultPhoto} alt="User Profile" />
           </a>

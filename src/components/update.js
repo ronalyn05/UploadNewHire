@@ -5257,9 +5257,9 @@ const toSentenceCase = (text) => {
                                   </Modal.Footer>
                               </Modal>
                           {/* </div> */}
-                                 {/* Dependent Table */}
+                                 {/* Compensation Table */}
                                  <div className='card-body'>
-                                {/* <div className="card-body"> */}
+                                {/* <div classN ame="card-body"> */}
                                   <div className="table-responsive">
                                     <table className="table">
                                       <thead>
@@ -5313,23 +5313,23 @@ const toSentenceCase = (text) => {
                                   <i className="fas fa-pencil-alt"></i>Edit
                                 </button> */}
                                 </td>
-                                <td>{compBen.Salary}</td>
-                                <td>{compBen.DailyEquivalent}</td>
-                                <td>{compBen.MonthlyEquivalent}</td>
-                                <td>{compBen.AnnualEquivalent}</td>
-                                <td>{compBen.RiceMonthly}</td>
-                                <td>{compBen.RiceAnnual}</td>
-                                <td>{compBen.RiceDifferentialAnnual}</td>
-                                <td>{compBen.UniformAnnual}</td>
+                                <td>₱{compBen.Salary}</td>  
+                                <td>₱{compBen.DailyEquivalent}</td> 
+                                <td>₱{compBen.MonthlyEquivalent}</td>
+                                <td>₱{compBen.AnnualEquivalent}</td>
+                                <td>₱{compBen.RiceMonthly}</td>
+                                <td>₱{compBen.RiceAnnual}</td>
+                                <td>₱{compBen.RiceDifferentialAnnual}</td>
+                                <td>₱{compBen.UniformAnnual}</td>
                                 <td>{compBen.LeaveDays}</td>
-                                <td>{compBen.LaundryAllowance}</td>
-                                <td>{compBen.CommAllowance}</td>
+                                <td>₱{compBen.LaundryAllowance}</td>
+                                <td>₱{compBen.CommAllowance}</td>
                                 <td>{compBen.CommAllowanceType}</td>
-                                <td>{compBen.CashGift}</td>
-                                <td>{compBen.MedicalInsurance}</td>
+                                <td>₱{compBen.CashGift}</td>
+                                <td>₱{compBen.MedicalInsurance}</td>
                                 <td>{compBen.FreeHMODependent}</td>
-                                <td>{compBen.MBL}</td>
-                                <td>{compBen.LifeInsurance}</td>
+                                <td>₱{compBen.MBL}</td>
+                                <td>₱{compBen.LifeInsurance}</td>
                                 <td>{compBen.Beneficiaries}</td>
                                 <td>{compBen.PersonalAccidentInsuranceBenefit}</td>
                                 <td>{compBen.PWDIDNumber}</td>

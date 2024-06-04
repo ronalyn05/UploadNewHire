@@ -15,7 +15,7 @@ function LoginPage() {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  //function that handles the login
+  //function that handles the login 
   const handleSubmit = async (e) => {
     e.preventDefault();
 

@@ -46,6 +46,16 @@ function Dashboard() {
     fetchNumberOfEmployees();
   }, []);
 
+    // Function to format text into sentence case
+const toSentenceCase = (text) => {
+  if (!text) return ''; // Handle null or undefined input
+  return text
+    .toLowerCase() // Convert the text to lowercase first
+    .split(' ') // Split the text into an array of words
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+    .join(' '); // Join the words back together
+};
+
   // useEffect(() => {
 
   //     // Chart.js initialization for area chart
@@ -113,7 +123,7 @@ function Dashboard() {
           <div className="container-fluid">
             {/* Welcome Message */}
             <div className="welcome-message">
-              <span>Hi there, {firstName}!</span>
+              <span>Hi there, {toSentenceCase(firstName)}!</span>
               <p> Nice to have you here! Let's make today great together!</p>
             </div>
             <br />

@@ -63,9 +63,8 @@ function Profile() {
   
       // Show success message to the user
       alert('Profile photo updated successfully!');
-  
-      // Reload the page after showing the alert
-      window.location.reload();
+
+      fetchPersonalDetails();
     } catch (err) {
       console.error(err);
       setErrorMessage('Error updating profile photo');
@@ -129,8 +128,7 @@ function Profile() {
       // Show success message to the user
       alert('User data updated successfully!');
 
-      // Reload the page after showing the alert
-    window.location.reload();
+    fetchPersonalDetails();
 
     } catch (err) {
       console.error(err);

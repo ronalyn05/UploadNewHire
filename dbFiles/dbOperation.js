@@ -3,20 +3,39 @@ const sql = require("mssql");
 const xlsx = require("xlsx");
 
 //get employee id and password for login
-const getEmployees = async (EmployeeId, Password) => {
+const getEmployees = async (EmployeeId) => {
   try {
     let pool = await sql.connect(config);
     let result = await pool
       .request()
       .input("EmployeeId", sql.VarChar, EmployeeId)
-      .input("Password", sql.VarChar, Password)
-      .query("SELECT * FROM UserAccount WHERE EmployeeId = @EmployeeId");
+      .query(`
+        SELECT UA.*, EI.EmployeeStatus 
+        FROM UserAccount UA
+        JOIN EmployeeInfo EI ON UA.EmployeeId = EI.EmployeeId
+        WHERE UA.EmployeeId = @EmployeeId
+      `);
 
     return result.recordset;
   } catch (error) {
     throw error;
   }
 };
+
+// const getEmployees = async (EmployeeId, Password) => {
+//   try {
+//     let pool = await sql.connect(config);
+//     let result = await pool
+//       .request()
+//       .input("EmployeeId", sql.VarChar, EmployeeId)
+//       .input("Password", sql.VarChar, Password)
+//       .query("SELECT * FROM UserAccount WHERE EmployeeId = @EmployeeId");
+
+//     return result.recordset;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
 // Get user employee id for autofill function
 const getUserEmpId = async (employeeId) => {
   try {
@@ -1532,7 +1551,7 @@ const deleteAllEmployeeData = async () => {
     await deleteAllFromTable(transaction, "Address");
     await deleteAllFromTable(transaction, "UserAccount");
     await deleteAllFromTable(transaction, "History");
-    // await deleteAllFromTable(transaction, "CompensationBenefits");
+    await deleteAllFromTable(transaction, "CompensationBenefits");
     
     await deleteAllFromTable(transaction, "EmpPersonalDetails");
 
