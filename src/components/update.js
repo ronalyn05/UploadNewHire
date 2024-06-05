@@ -478,6 +478,111 @@ const handleAddContactForm = async (e) => {
   };
    //UPDATE EMPLOYEE INFORMATION
 // Function to handle form submission
+// const handleFormEmpInfoSubmit = async (e) => {
+//   e.preventDefault(); // Prevent the default form submission
+
+//   // Validate HRANType is chosen
+//   if (!employeeData.HRANType) {
+//     alert('Please choose an HRANType before updating the employee information.');
+//     return;
+//   }
+
+//   try {
+//     // Fetch the current employee data
+//     const currentDataResponse = await fetch(`http://localhost:5000/getEmployeeInfo/${employeeId}`);
+//     if (!currentDataResponse.ok) {
+//       throw new Error('Failed to fetch current employee data');
+//     }
+//     const currentData = await currentDataResponse.json();
+
+//     // Store previous values for the fields being updated
+//     const previousValues = {
+//       Position: currentData.Position,
+//       // Add other fields as needed
+//     };
+
+//     // Fetch call to update employee information
+//     const response = await fetch(`http://localhost:5000/updateEmployeeInfo/${employeeId}`, {
+//       method: 'PUT',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(employeeData),
+//     });
+
+//     if (!response.ok) {
+//       throw new Error('Failed to update employee');
+//     }
+
+//     // Retrieve the name of the employee from employeeData
+//     const { FirstName, LastName } = employeeData;
+//     const employeeName = `${FirstName} ${LastName}`;
+
+//     // Compare initial employeeData with updated employeeData
+//     const updatedFields = [];
+//     Object.entries(employeeData).forEach(([key, value]) => {
+//       if (value !== initialEmployeeData[key]) {
+//         updatedFields.push(key);
+//       }
+//     });
+
+//     // Filter out fields that contain EmployeeName, FirstName, MiddleName, LastName
+//     const filteredFields = updatedFields.filter(
+//       (field) => !['EmployeeName', 'FirstName', 'MiddleName', 'LastName'].includes(field)
+//     );
+
+//     // Generate success message based on updated fields
+//     let successMessage;
+//     if (filteredFields.length === 0) {
+//       successMessage = `No employee information has been updated for ${employeeName}.`;
+//     } else {
+//       successMessage = `Employee ${employeeName} has successfully updated ${filteredFields.join(', ')}!`;
+//     }
+
+//     // Retrieve user's first name from session storage
+//     const updatedByFirstName = sessionStorage.getItem('firstName');
+//     const updatedByLastName = sessionStorage.getItem('lastName');
+//     const updatedByRole = sessionStorage.getItem('role');
+//     const updatedBy = `${updatedByRole} ${updatedByFirstName} ${updatedByLastName}`;
+
+//     // Get the chosen HRANType from the employeeData
+//     const chosenHRANType = employeeData.HRANType;
+
+//     // Insert into History table
+//     const historyData = {
+//       EmployeeName: employeeName,
+//       Action: 'Update',
+//       FieldName: chosenHRANType,
+//       OldValue: previousValues.Position, // Use the previous position value
+//       NewValue: employeeData.Position,
+//       DateCreated: new Date().toISOString(),
+//       UpdatedBy: updatedBy,
+//       EmployeeId: employeeId,
+//     };
+
+//     const historyResponse = await fetch('http://localhost:5000/addToHistory', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(historyData),
+//     });
+
+//     if (!historyResponse.ok) {
+//       throw new Error('Failed to add record to History');
+//     }
+
+//     // Display the success message
+//     alert(successMessage);
+
+//     // Reload the page after showing the alert
+//     window.location.reload();
+//   } catch (error) {
+//     console.error('Error updating employee information:', error);
+//     // Send alert message for failure
+//     alert('Failed to update employee information. Please try again later.');
+//   }
+// };
 const handleFormEmpInfoSubmit = async (e) => {
   e.preventDefault(); // Prevent the default form submission
 
@@ -495,11 +600,14 @@ const handleFormEmpInfoSubmit = async (e) => {
     }
     const currentData = await currentDataResponse.json();
 
-    // Store previous values for the fields being updated
-    const previousValues = {
-      Position: currentData.Position,
-      // Add other fields as needed
-    };
+    // Store previous values for all the fields being updated
+    const previousValues = { ...currentData };
+    
+    // // Store previous values for the fields being updated
+    // const previousValues = {
+    //   Position: currentData.Position,
+    //   // Add other fields as needed
+    // };
 
     // Fetch call to update employee information
     const response = await fetch(`http://localhost:5000/updateEmployeeInfo/${employeeId}`, {
@@ -546,30 +654,33 @@ const handleFormEmpInfoSubmit = async (e) => {
     const updatedBy = `${updatedByRole} ${updatedByFirstName} ${updatedByLastName}`;
 
     // Get the chosen HRANType from the employeeData
-    const chosenHRANType = employeeData.HRANType;
+    // const chosenHRANType = employeeData.HRANType;
 
-    // Insert into History table
-    const historyData = {
-      EmployeeName: employeeName,
-      Action: 'Update',
-      FieldName: chosenHRANType,
-      OldValue: previousValues.Position, // Use the previous position value
-      NewValue: employeeData.Position,
-      DateCreated: new Date().toISOString(),
-      UpdatedBy: updatedBy,
-      EmployeeId: employeeId,
-    };
+    // Insert into History table for each updated field
+    for (const field of filteredFields) {
+      const historyData = {
+        EmployeeName: employeeName,
+        Action: 'Update',
+        FieldName: field,
+        // FieldName: field === 'HRANType' ? chosenHRANType : field,
+        OldValue: previousValues[field] || 'N/A', // Use the previous value or 'N/A' if not available
+        NewValue: employeeData[field],
+        DateCreated: new Date().toISOString(),
+        UpdatedBy: updatedBy,
+        EmployeeId: employeeId,
+      };
 
-    const historyResponse = await fetch('http://localhost:5000/addToHistory', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(historyData),
-    });
+      const historyResponse = await fetch('http://localhost:5000/addToHistory', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(historyData),
+      });
 
-    if (!historyResponse.ok) {
-      throw new Error('Failed to add record to History');
+      if (!historyResponse.ok) {
+        throw new Error('Failed to add record to History');
+      }
     }
 
     // Display the success message
@@ -583,6 +694,7 @@ const handleFormEmpInfoSubmit = async (e) => {
     alert('Failed to update employee information. Please try again later.');
   }
 };
+
 
   // const handleFormEmpInfoSubmit = async (e) => {
   //   e.preventDefault(); // Prevent the default form submission

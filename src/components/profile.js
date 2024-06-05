@@ -113,13 +113,13 @@ function Profile() {
     try {
       // Retrieve userId from the textbox
       // const employeeId = document.getElementById('employeeId').value;
-      const employeeId = userData.EmployeeId; // Use userData directly
+      const employeeId = userData.EmployeeId.trim(); // Use userData directly
   
       const updatedDetails = {
-        FirstName: userData.FirstName,
-        LastName: userData.LastName,
-        MiddleName: userData.MiddleName,
-        EmailAddress: userData.EmailAddress,
+        FirstName: userData.FirstName.trim(),
+        LastName: userData.LastName.trim(),
+        MiddleName: userData.MiddleName.trim(),
+        EmailAddress: userData.EmailAddress.trim(),
         EmployeeId: employeeId // Use the userId from the textbox
       };
   

@@ -11,6 +11,7 @@ import Profile from './components/profile';
 import Employee from './components/employee';
 import EmployeeProfile from './components/employeeProfile';
 import ChangePassword from './components/changePassword';
+import ForgotPasswordPage from './components/forgotpassword';
 
 function App() {
   
@@ -29,6 +30,7 @@ function App() {
           <Route path="/employee" element={<Employee />} />
           <Route path="/employeeProfile" element={<EmployeeProfile />} />
           <Route path="/changePassword" element={<ChangePassword />} />
+          <Route path="/forgotpassword" element={<ForgotPasswordPage/>}></Route>
         </Routes>
       </div>
     </Router>
