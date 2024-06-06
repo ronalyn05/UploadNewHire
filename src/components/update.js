@@ -109,7 +109,7 @@ import 'jspdf-autotable';
   const [filteredCompBen, setFilteredCompBen] = useState([]);
   const [filteredHistory, setFilteredHistory] = useState([]);
   const [errors, setErrors] = useState({});
-  // const [compBen, setCompBen] = useState([]);
+  // const [compBen, setCompBen] = useState([]); 
   const [selectedCompBen, setSelectedCompBen] = useState(null);
 
     // Function to handle input change in the search field
@@ -695,7 +695,6 @@ const handleFormEmpInfoSubmit = async (e) => {
   }
 };
 
-
   // const handleFormEmpInfoSubmit = async (e) => {
   //   e.preventDefault(); // Prevent the default form submission
 
@@ -851,7 +850,8 @@ const handleFormEmpInfoSubmit = async (e) => {
     //     }
     //   };
       //UPDATE ADDRESS DETAILS
-    const handleAddressFormSubmit = async (e) => {
+   
+      const handleAddressFormSubmit = async (e) => {
         e.preventDefault(); // Prevent the default form submission
         
         try {

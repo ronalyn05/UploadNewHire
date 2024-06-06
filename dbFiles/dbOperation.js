@@ -37,6 +37,22 @@ const getEmployees = async (EmployeeId) => {
 //   }
 // };
 // Get user employee id for autofill function
+// const getExistingEmployeeIds = async (employeeIds) => {
+//   try {
+//     let pool = await sql.connect(config);
+//     let result = await pool
+//       .request()
+//       .input("EmployeeId", sql.VarChar(sql.MAX), employeeIds.join(','))
+//       .query(`
+//           SELECT EmployeeId FROM EmpPersonalDetails WHERE EmployeeId IN (@EmployeeId);
+//       `);
+    
+//     return result.recordset.map(record => record.EmployeeId);
+//   } catch (error) {
+//     console.error("Error fetching employee ids:", error);
+//     throw new Error("Error fetching employee ids");
+//   }
+// };
 const getUserEmpId = async (employeeId) => {
   try {
     let pool = await sql.connect(config);
@@ -238,7 +254,6 @@ await pool
     // Insert into DeliveryUnit table
     await pool
       .request()
-      // .input("DUID", newHire.DUID)
       .input("EmployeeId", newHire.EmployeeId)
       .input("DUCode", newHire.DUCode)
       .input("DUName", newHire.DUName)
@@ -389,9 +404,6 @@ await pool
   `);
 
     //insertion of user account
-    //  const uniquePassword = generateUniquePassword();
-    //  const hashedPassword = await bcrypt.hash(uniquePassword, 10);
-
     await pool
       .request()
       .input('EmployeeId', newHire.EmployeeId)
@@ -407,40 +419,6 @@ await pool
         VALUES (@EmployeeId, @LastName, @FirstName, @MiddleName, @EmailAddress, @Password, @Role)
       `);
 
-    // const emailSubject = 'Account Created';
-    // const emailText = `Your account has been created. 
-    //                     UserID: ${newHire.EmployeeId} 
-    //                     Password: ${uniquePassword} 
-    //                     Please change your password upon initial login. 
-    //                     Tool Link: [your-tool-link]`;
-
-    // await sendEmail(newHire.EmailAddress, emailSubject, emailText);
-
-    // if (newHire.Role === 'HRAdmin') {
-    //   const defaultPassword = 'Test@12345';
-    //   const hashedDefaultPassword = await bcrypt.hash(defaultPassword, 10);
-
-    //   await pool
-    //     .request()
-    //     .input('EmployeeId', newHire.EmployeeId)
-    //     .input('Role', 'HRAdmin')
-    //     .input('Password', hashedDefaultPassword)
-    //     .query(`
-    //       UPDATE UserAccount
-    //       SET Role = @Role, Password = @Password
-    //       WHERE EmployeeId = @EmployeeId
-    //     `);
-
-    //   const adminEmailSubject = 'HR Admin Role Assigned';
-    //   const adminEmailText = `You have been assigned as HR Admin. 
-    //                           UserID: ${newHire.EmployeeId} 
-    //                           Password: ${defaultPassword} 
-    //                           Please change your password upon initial login. 
-    //                           Admin Dashboard Link: [your-admin-dashboard-link]`;
-
-    //   await sendEmail(newHire.EmailAddress, adminEmailSubject, adminEmailText);
-    // }
-
     return 'Data successfully uploaded and account has been created.';
   } catch (error) {
     console.error('Error occurred while inserting new data:', error);
@@ -450,7 +428,7 @@ await pool
 //update password / changing of password
 const updateUserPassword = async (employeeId, newPassword) => {
   try {
-    const pool = await sql.connect(config); // Establish DB connection
+    const pool = await sql.connect(config); 
     const request = pool.request();
     const query = `
       UPDATE UserAccount 
@@ -1812,4 +1790,5 @@ module.exports = {
   addToHistory,
   getEmployeeInfoById,
   getHistoryByEmployeeId
+  // getExistingEmployeeIds
 };

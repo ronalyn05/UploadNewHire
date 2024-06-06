@@ -66,6 +66,17 @@ app.get('/api/checkExistingEmployeeId/:employeeId', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+// app.get('/api/checkExistingEmployeeIds', async (req, res) => {
+//   try {
+//     const employeeIds = req.query.ids.split(',');
+//     const existingEmployeeIds = await dbOperation.getExistingEmployeeIds(employeeIds);
+//     res.status(200).json({ existingEmployeeIds });
+//   } catch (error) {
+//     console.error('Error checking employee IDs:', error);
+//     res.status(500).send('Internal Server Error');
+//   }
+// });
+
 // Backend API endpoint to check if an employee ID exists
 app.get('/api/checkEmployeeId/:employeeId', async (req, res) => {
   try {
@@ -293,27 +304,27 @@ app.get('/api/getUserData/:employeeId', async (req, res) => {
   }
 });
 
-// POST endpoint to handle Excel data upload
-app.post('/upload', async (req, res) => {
-  const excelData = req.body; // Assuming excelData is sent as JSON
+  // POST endpoint to handle Excel data upload
+  app.post('/upload', async (req, res) => {
+    const excelData = req.body; // Assuming excelData is sent as JSON
 
-  try {
-    for (const row of excelData) {
-      // Hash the password before storing it in the database
-      const hashedPassword = await bcrypt.hash(row.Password, 10);
+    try {
+      for (const row of excelData) {
+        // Hash the password before storing it in the database
+        const hashedPassword = await bcrypt.hash(row.Password, 10);
 
-      // Insert row data along with the hashed password into the database
-      await dbOperation.insertNewHire(row, hashedPassword);
-      console.log('Employee inserted:', row);
+        // Insert row data along with the hashed password into the database
+        await dbOperation.insertNewHire(row, hashedPassword);
+        console.log('Employee inserted:', row);
+      }
+
+      // Respond with success message
+      res.status(200).json({ message: 'Data uploaded successfully' });
+    } catch (error) {
+      console.error("Error occurred while inserting data:", error);
+      res.status(500).json({ error: 'Internal server error' });
     }
-
-    // Respond with success message
-    res.status(200).json({ message: 'Data uploaded successfully' });
-  } catch (error) {
-    console.error("Error occurred while inserting data:", error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
+  });
 
 // Endpoint to retrieve employee data
 app.get('/newHireEmp', async (req, res) => {

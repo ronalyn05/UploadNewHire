@@ -76,10 +76,14 @@ const NewHireUpload = () => {
       reader.readAsArrayBuffer(file);
     });
   };
-
+//USBUNUNON (AUTOMATICALLY FILL IN N/A VALUES)
   const parseCellValue = (value) => {
     return value !== undefined && value !== null ? value.toString() : "N/A";
   };
+  // const parseCellValue = (value) => {
+  //   return value !== undefined && value !== null ? value.toString() : "";
+  // };
+  
 
   const parseExcelData = (data) => {
     const workbook = XLSX.read(data, { type: "array" });
@@ -146,11 +150,6 @@ const NewHireUpload = () => {
     setEditModalShow(false);
   };
 
-// Function to generate a unique password
-// const generateUniquePassword = () => {
-//   return 'Test@' + Math.random().toString(36).slice(-8);
-// };
-
 // Function to send email notification
 const sendEmailNotification = async ( templateParams) => {
   try {
@@ -163,48 +162,32 @@ const sendEmailNotification = async ( templateParams) => {
   }
 };
 
-// const sendEmailNotification = async (to, subject, message) => {
-//   try {
-//     const templateParams = {
-//       to_email: to,
-//       subject: subject,
-//       message: message
-//     };
-
-//     // Send email using EmailJS API
-//     await emailjs.send(emailServiceID, emailTemplateID, templateParams);
-
-//     console.log('Email sent successfully');
-//   } catch (error) {
-//     console.error('Error sending email:', error);
-//   }
-// };
 //function of insertion of data
-      const handleSaveData = async () => {
-        console.log("Saving data...");
-        console.log("Excel Data:", excelData);
+const handleSaveData = async () => {
+  console.log("Saving data...");
+  console.log("Excel Data:", excelData);
 
-        try {
-          // Check for null values in any row
-          const hasNullValues = excelData.some((row) =>
-            Object.values(row).some((value) => value === null || value === "")
+  try {
+      // Check for null values in any row
+      const hasNullValues = excelData.some((row) =>
+          Object.values(row).some((value) => value === null || value === "")
+      );
+
+      if (hasNullValues) {
+          throw new Error(
+              "One or more fields contain null values. Please fill in all empty fields!"
           );
+      }
 
-          if (hasNullValues) {
-            throw new Error(
-              "One or more fields contain null values. Please fill in all fields and use 'N/A' if a field is empty."
-            );
-          }
+      // Validate bit fields
+      const validateBitFields = () => {
+          const invalidFields = [];
 
-          // Validate bit fields
-          const validateBitFields = () => {
-            const invalidFields = [];
-
-            excelData.forEach((row, index) => {
+          excelData.forEach((row, index) => {
               const validateField = (fieldName, validValues) => {
-                if (!validValues.includes(row[fieldName])) {
-                  invalidFields.push(`${fieldName} in row ${index + 1}`);
-                }
+                  if (!validValues.includes(row[fieldName])) {
+                      invalidFields.push(`${fieldName} in row ${index + 1}`);
+                  }
               };
 
               validateField("IsManager", ["0", "1", 0, 1]);
@@ -216,153 +199,116 @@ const sendEmailNotification = async ( templateParams) => {
               validateField("IsDUHead", ["0", "1", 0, 1]);
               validateField("IsPermanent", ["0", "1", 0, 1]);
               validateField("IsEmergency", ["0", "1", 0, 1]);
-            });
-
-            if (invalidFields.length > 0) {
-              throw new Error(
-                `Invalid values detected:\n${invalidFields.join("\n")}`
-              );
-            }
-          };
-
-          validateBitFields();
-
-          // Check for duplicate Employee IDs against backend API
-          const duplicateEmployeeIds = [];
-          for (const row of excelData) {
-            const { EmployeeId } = row;
-            const response = await axios.get(
-              `/api/checkExistingEmployeeId/${EmployeeId}`
-            );
-            if (response.data.exists) {
-              duplicateEmployeeIds.push(EmployeeId);
-            }
-          }
-
-          if (duplicateEmployeeIds.length > 0) {
-            throw new Error(
-              `Duplicate Employee IDs detected: ${duplicateEmployeeIds.join(
-                ", "
-              )}. Each Employee ID must be unique.`
-            );
-          }
-
-          // Format date fields
-          const formattedData = excelData.map((row) => {
-            const formattedRow = { ...row };
-            const dateFields = [
-              "Birthdate",
-              "DateHired",
-              "DateTo",
-              "DateFrom",
-              "DateOfBirth",
-            ];
-            dateFields.forEach((field) => {
-              formattedRow[field] = convertExcelDateToDate(row[field]);
-            });
-            return formattedRow;
           });
 
-        //   for (const row of excelData) {
-        //     // Generate a unique password for each employee
-        //     const uniquePassword = generateUniquePassword();
-        //     row.Password = uniquePassword;
+          if (invalidFields.length > 0) {
+              throw new Error(
+                  `Invalid values detected:\n${invalidFields.join("\n")}`
+              );
+          }
+      };
 
-        //     // Create the template parameters
-        //     const templateParams = {
-        //         firstName: row.FirstName,
-        //         employeeId: row.EmployeeId,
-        //         temporaryPassword: row.Password,
-        //         to_email: row.EmailAddress,
-        //         subject: 'Your Account Details'
-        //     };
+      validateBitFields();
 
-        //     // Send email notification with account details
-        //     await sendEmailNotification(templateParams);
-        // }
-         // Generate a unique password for each employee and include it in the data sent to the server
-    const dataWithPasswords = formattedData.map((row) => {
-      const uniquePassword = generateUniquePassword();
-      return { ...row, Password: uniquePassword };
-    });
+      // Check for duplicate Employee IDs against backend API
+      const duplicateEmployeeIds = [];
+      const nonExistingEmployeeData = [];
 
-        // Make a POST request to upload data
-        const response = await axios.post("/upload", dataWithPasswords, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-    
-        if (response.status !== 200) {
-          throw new Error("Failed to save data");
-        }
-    
-        // Send email notifications after successful upload
-        for (const row of dataWithPasswords) {
-          const templateParams = {
-            from_name: 'Innodata - HRAdmin',
-            firstName: row.FirstName,
-            employeeId: row.EmployeeId,
-            temporaryPassword: row.Password,
-            to_email: row.EmailAddress,
-            // subject: 'Your Account Details',
-          };
-    
-          // Send email notification with account details
-          await sendEmailNotification(templateParams);
-        }
+      for (const row of excelData) {
+          const { EmployeeId } = row;
+          const response = await axios.get(`/api/checkExistingEmployeeId/${EmployeeId}`);
+          if (response.data.exists) {
+              duplicateEmployeeIds.push(EmployeeId);
+          } else {
+              nonExistingEmployeeData.push(row);
+          }
+      }
 
-          // // Make a POST request to upload data
-          // const response = await axios.post("/upload", formattedData, {
-          //   headers: {
-          //     "Content-Type": "application/json",
-          //   },
-          // });
+      if (nonExistingEmployeeData.length > 0) {
+          // Format date fields for non-existing employee data
+          const formattedData = nonExistingEmployeeData.map((row) => {
+              const formattedRow = { ...row };
+              const dateFields = [
+                  "Birthdate",
+                  "DateHired",
+                  "DateTo",
+                  "DateFrom",
+                  "DateOfBirth",
+              ];
+              dateFields.forEach((field) => {
+                  formattedRow[field] = convertExcelDateToDate(row[field]);
+              });
+              return formattedRow;
+          });
 
-          // if (response.status !== 200) {
-          //   throw new Error("Failed to save data");
-          // }
+          // Generate a unique password for each employee and include it in the data sent to the server
+          const dataWithPasswords = formattedData.map((row) => {
+              const uniquePassword = generateUniquePassword();
+              return { ...row, Password: uniquePassword };
+          });
 
-        alert("Data has been successfully uploaded and Email sent successfully to each account user!");
+          // Make a POST request to upload non-existing employee data
+          const response = await axios.post("/upload", dataWithPasswords, {
+              headers: {
+                  "Content-Type": "application/json",
+              },
+          });
+
+          if (response.status !== 200) {
+              throw new Error("Failed to save data");
+          }
+
+          // Send email notifications after successful upload
+          for (const row of dataWithPasswords) {
+            const templateParams = {
+              from_name: 'Innodata - HRAdmin',
+              to_email: row.EmailAddress,
+              subject: 'Your Account Details',
+              firstName: row.FirstName,
+              employeeId: row.EmployeeId,
+              temporaryPassword: row.Password,
+             };
+          
+              // Send email notification with account details
+              await sendEmailNotification(templateParams);
+          }
+
+          // Combine success and error messages
+          const successMessage = `Data has been successfully uploaded and email sent to new account users.`;
+          const duplicateMessage = duplicateEmployeeIds.length > 0
+              ? `Duplicate Employee IDs detected: ${duplicateEmployeeIds.join(", ")}. Each Employee ID must be unique.`
+              : '';
+
+          alert(`${successMessage}${duplicateMessage ? '\n\n' + duplicateMessage : ''}`);
           console.log("Upload response:", response.data);
-          // alert("Data has been successfully uploaded!");
           navigate("/reports"); // Navigate to report.js after successful upload
-        } catch (error) { 
-          console.error("Error occurred while saving data:", error);
+      } else {
+        alert(
+          `Duplicate Employee IDs detected in the uploaded data: ${duplicateEmployeeIds.join(", ")}. Each Employee ID must be unique.`
+      );
+          throw new Error("All Employee IDs already exist in the database. No new data to upload.");
+      }
+  } catch (error) {
+      console.error("Error occurred while saving data:", error);
 
-          if (error.message.includes("Duplicate Employee IDs detected")) {
-            // Extract the list of duplicate Employee IDs from the error message
-            const duplicateIds = error.message.match(
+      if (error.message.includes("Duplicate Employee IDs detected")) {
+          // Extract the list of duplicate Employee IDs from the error message
+          const duplicateIds = error.message.match(
               /Duplicate Employee IDs detected: (.*). Each Employee ID must be unique\./
-            );
-            const duplicateEmployeeIds = duplicateIds
+          );
+          const duplicateEmployeeIds = duplicateIds
               ? duplicateIds[1].split(", ")
               : [];
 
-            if (duplicateEmployeeIds.length > 0) {
+          if (duplicateEmployeeIds.length > 0) {
               alert(
-                `Duplicate Employee IDs detected in the uploaded data: ${duplicateEmployeeIds.join(
-                  ", "
-                )}. Each Employee ID must be unique.`
+                  `Duplicate Employee IDs detected in the uploaded data: ${duplicateEmployeeIds.join(", ")}. Each Employee ID must be unique.`
               );
               return; // Stop further execution to prevent displaying the generic error message
-            }
           }
-
-          // Handle other types of errors
-          if (error.message.includes("One or more fields contain null values")) {
-            alert(
-              "One or more fields contain null values. Please fill in all fields and use 'N/A' if a field is empty."
-            );
-          } else if (error.message.includes("Failed to save data")) {
-            alert("Failed to save data. Please try again.");
-          } else {
-            alert(
-              `Failed to upload data to the database. An unexpected error occurred. Please try again.`
-            );
-          }
-        }
-      };
+      }
+  }
+};
 
   return (
     <div>
