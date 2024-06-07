@@ -9,7 +9,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import * as emailjs from 'emailjs-com';
 import bcrypt from 'bcryptjs';
-// Import the generateUniquePassword function
 const { generateUniquePassword } = require('./utils');
 
   // Initialize EmailJS with your user ID

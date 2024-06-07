@@ -10,7 +10,7 @@ const getEmployees = async (EmployeeId) => {
       .request()
       .input("EmployeeId", sql.VarChar, EmployeeId)
       .query(`
-        SELECT UA.*, EI.EmployeeStatus 
+        SELECT UA.*, EI.EmployeeStatus, EI.Facility 
         FROM UserAccount UA
         JOIN EmployeeInfo EI ON UA.EmployeeId = EI.EmployeeId
         WHERE UA.EmployeeId = @EmployeeId
@@ -21,38 +21,7 @@ const getEmployees = async (EmployeeId) => {
     throw error;
   }
 };
-
-// const getEmployees = async (EmployeeId, Password) => {
-//   try {
-//     let pool = await sql.connect(config);
-//     let result = await pool
-//       .request()
-//       .input("EmployeeId", sql.VarChar, EmployeeId)
-//       .input("Password", sql.VarChar, Password)
-//       .query("SELECT * FROM UserAccount WHERE EmployeeId = @EmployeeId");
-
-//     return result.recordset;
-//   } catch (error) {
-//     throw error;
-//   }
-// };
-// Get user employee id for autofill function
-// const getExistingEmployeeIds = async (employeeIds) => {
-//   try {
-//     let pool = await sql.connect(config);
-//     let result = await pool
-//       .request()
-//       .input("EmployeeId", sql.VarChar(sql.MAX), employeeIds.join(','))
-//       .query(`
-//           SELECT EmployeeId FROM EmpPersonalDetails WHERE EmployeeId IN (@EmployeeId);
-//       `);
-    
-//     return result.recordset.map(record => record.EmployeeId);
-//   } catch (error) {
-//     console.error("Error fetching employee ids:", error);
-//     throw new Error("Error fetching employee ids");
-//   }
-// };
+//to check if employee data exists
 const getUserEmpId = async (employeeId) => {
   try {
     let pool = await sql.connect(config);
@@ -68,6 +37,46 @@ const getUserEmpId = async (employeeId) => {
   } catch (error) {
     console.error("Error fetching employee id:", error);
     throw new Error("Error fetching employee id");
+  }
+};
+//check if  emp id and email address exist
+const checkEmployeeAndEmail = async (employeeId, email) => {
+  try {
+    let pool = await sql.connect(config);
+    let result = await pool
+      .request()
+      .input("EmployeeId", sql.VarChar, employeeId)
+      .input("EmailAddress", sql.VarChar, email)
+      .query(`
+          SELECT * FROM EmpPersonalDetails 
+          WHERE EmployeeId = @EmployeeId AND EmailAddress = @EmailAddress;
+      `);
+    
+    // Return true if employee ID and email exist, otherwise false
+    return result.recordset.length > 0;
+  } catch (error) {
+    console.error("Error checking employee ID and email:", error);
+    throw new Error("Error checking employee ID and email");
+  }
+};
+
+// Database operation to reset the user's password
+const resetPassword = async (email, newPassword) => {
+  try {
+    let pool = await sql.connect(config);
+    await pool.request()
+      .input("Email", sql.VarChar, email)
+      .input("Password", sql.VarChar, newPassword)
+      .query(`
+        UPDATE UserAccount SET Password = @Password WHERE Email = @Email;
+      `);
+    
+    // If the query was successful, return true
+    return true;
+  } catch (error) {
+    console.error("Error resetting password in the database:", error);
+    // If the query failed, return false
+    return false;
   }
 };
 // Database operation to retrieve employee by ID
@@ -1789,6 +1798,8 @@ module.exports = {
   updateEmployeeRole,
   addToHistory,
   getEmployeeInfoById,
+  checkEmployeeAndEmail,
+  resetPassword,
   getHistoryByEmployeeId
   // getExistingEmployeeIds
 };

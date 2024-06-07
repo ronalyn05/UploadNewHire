@@ -196,15 +196,6 @@ function Profile() {
                               <div className="col-sm-6 mb-3 mb-sm-0">
                                 <label htmlFor="employeeId">Employee Id:</label>
                                 <span className="form-control font-bold text-center form-control-user"> {userData.EmployeeId}</span>
-                                  {/* <input
-                                    type="text"
-                                    className="form-control form-control-user"
-                                    id="EmployeeId"
-                                    placeholder="Employee Id"
-                                    onChange={handleChange}
-                                    value={userData.EmployeeId}
-                                    readOnly={true}
-                                  /> */}
                                 </div>
                               </div>
                               <div className="form-group row">
@@ -230,17 +221,6 @@ function Profile() {
                                     value={userData.LastName}
                                   />
                                 </div>
-                                {/* <div className="col-sm-6">
-                                <label htmlFor="username">User Name:</label>
-                                  <input
-                                    type="text"
-                                    className="form-control form-control-user"
-                                    id="UserName"
-                                    placeholder="User Name"
-                                    onChange={handleChange}
-                                    value={userData.UserName}
-                                  />
-                                </div> */}
                               </div>
                               <div className="form-group row">
                               <div className="col-sm-6 mb-3 mb-sm-0">
@@ -265,7 +245,6 @@ function Profile() {
                                   value={userData.EmailAddress}
                                 />
                                 </div>
-                                
                               </div>
                               <div className="d-flex justify-content-center">
                                 <div className="col-md-6 d-flex justify-content-center">

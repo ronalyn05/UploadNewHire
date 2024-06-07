@@ -66,16 +66,41 @@ app.get('/api/checkExistingEmployeeId/:employeeId', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-// app.get('/api/checkExistingEmployeeIds', async (req, res) => {
-//   try {
-//     const employeeIds = req.query.ids.split(',');
-//     const existingEmployeeIds = await dbOperation.getExistingEmployeeIds(employeeIds);
-//     res.status(200).json({ existingEmployeeIds });
-//   } catch (error) {
-//     console.error('Error checking employee IDs:', error);
-//     res.status(500).send('Internal Server Error');
-//   }
-// });
+// Backend API endpoint to check if an employee ID exists
+app.post('/api/checkEmployeeAndEmail', async (req, res) => {
+  try {
+    const { employeeId, email } = req.body;
+    // Perform a query to check if the employeeId and email exist in the database
+    const existingEmployee = await dbOperation.checkEmployeeAndEmail(employeeId, email);
+    if (existingEmployee) {
+      res.status(200).json({ exists: true });
+    } else {
+      res.status(200).json({ exists: false });
+    }
+  } catch (error) {
+    console.error('Error checking employee ID and email:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+// Backend API endpoint to reset the password
+app.post('/api/resetPassword', async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+
+    // Update the user's password in the database
+    const result = await dbOperation.resetPassword(email, newPassword);
+
+    // Check if the password was successfully updated
+    if (result) {
+      res.status(200).json({ message: "Password reset successfully." });
+    } else {
+      res.status(400).json({ error: "Unable to reset password. Please try again." });
+    }
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 // Backend API endpoint to check if an employee ID exists
 app.get('/api/checkEmployeeId/:employeeId', async (req, res) => {

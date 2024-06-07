@@ -1,50 +1,80 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import * as emailjs from 'emailjs-com';
+import bcrypt from 'bcryptjs';
+
+const emailServiceID = 'service_xfudh5t';
+const emailTemplateID = 'template_ql1pc7d';
+
+// Initialize EmailJS with your user ID
+emailjs.init("5CED_P6z3JRHEcgVq");
 
 function ForgotPasswordPage() {
-  const [formData, setFormData] = useState({
-    EmployeeId: "",
-    EmailAddress: "",
-  });
-  const [message, setMessage] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [employeeId, setEmployeeId] = useState("");
+  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [generatedOtp, setGeneratedOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [showOtpField, setShowOtpField] = useState(false);
+  const [showNewPasswordField, setShowNewPasswordField] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+  const generateOtp = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
   };
 
-  const handleSubmit = async (e) => {
+  const handleEmailSubmit = async (e) => {
     e.preventDefault();
 
-    // Trim whitespace from form data
-    const trimmedFormData = Object.fromEntries(
-      Object.entries(formData).map(([key, value]) => [key, value.trim()])
-    );
+    try {
+      const response = await axios.post("/api/checkEmployeeAndEmail", { employeeId, email });
+      if (response.data.exists) {
+        const otp = generateOtp();
+        setGeneratedOtp(otp);
+
+        // Send OTP email
+        const templateParams = {
+          to_name: employeeId,
+          from_name: 'Innodata - HRAdmin',
+          to_email: email,
+          subject: 'Your OTP for Password Reset',
+          otp: otp,
+        };
+        await emailjs.send(emailServiceID, emailTemplateID, templateParams);
+        setShowOtpField(true);
+        alert("OTP sent to your email.");
+      } else {
+        alert("Employee ID and/or Email do not exist in the database.");
+      }
+    } catch (error) {
+      console.error("Error checking Employee ID and Email:", error);
+      alert("An error occurred. Please try again.");
+    }
+  };
+
+  const handleOtpSubmit = (e) => {
+    e.preventDefault();
+
+    if (otp === generatedOtp) {
+      setShowNewPasswordField(true);
+      alert("OTP verified. Please enter your new password.");
+    } else {
+      alert("Invalid OTP. Please try again.");
+    }
+  };
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
 
     try {
-      const response = await fetch("/api/forgotPassword", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(trimmedFormData),
-      });
-
-      if (!response.ok) {
-        const responseData = await response.json();
-        setErrorMessage(responseData.error || "Request Failed");
-        return;
-      }
-
-      const data = await response.json();
-      console.log("Password reset request successful:", data);
-      setMessage("Password reset request sent successfully. Please contact your HRAdmin.");
-      setErrorMessage(null);
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await axios.post("/api/resetPassword", { email, newPassword: hashedPassword });
+      alert("Password reset successfully. You can now log in with your new password.");
+      navigate("/login"); // Redirect to login page after successful password reset
     } catch (error) {
-      console.error("Request Failed", error);
-      setErrorMessage(error.message || "Request Failed.");
-      setMessage(null);
+      console.error("Error resetting password:", error);
+      alert("An error occurred. Please try again.");
     }
   };
 
@@ -72,16 +102,16 @@ function ForgotPasswordPage() {
                     style={{ width: "100px", height: "90px" }}
                   />
                 </div>
-                <form className="user" onSubmit={handleSubmit}>
+                <form className="user" onSubmit={handleEmailSubmit}>
                   <div className="form-group">
                     <input
                       type="text"
                       className="form-control form-control-user"
-                      id="EmployeeId"
-                      name="EmployeeId"
+                      id="employeeId"
+                      name="employeeId"
                       placeholder="Employee ID"
-                      value={formData.EmployeeId}
-                      onChange={handleChange}
+                      value={employeeId}
+                      onChange={(e) => setEmployeeId(e.target.value)}
                       required
                     />
                   </div>
@@ -89,11 +119,11 @@ function ForgotPasswordPage() {
                     <input
                       type="email"
                       className="form-control form-control-user"
-                      id="EmailAddress"
-                      name="EmailAddress"
+                      id="email"
+                      name="email"
                       placeholder="Email Address"
-                      value={formData.EmailAddress}
-                      onChange={handleChange}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       required
                     />
                   </div>
@@ -104,22 +134,56 @@ function ForgotPasswordPage() {
                     Request Password Reset
                   </button>
                 </form>
+                {showOtpField && (
+                  <form className="user mt-3" onSubmit={handleOtpSubmit}>
+                    <div className="form-group">
+                      <input
+                        type="text"
+                        className="form-control form-control-user"
+                        id="otp"
+                        name="otp"
+                        placeholder="Enter OTP"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="btn btn-primary btn-user btn-block"
+                    >
+                      Verify OTP
+                    </button>
+                  </form>
+                )}
+                {showNewPasswordField && (
+                  <form className="user mt-3" onSubmit={handlePasswordSubmit}>
+                    <div className="form-group">
+                      <input
+                        type="password"
+                        className="form-control form-control-user"
+                        id="newPassword"
+                        name="newPassword"
+                        placeholder="Enter New Password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="btn btn-primary btn-user btn-block"
+                    >
+                      Reset Password
+                    </button>
+                  </form>
+                )}
                 <hr />
                 <div className="text-center">
                   <Link className="small" to="/">
                     Back to Login
                   </Link>
                 </div>
-                {message && (
-                  <div className="alert alert-success mt-3" role="alert">
-                    {message}
-                  </div>
-                )}
-                {errorMessage && (
-                  <div className="alert alert-danger mt-3" role="alert">
-                    {errorMessage}
-                  </div>
-                )}
               </div>
             </div>
           </div>

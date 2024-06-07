@@ -54,6 +54,7 @@ function LoginPage() {
       sessionStorage.setItem("middleName", data.MiddleName);
       sessionStorage.setItem("profilePhoto", data.ProfilePhoto);
       sessionStorage.setItem("role", data.Role);
+      sessionStorage.setItem("facility", data.Facility);
 
       if (data.Role === "HRAdmin") {
         if (data.ChangePasswordRequired) {
