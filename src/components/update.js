@@ -658,6 +658,22 @@ const handleFormEmpInfoSubmit = async (e) => {
 
     // Insert into History table for each updated field
     for (const field of filteredFields) {
+      // const getPhilippineDateTime = () => {
+      //   return new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: false });
+      // };
+      
+      // const historyData = {
+      //   EmployeeName: employeeName,
+      //   Action: 'Update',
+      //   FieldName: field,
+      //   // FieldName: field === 'HRANType' ? chosenHRANType : field,
+      //   OldValue: previousValues[field] || 'N/A', // Use the previous value or 'N/A' if not available
+      //   NewValue: employeeData[field],
+      //   DateCreated: getPhilippineDateTime(),
+      //   UpdatedBy: updatedBy,
+      //   EmployeeId: employeeId,
+      // };
+      
       const historyData = {
         EmployeeName: employeeName,
         Action: 'Update',
@@ -2198,6 +2214,17 @@ const toSentenceCase = (text) => {
                                               <div className="form-group">
                                               <label htmlFor="titoType">TITO Type</label>
                                               <input type="text" className="form-control" value={employeeData.TITOType} placeholder="enter tito type" name="TitoType" onChange={handleInputChange} />
+                                              </div>
+                                            </div>
+                                            <div className="col-md-4">
+                                              <div className="form-group">
+                                              <label htmlFor="RoleType">Employee Role Type</label>
+                                              <select className='form-control' 
+                                                    value={employeeData.Role} name="Role" onChange={handleInputChange}>
+                                                        <option value="HRAdmin">HRAdmin</option>
+                                                        <option value="Employee">Employee</option>
+                                                    </select>
+                                              {/* <input type="text" className="form-control" value={employeeData.EmployeeCategory} placeholder="enter work Week Type" name="EmployeeCategory" onChange={handleInputChange} /> */}
                                               </div>
                                             </div>
                                 </div>

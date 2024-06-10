@@ -400,38 +400,38 @@ app.get('/retrieve/:employeeId', async (req, res) => {
 });
 
 // Update password endpoint
-app.post('/update/password/:employeeId', async (req, res) => {
-  const { employeeId } = req.params;
-  const { Password } = req.body;
+// app.post('/update/password/:employeeId', async (req, res) => {
+//   const { employeeId } = req.params;
+//   const { Password } = req.body;
 
-  try {
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(Password, 10);
+//   try {
+//     // Hash the password
+//     const hashedPassword = await bcrypt.hash(Password, 10);
 
-    // Perform the update operation in your database
-    await dbOperation.updateEmployeePassword(employeeId, hashedPassword);
+//     // Perform the update operation in your database
+//     await dbOperation.updateEmployeePassword(employeeId, hashedPassword);
 
-    res.json({ message: 'Password updated successfully' });
-  } catch (error) {
-    console.error('Error updating password:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
+//     res.json({ message: 'Password updated successfully' });
+//   } catch (error) {
+//     console.error('Error updating password:', error);
+//     res.status(500).json({ message: 'Internal server error' });
+//   }
+// });
 
 // Update role type endpoint
-app.post('/update/role/:employeeId', async (req, res) => {
-  const { employeeId } = req.params;
-  const { Role } = req.body;
-  try {
-    // Perform the update operation in your database here
-    await dbOperation.updateEmployeeRole(employeeId, Role);
-    // updateEmployeeRole doesn't return the updated data, you can send a success response
-    res.json({ message: 'Role updated successfully' });
-  } catch (error) {
-    console.error('Error updating role:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
+// app.post('/update/role/:employeeId', async (req, res) => {
+//   const { employeeId } = req.params;
+//   const { Role } = req.body;
+//   try {
+//     // Perform the update operation in your database here
+//     await dbOperation.updateEmployeeRole(employeeId, Role);
+//     // updateEmployeeRole doesn't return the updated data, you can send a success response
+//     res.json({ message: 'Role updated successfully' });
+//   } catch (error) {
+//     console.error('Error updating role:', error);
+//     res.status(500).json({ message: 'Internal server error' });
+//   }
+// });
 
 
 // Endpoint to update employee by ID

@@ -65,10 +65,10 @@ const resetPassword = async (email, newPassword) => {
   try {
     let pool = await sql.connect(config);
     await pool.request()
-      .input("Email", sql.VarChar, email)
+      .input("EmailAddress", sql.VarChar, email)
       .input("Password", sql.VarChar, newPassword)
       .query(`
-        UPDATE UserAccount SET Password = @Password WHERE Email = @Email;
+        UPDATE UserAccount SET Password = @Password WHERE EmailAddress = @EmailAddress;
       `);
     
     // If the query was successful, return true
@@ -583,42 +583,42 @@ const getEmployeeById = async (employeeId) => {
     throw error;
   }
 }
-// Update password query 
-const updateEmployeePassword = async (employeeId, hashedPassword) => {
-  try {
-    let pool = await sql.connect(config);
-    await pool
-      .request()
-      .input("EmployeeId", sql.VarChar, employeeId)
-      .input("Password", sql.VarChar, hashedPassword) // Store hashed password
-      .query(`
-        UPDATE UserAccount
-        SET Password = @Password
-        WHERE EmployeeId = @EmployeeId;
-      `);
-  } catch (error) {
-    console.error("Error updating password:", error);
-    throw error;
-  }
-}
-// Update role type query 
-const updateEmployeeRole = async (employeeId, role) => {
-  try {
-    let pool = await sql.connect(config);
-    await pool
-      .request()
-      .input("EmployeeId", sql.VarChar, employeeId)
-      .input("Role", sql.VarChar, role)
-      .query(`
-        UPDATE UserAccount
-        SET Role = @Role
-        WHERE EmployeeId = @EmployeeId;
-      `);
-  } catch (error) {
-    console.error("Error updating role:", error);
-    throw error;
-  }
-}
+// // Update password query 
+// const updateEmployeePassword = async (employeeId, hashedPassword) => {
+//   try {
+//     let pool = await sql.connect(config);
+//     await pool
+//       .request()
+//       .input("EmployeeId", sql.VarChar, employeeId)
+//       .input("Password", sql.VarChar, hashedPassword) // Store hashed password
+//       .query(`
+//         UPDATE UserAccount
+//         SET Password = @Password
+//         WHERE EmployeeId = @EmployeeId;
+//       `);
+//   } catch (error) {
+//     console.error("Error updating password:", error);
+//     throw error;
+//   }
+// }
+// // Update role type query 
+// const updateEmployeeRole = async (employeeId, role) => {
+//   try {
+//     let pool = await sql.connect(config);
+//     await pool
+//       .request()
+//       .input("EmployeeId", sql.VarChar, employeeId)
+//       .input("Role", sql.VarChar, role)
+//       .query(`
+//         UPDATE UserAccount
+//         SET Role = @Role
+//         WHERE EmployeeId = @EmployeeId;
+//       `);
+//   } catch (error) {
+//     console.error("Error updating role:", error);
+//     throw error;
+//   }
+// }
 
 //update employee personal details  by id
 const updateEmployeeById = async (employeeId, updatedEmployeeData) => {
@@ -627,28 +627,28 @@ const updateEmployeeById = async (employeeId, updatedEmployeeData) => {
     let result = await pool
       .request()
       .input("EmployeeId", sql.VarChar, employeeId)
-      .input("EmployeeName", sql.VarChar(255), updatedEmployeeData.EmployeeName)
-      .input("LastName", sql.VarChar(255), updatedEmployeeData.LastName)
-      .input("FirstName", sql.VarChar(255), updatedEmployeeData.FirstName)
-      .input("MiddleName", sql.VarChar(255), updatedEmployeeData.MiddleName)
-      .input("MaidenName", sql.VarChar(255), updatedEmployeeData.MaidenName)
-      .input("Birthdate", sql.VarChar(255), updatedEmployeeData.Birthdate)
-      .input("Age", sql.VarChar(255), updatedEmployeeData.Age)
-      .input("BirthMonth", sql.VarChar(255), updatedEmployeeData.BirthMonth)
-      .input("AgeBracket", sql.VarChar(255), updatedEmployeeData.AgeBracket)
-      .input("Gender", sql.VarChar(255), updatedEmployeeData.Gender)
+      .input("EmployeeName", sql.VarChar(255), updatedEmployeeData.EmployeeName.trim())
+      .input("LastName", sql.VarChar(255), updatedEmployeeData.LastName.trim())
+      .input("FirstName", sql.VarChar(255), updatedEmployeeData.FirstName.trim())
+      .input("MiddleName", sql.VarChar(255), updatedEmployeeData.MiddleName.trim())
+      .input("MaidenName", sql.VarChar(255), updatedEmployeeData.MaidenName.trim())
+      .input("Birthdate", sql.VarChar(255), updatedEmployeeData.Birthdate.trim())
+      .input("Age", sql.VarChar(255), updatedEmployeeData.Age.trim())
+      .input("BirthMonth", sql.VarChar(255), updatedEmployeeData.BirthMonth.trim())
+      .input("AgeBracket", sql.VarChar(255), updatedEmployeeData.AgeBracket.trim())
+      .input("Gender", sql.VarChar(255), updatedEmployeeData.Gender.trim())
       .input(
         "MaritalStatus",
         sql.VarChar(255),
-        updatedEmployeeData.MaritalStatus
+        updatedEmployeeData.MaritalStatus.trim()
       )
-      .input("SSS", sql.VarChar(255), updatedEmployeeData.SSS)
-      .input("PHIC", sql.VarChar(255), updatedEmployeeData.PHIC)
-      .input("HDMF", sql.VarChar(255), updatedEmployeeData.HDMF)
-      .input("TIN", sql.VarChar(255), updatedEmployeeData.TIN)
-      .input("EmailAddress", sql.VarChar(255), updatedEmployeeData.EmailAddress)
-      .input("HmoProvider", sql.VarChar(255), updatedEmployeeData.HmoProvider)
-      .input("HmoPolicyNumber", sql.VarChar(255), updatedEmployeeData.HmoPolicyNumber)
+      .input("SSS", sql.VarChar(255), updatedEmployeeData.SSS.trim())
+      .input("PHIC", sql.VarChar(255), updatedEmployeeData.PHIC.trim())
+      .input("HDMF", sql.VarChar(255), updatedEmployeeData.HDMF.trim())
+      .input("TIN", sql.VarChar(255), updatedEmployeeData.TIN.trim())
+      .input("EmailAddress", sql.VarChar(255), updatedEmployeeData.EmailAddress.trim())
+      .input("HmoProvider", sql.VarChar(255), updatedEmployeeData.HmoProvider.trim())
+      .input("HmoPolicyNumber", sql.VarChar(255), updatedEmployeeData.HmoPolicyNumber.trim())
       .query(`
           UPDATE EmpPersonalDetails 
           SET EmployeeId = @EmployeeId,
@@ -829,6 +829,16 @@ const updateEmployeeInfoById = async (employeeId, updatedEmployeeData) => {
           Is_Active = @Is_Active
           WHERE EmployeeId = @EmployeeId
         `);
+         //update employee user account role
+         await pool
+         .request()
+         .input("EmployeeId", sql.VarChar, employeeId)
+         .input("Role", sql.VarChar(255), updatedEmployeeData.Role)
+         .query(`
+             UPDATE UserAccount 
+             SET Role = @Role
+             WHERE EmployeeId = @EmployeeId
+           `);
         
     return result;
   } catch (error) {
@@ -860,15 +870,17 @@ const addToHistory = async (historyData) => {
       throw error;
   }
 };
+//retrieve employee info and user account
 const getEmployeeInfoById = async (employeeId) => {
   try {
     let pool = await sql.connect(config);
     let result = await pool.request()
       .input('EmployeeId', sql.VarChar, employeeId)
       .query(`
-        SELECT *
-        FROM EmployeeInfo
-        WHERE EmployeeId = @EmployeeId
+        SELECT e.*, ua.Role
+        FROM EmployeeInfo e
+        JOIN UserAccount ua ON e.EmployeeId = ua.EmployeeId
+        WHERE e.EmployeeId = @EmployeeId
       `);
     return result.recordset[0];
   } catch (error) {
@@ -876,7 +888,6 @@ const getEmployeeInfoById = async (employeeId) => {
     throw error;
   }
 };
-
 //update employee address by id
 const updateEmployeeAddressById = async (employeeId, updatedEmployeeData) => {
   try {
@@ -1794,8 +1805,8 @@ module.exports = {
   insertCompBen,
   getCompBenByEmployeeId,
   updateCompBenById,
-  updateEmployeePassword,
-  updateEmployeeRole,
+  // updateEmployeePassword,
+  // updateEmployeeRole,
   addToHistory,
   getEmployeeInfoById,
   checkEmployeeAndEmail,

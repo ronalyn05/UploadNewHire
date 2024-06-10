@@ -76,82 +76,46 @@ function EmployeeProfile() {
     });
   };
 //function to reset the employee password
-  const handlePasswordUpdate = async (e) => {
-    e.preventDefault();
-    console.log(this);
-  console.log(employeeId);
-    try {
-      const response = await fetch(`http://localhost:5000/update/password/${employeeId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          EmployeeId: sessionStorage.getItem('employeeId'),
-          Password: formData.password,
+  // const handlePasswordUpdate = async (e) => {
+  //   e.preventDefault();
+  //   console.log(this);
+  // console.log(employeeId);
+  //   try {
+  //     const response = await fetch(`http://localhost:5000/update/password/${employeeId}`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         EmployeeId: sessionStorage.getItem('employeeId'),
+  //         Password: formData.password,
           
-        }),
-      });
+  //       }),
+  //     });
   
-      if (!response.ok) {
-        const responseData = await response.json();
-        setErrorMessage(responseData.error || 'Password Change Failed');
-        return;
-      }
+  //     if (!response.ok) {
+  //       const responseData = await response.json();
+  //       setErrorMessage(responseData.error || 'Password Change Failed');
+  //       return;
+  //     }
 
-      alert('Password has successfully changed!');
+  //     alert('Password has successfully changed!');
 
-      //window reload
-      window.location.reload();
+  //     //window reload
+  //     window.location.reload();
       
-      // navigate('/');
-    } catch (error) {
-      console.error("Password Change Failed", error);
-      setErrorMessage(error.message || "Password Change Failed.");
-    }
-  };
+  //     // navigate('/');
+  //   } catch (error) {
+  //     console.error("Password Change Failed", error);
+  //     setErrorMessage(error.message || "Password Change Failed.");
+  //   }
+  // };
   //function to update the employee role type
-  const handleRoleUpdate = async (e) => {
-    e.preventDefault();
-  console.log(employeeId);
-    try {
-        const response = await fetch(`http://localhost:5000/update/role/${employeeId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          EmployeeId: sessionStorage.getItem('employeeId'),
-          Role: formData.role,
-          
-        }),
-      });
-  
-      if (!response.ok) {
-        const responseData = await response.json();
-        setErrorMessage(responseData.error || 'Role Change Failed');
-        return;
-      }
-
-      alert('Role has successfully changed!');
-
-      //window reload
-      window.location.reload();
-      fetchEmployeeData();
-      
-      // navigate('/');
-    } catch (error) {
-      console.error("Role Change Failed", error);
-      setErrorMessage(error.message || "Role Change Failed.");
-    }
-  };
-
   // const handleRoleUpdate = async (e) => {
   //   e.preventDefault();
-  //   console.log(employeeId);
-  //   console.log(formData);
+  // console.log(employeeId);
   //   try {
-  //     const response = await fetch(`http://localhost:5000/update/role/${employeeId}`, {
+  //       const response = await fetch(`http://localhost:5000/update/role/${employeeId}`, {
   //       method: 'POST',
   //       headers: {
   //         'Content-Type': 'application/json',
@@ -159,19 +123,26 @@ function EmployeeProfile() {
   //       body: JSON.stringify({
   //         EmployeeId: sessionStorage.getItem('employeeId'),
   //         Role: formData.role,
+          
   //       }),
   //     });
+  
   //     if (!response.ok) {
-  //       throw new Error('Failed to update role');
+  //       const responseData = await response.json();
+  //       setErrorMessage(responseData.error || 'Role Change Failed');
+  //       return;
   //     }
-  //     const updatedData = await response.json();
-  //     setEmployeeData(updatedData);
-  //     // Fetch updated employee data after role update
-  //     await fetchEmployeeData(employeeId);
-  //     alert('Role updated successfully');
+
+  //     alert('Role has successfully changed!');
+
+  //     //window reload
+  //     window.location.reload();
+  //     fetchEmployeeData();
+      
+  //     // navigate('/');
   //   } catch (error) {
-  //     console.error('Error updating role:', error);
-  //     setErrorMessage('Error updating role');
+  //     console.error("Role Change Failed", error);
+  //     setErrorMessage(error.message || "Role Change Failed.");
   //   }
   // };
 
@@ -394,7 +365,7 @@ function EmployeeProfile() {
                               </div>
                             </div>
                           </div>
-                          <hr/>
+                          {/* <hr/>
                                   <h5 className='text-primary'>Change employee password / role type here</h5>
                                   <hr className="hr-change-Pass"/>
                                 <br/>
@@ -433,7 +404,7 @@ function EmployeeProfile() {
                                       <i className="fas fa-pencil-alt"></i></button>
                                     </div>
                                   </div>
-                                </form>
+                                </form> */}
                         </form>
                       </div>
                     </div>

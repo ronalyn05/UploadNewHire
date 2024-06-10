@@ -71,7 +71,7 @@ function ForgotPasswordPage() {
       const hashedPassword = await bcrypt.hash(newPassword, 10);
       await axios.post("/api/resetPassword", { email, newPassword: hashedPassword });
       alert("Password reset successfully. You can now log in with your new password.");
-      navigate("/login"); // Redirect to login page after successful password reset
+      navigate("/"); // Redirect to login page after successful password reset
     } catch (error) {
       console.error("Error resetting password:", error);
       alert("An error occurred. Please try again.");
