@@ -10,20 +10,13 @@ function EmployeeProfile() {
   const [employeeData, setEmployeeData] = useState({
     ProfilePhoto: "/img/user.png",
   });
-  // const [password, setPassword] = useState('');
-  // const [role, setRole] = useState('');
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const employeeProfileRef = useRef(null);
-  const [formData, setFormData] = useState({
-    Password: "",
-    Role: ""
-  });
 
   useEffect(() => {
     if (state && state.employeeData) {
       setEmployeeData(state.employeeData);
-      // setRole(state.employeeData.Role || '');
     } else {
       fetchEmployeeData(employeeId);
     }
@@ -66,85 +59,6 @@ function EmployeeProfile() {
   const handleNavigateBack = () => {
     navigate(-1);
   };
-
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-//function to reset the employee password
-  // const handlePasswordUpdate = async (e) => {
-  //   e.preventDefault();
-  //   console.log(this);
-  // console.log(employeeId);
-  //   try {
-  //     const response = await fetch(`http://localhost:5000/update/password/${employeeId}`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         EmployeeId: sessionStorage.getItem('employeeId'),
-  //         Password: formData.password,
-          
-  //       }),
-  //     });
-  
-  //     if (!response.ok) {
-  //       const responseData = await response.json();
-  //       setErrorMessage(responseData.error || 'Password Change Failed');
-  //       return;
-  //     }
-
-  //     alert('Password has successfully changed!');
-
-  //     //window reload
-  //     window.location.reload();
-      
-  //     // navigate('/');
-  //   } catch (error) {
-  //     console.error("Password Change Failed", error);
-  //     setErrorMessage(error.message || "Password Change Failed.");
-  //   }
-  // };
-  //function to update the employee role type
-  // const handleRoleUpdate = async (e) => {
-  //   e.preventDefault();
-  // console.log(employeeId);
-  //   try {
-  //       const response = await fetch(`http://localhost:5000/update/role/${employeeId}`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         EmployeeId: sessionStorage.getItem('employeeId'),
-  //         Role: formData.role,
-          
-  //       }),
-  //     });
-  
-  //     if (!response.ok) {
-  //       const responseData = await response.json();
-  //       setErrorMessage(responseData.error || 'Role Change Failed');
-  //       return;
-  //     }
-
-  //     alert('Role has successfully changed!');
-
-  //     //window reload
-  //     window.location.reload();
-  //     fetchEmployeeData();
-      
-  //     // navigate('/');
-  //   } catch (error) {
-  //     console.error("Role Change Failed", error);
-  //     setErrorMessage(error.message || "Role Change Failed.");
-  //   }
-  // };
 
   if (!employeeData) {
     return <div>Loading...</div>;
@@ -365,46 +279,6 @@ function EmployeeProfile() {
                               </div>
                             </div>
                           </div>
-                          {/* <hr/>
-                                  <h5 className='text-primary'>Change employee password / role type here</h5>
-                                  <hr className="hr-change-Pass"/>
-                                <br/>
-                                <form>
-                                  <div className="form-group">
-                                  <label className="blueLabel labelWithSpacing">
-                                  Reset Password
-                                </label>
-                                    <div className="d-flex align-items-center">
-                                      <input 
-                                        type="password" 
-                                        className="form-control mr-2" 
-                                        value={formData.password}
-                                        placeholder="Reset Employee Password" 
-                                        name="password" 
-                                        onChange={handleInputChange}
-                                      />
-                                      <button type="submit" className="btn btn-primary" onClick={handlePasswordUpdate}>
-                                      <i className="fas fa-pencil-alt"></i></button>
-                                    </div>
-                                  </div>
-                                </form> 
-                                <form>
-                                  <div className="form-group">
-                                  <label className="blueLabel labelWithSpacing">
-                                  Update Role Type
-                                </label>
-                                    <div className="d-flex align-items-center">
-                                    <select className= 'form-control mr-2' 
-                                                    value={formData.role} name="Update Employee Role" onChange={handleInputChange}>
-                                                      <option>Select Role Type</option>
-                                                        <option value="HRAdmin">HRAdmin</option>
-                                                        <option value="Employee">Employee</option>
-                                                    </select>
-                                      <button type="submit" className="btn btn-primary"  onClick={handleRoleUpdate}>
-                                      <i className="fas fa-pencil-alt"></i></button>
-                                    </div>
-                                  </div>
-                                </form> */}
                         </form>
                       </div>
                     </div>

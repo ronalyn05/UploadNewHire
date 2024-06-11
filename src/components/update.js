@@ -48,7 +48,7 @@ import 'jspdf-autotable';
     ProfilePhoto: "/img/user.png",
     HRANType: ''
   });
-      // Define initialOptions first
+  // Define initialOptions first
   const initialOptions = [
         'Re - Hire',
         'Recall',
@@ -111,6 +111,12 @@ import 'jspdf-autotable';
   const [errors, setErrors] = useState({});
   // const [compBen, setCompBen] = useState([]); 
   const [selectedCompBen, setSelectedCompBen] = useState(null);
+  const [country, setCountry] = useState([]);
+  const [provinces, setProvinces] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [regions, setRegions] = useState([]);
+  const [barangay, setBarangay] = useState([]);
+
 
     // Function to handle input change in the search field
     const handleSearchChange = (e) => {
@@ -133,14 +139,7 @@ import 'jspdf-autotable';
         setFilteredDependents([]);
       }
     }, [searchQuery, dependents]);
-    
-    // useEffect(() => {
-    //   const filtered = dependents.filter((dependent) =>
-    //     dependent.FullName.toLowerCase().includes(searchQuery.toLowerCase())
-    //   );
-    //   setFilteredDependents(filtered);
-    // }, [searchQuery, dependents]);
-    
+
  // Define the fetchDependents function
  const fetchDependents = async () => {
   try {
@@ -678,8 +677,7 @@ const handleFormEmpInfoSubmit = async (e) => {
         EmployeeName: employeeName,
         Action: 'Update',
         FieldName: field,
-        // FieldName: field === 'HRANType' ? chosenHRANType : field,
-        OldValue: previousValues[field] || 'N/A', // Use the previous value or 'N/A' if not available
+        OldValue: previousValues[field] || 'N/A',
         NewValue: employeeData[field],
         DateCreated: new Date().toISOString(),
         UpdatedBy: updatedBy,
@@ -1604,17 +1602,119 @@ const handleFormEmpInfoSubmit = async (e) => {
   
     const statusColor = getStatusColor(employeeData.EmployeeStatus);
   
-    const handleRegionChange = (e) => {
-      const region = e.target.value;
-      setEmployeeData({
-        ...employeeData,
-        Province: '', 
-        CityMunicipality: '', 
-        ZipCode: '', 
-        Region: region
-      });
+    // const handleRegionChange = (e) => {
+    //   const region = e.target.value;
+    //   setEmployeeData({
+    //     ...employeeData,
+    //     Province: '', 
+    //     CityMunicipality: '', 
+    //     ZipCode: '', 
+    //     Region: region
+    //   });
       
+    // };
+    useEffect(() => {
+      fetchCountries();
+    }, []);
+
+    const fetchCountries = async () => {
+      const username = 'innodata_test'; // GeoNames username
+      try {
+        const response = await fetch(`http://api.geonames.org/countryInfoJSON?username=${username}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch countries');
+        }
+        const data = await response.json();
+        console.log('Countries data:', data); // Log the response data
+        const countries = data.geonames.map(country => country.countryName);
+        console.log('Countries:', countries); // Log the countries array
+        populateCountryDropdown(countries);
+      } catch (error) {
+        console.error('Error fetching countries:', error);
+      }
     };
+  
+    const populateCountryDropdown = (countries) => {
+      const countryDropdown = document.getElementById('countryDropdown');
+      countries.forEach(country => {
+        const option = document.createElement('option');
+        option.text = country;
+        option.value = country;
+        countryDropdown.appendChild(option);
+      });
+    };
+  //function that handldes the country
+    const handleCountryChange = async (e) => {
+      const selectedCountry = e.target.value;
+      handleInputChange(e); // To update the country in employeeData
+      setRegions([]); // Clear regions when country changes
+      try {
+        const username = 'innodata_test'; // GeoNames username
+        const response = await fetch(`http://api.geonames.org/searchJSON?q=${selectedCountry}&maxRows=10&username=${username}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch regions data');
+        }
+        const data = await response.json();
+        const regions = data.geonames.map(region => region.name);
+        setRegions(regions);
+        setProvinces([]); // Clear provinces when country changes
+      } catch (error) {
+        console.error('Error fetching regions data:', error);
+      }
+    };
+// Update handleRegionChange function to fetch regions correctly
+    const handleRegionChange = async (e) => {
+      const selectedRegion = e.target.value;
+      handleInputChange(e); // To update the region in employeeData
+      try {
+        const username = 'innodata_test'; // GeoNames username
+        const response = await fetch(`http://api.geonames.org/searchJSON?q=${selectedRegion}&maxRows=10&username=${username}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch address data');
+        }
+        const data = await response.json();
+        const provinces = data.geonames.map(item => item.adminName1);
+        setProvinces(provinces);
+        setCities([]); // Clear cities when region changes
+      } catch (error) {
+        console.error('Error fetching address data:', error);
+      }
+    };
+    //function that handldes the province 
+    const handleProvinceChange = async (e) => {
+      const selectedProvince = e.target.value;
+      handleInputChange(e); // To update the province in employeeData
+      try {
+        const username = 'innodata_test'; // GeoNames username
+        const response = await fetch(`http://api.geonames.org/searchJSON?q=${selectedProvince}&maxRows=10&username=${username}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch cities data');
+        }
+        const data = await response.json();
+        const cities = data.geonames.map(item => item.name);
+        setCities(cities);
+      } catch (error) {
+        console.error('Error fetching cities data:', error);
+      }
+    };
+    //function that handles the city/municipality
+    const handleCityChange = async (e) => {
+      const selectedCity = e.target.value;
+      handleInputChange(e); // To update the city in employeeData
+      try {
+        const username = 'innodata_test'; // GeoNames username
+        const response = await fetch(`http://api.geonames.org/searchJSON?q=${selectedCity}&maxRows=10&username=${username}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch barangays data');
+        }
+        const data = await response.json();
+        const barangays = data.geonames.map(item => item.name);
+        setBarangay(barangays);
+      } catch (error) {
+        console.error('Error fetching barangays data:', error);
+      }
+    }; 
+
 
   //array lists all the fields that are mandatory
   const requiredFields = [
@@ -3826,141 +3926,114 @@ const toSentenceCase = (text) => {
 
                                   </div>
                                     <hr/>
-                          <form onSubmit={handleAddressFormSubmit}>
-                          {/* <div className='card-body'> */}
-                          <h5 className='text-primary'>Address Details</h5>
-                                <hr className="hr-cobalt-blue"/>
-                                <br/>
-                                <div className="row ">
-                                    {/* <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label>Employee ID</label>
-                                            <span className="form-control">{Array.isArray(employeeData.EmployeeId) ? employeeData.EmployeeId[0] : employeeData.EmployeeId}</span>
-                                        </div>
-                                    </div> */}
-                                    <div className="col-md-4">
-                                        <div className="form-group">
+                                    <form onSubmit={handleAddressFormSubmit}>
+                                      <h5 className='text-primary'>Address Details</h5>
+                                      <hr className="hr-cobalt-blue"/>
+                                      <br/>
+                                      <div className="row">
+                                        <div className="col-md-4">
+                                          <div className="form-group">
                                             <label htmlFor="houseNumber">House Number</label>
-                                            <input type="text" className="form-control"  placeholder="enter house number" value={employeeData.HouseNumber} name="HouseNumber" onChange={handleInputChange} />
+                                            <input type="text" className="form-control" placeholder="enter house number" value={employeeData.HouseNumber} name="HouseNumber" onChange={handleInputChange} />
+                                          </div>
                                         </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
+                                        <div className="col-md-8">
+                                          <div className="form-group">
                                             <label htmlFor="completeAddress">Complete Address</label>
                                             <input type="text" className="form-control" placeholder="Enter Complete Address" name="CompleteAddress" value={employeeData.CompleteAddress} onChange={handleInputChange} />
+                                          </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="brgy">Barangay</label>
-                                            <input type="text" className="form-control" placeholder="Enter Barangay" name="Barangay" value={employeeData.Barangay} onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
-                                            <label htmlFor="cityMunicipality">City / Municipality</label>
-                                            <input type="text" className="form-control" placeholder="Enter City/Municipality" name="CityMunicipality" value={employeeData.CityMunicipality} onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                      <div className="form-group">
-                                        <label htmlFor="province">Province</label>
-                                        <select className="form-control" value={employeeData.Province} name="Province" onChange={handleInputChange}>
-                                          <option value="">Select Province</option>
-                                          <option value="Abra">Abra</option>
-                                          <option value="Agusan del Norte">Agusan del Norte</option>
-                                          <option value="Agusan del Sur">Agusan del Sur</option>
-                                          <option value="Aklan">Aklan</option>
-                                          <option value="Albay">Albay</option>
-                                          <option value="Antique">Antique</option>
-                                          <option value="Apayao">Apayao</option>
-                                          <option value="Aurora">Aurora</option>
-                                          <option value="Basilan">Basilan</option>
-                                          <option value="Bataan">Bataan</option>
-                                          <option value="Batanes">Batanes</option>
-                                          <option value="Batangas">Batangas</option>
-                                          <option value="Benguet">Benguet</option>
-                                          <option value="Biliran">Biliran</option>
-                                          <option value="Bohol">Bohol</option>
-                                          <option value="Bukidnon">Bukidnon</option>
-                                          <option value="Bulacan">Bulacan</option>
-                                          <option value="Cagayan">Cagayan</option>
-                                          <option value="Camarines Norte">Camarines Norte</option>
-                                          <option value="Agusan del Norte">Agusan del Norte</option>
-                                        </select>
                                       </div>
-                                    </div>
-                                  </div>
-                                  <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                      <div className="form-group">
-                                        <label htmlFor="region">Region</label>
-                                        <select className="form-control" value={employeeData.Region} name="Region" onChange={handleRegionChange}>
-                                          <option value="">Select Region</option>
-                                          <option value="Ilocos Region">Ilocos Region</option>
-                                          <option value="Cagayan Valley">Cagayan Valley</option>
-                                          <option value="Central Luzon">Central Luzon</option>
-                                          <option value="CALABARZON">CALABARZON</option>
-                                          <option value="Bicol Region">Bicol Region</option>
-                                          <option value="Western Visayas">Western Visayas</option>
-                                          <option value="Central Visayas">Central Visayas</option>
-                                          <option value="Eastern Visayas">Eastern Visayas</option>
-                                          <option value="Zamboanga Peninsula">Zamboanga Peninsula</option>
-                                          <option value="Northern Mindanao">Northern Mindanao</option>
-                                          <option value="Davao Region">Davao Region</option>
-                                          <option value="SOCCSKSARGEN">SOCCSKSARGEN</option>
-                                          <option value="Caraga Region">Caraga Region</option>
-                                          <option value="Cordillera Administrative Region">Cordillera Administrative Region</option>
-                                          <option value="National Capital Region">National Capital Region</option>
-                                          <option value="MIMAROPA">MIMAROPA</option>
-                                          <option value="Bangsamoro Autonomous Region in Muslim Mindanao">Bangsamoro Autonomous Region in Muslim Mindanao</option>
-                                        </select>
-                                      </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
+                                      <div className="row justify-content-center">
+                                        <div className="col-md-4">
+                                          <div className="form-group">
                                             <label htmlFor="country">Country</label>
-                                            <input type="text" className="form-control" placeholder="Enter Country" name="Country" value={employeeData.Country} onChange={handleInputChange} />
+                                            <select id="countryDropdown" className="form-control" value={employeeData.Country} name="Country" onChange={handleCountryChange}>
+                                              <option value="">Select Country</option>
+                                            </select>
+                                          </div>
                                         </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                              <div className="form-group">
-                                              <label htmlFor="zipcode">Zip Code</label>
-                                              <input type="text" className="form-control" placeholder="Enter Zip Code" name="ZipCode" value={employeeData.ZipCode} onChange={handleInputChange} />
-                                              </div>
-                                            </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <div className="form-group">
+                                      <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label htmlFor="region">Region</label>
+                                            <select id="regionDropdown" className="form-control" value={employeeData.Region} name="Region" onChange={handleRegionChange}>
+                                              <option value="">Select Region</option>
+                                              {regions.map(region => (
+                                                <option key={region} value={region}>{region}</option>
+                                              ))}
+                                            </select>
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label htmlFor="province">Province</label>
+                                            <select id="provinceDropdown" className="form-control" value={employeeData.Province} name="Province" onChange={handleProvinceChange}>
+                                              <option value="">Select Province</option>
+                                              {provinces.map(province => (
+                                                <option key={province} value={province}>{province}</option>
+                                              ))}
+                                          </select>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="row justify-content-center">
+                                      <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label htmlFor="cityMunicipality">City / Municipality</label>
+                                            <select id="cityDropdown" className="form-control" value={employeeData.CityMunicipality} name="CityMunicipality" onChange={handleCityChange}>
+                                              <option value="">Select City/Municipality</option>
+                                              {cities.map(city => (
+                                                <option key={city} value={city}>{city}</option>
+                                              ))}
+                                            </select>
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label htmlFor="brgy">Barangay</label>
+                                            <select id="barangayDropdown" className="form-control" value={employeeData.Barangay} name="Barangay" onChange={handleInputChange}>
+                                              <option value="">Select Barangay</option>
+                                              {barangay.map(b => (
+                                                <option key={b} value={b}>{b}</option>
+                                              ))}
+                                            </select>
+                                          </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label htmlFor="zipcode">Zip Code</label>
+                                            <input type="text" className="form-control" placeholder="Enter Zip Code" name="ZipCode" value={employeeData.ZipCode} onChange={handleInputChange} />
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="row justify-content-center">
+                                        <div className="col-md-4">
+                                          <div className="form-group">
                                             <label htmlFor="landmark">Land Mark</label>
                                             <input type="text" className="form-control" placeholder="Enter Land Mark" name="Landmark" value={employeeData.Landmark} onChange={handleInputChange} />
+                                          </div>
                                         </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-group">
+                                        <div className="col-md-4">
+                                          <div className="form-group">
                                             <label htmlFor="isPermanent">is Permanent</label>
                                             <select className="form-control" value={employeeData.IsPermanent} name="IsPermanent" onChange={handleInputChange}>
-                                                <option value={true}>Yes</option>
-                                                <option value={false}>No</option>
+                                              <option value={true}>Yes</option>
+                                              <option value={false}>No</option>
                                             </select>
+                                          </div>
                                         </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                              <div className="form-group">
-                                              <label htmlFor="isEmergency">is Emergency</label>
-                                              <select className="form-control" value={employeeData.IsEmergency} name="IsEmergency" onChange={handleInputChange}>
-                                                <option value={true}>Yes</option>
-                                                <option value={false}>No</option>
+                                        <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label htmlFor="isEmergency">is Emergency</label>
+                                            <select className="form-control" value={employeeData.IsEmergency} name="IsEmergency" onChange={handleInputChange}>
+                                              <option value={true}>Yes</option>
+                                              <option value={false}>No</option>
                                             </select>
-                                              </div>
-                                            </div>
-                                {/* </div> */}
-                                </div>
-                                <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
-                            </form>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <button type="submit" className="btn btn-primary d-block mx-auto">Save Changes</button>
+                                    </form>
                             <hr/>
                             <h5 className='text-primary'>Emergency Contact Details</h5>
                                 <hr className="hr-cobalt-blue"/>
