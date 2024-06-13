@@ -111,17 +111,18 @@ import 'jspdf-autotable';
   const [errors, setErrors] = useState({});
   // const [compBen, setCompBen] = useState([]); 
   const [selectedCompBen, setSelectedCompBen] = useState(null);
-  const [country, setCountry] = useState([]);
+  const [countries, setCountries] = useState([]);
+  const [regions, setRegions] = useState([]);
   const [provinces, setProvinces] = useState([]);
   const [cities, setCities] = useState([]);
-  const [regions, setRegions] = useState([]);
   const [barangay, setBarangay] = useState([]);
+  
 
 
     // Function to handle input change in the search field
-    const handleSearchChange = (e) => {
-      setSearchQuery(e.target.value);
-    };
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
      // Go back to the previous page in history
   const handleNavigateBack = () => {
     // Navigate back one step in history (equivalent to pressing the browser's back button)
@@ -1601,22 +1602,11 @@ const handleFormEmpInfoSubmit = async (e) => {
     };
   
     const statusColor = getStatusColor(employeeData.EmployeeStatus);
-  
-    // const handleRegionChange = (e) => {
-    //   const region = e.target.value;
-    //   setEmployeeData({
-    //     ...employeeData,
-    //     Province: '', 
-    //     CityMunicipality: '', 
-    //     ZipCode: '', 
-    //     Region: region
-    //   });
-      
-    // };
+
     useEffect(() => {
       fetchCountries();
     }, []);
-
+  
     const fetchCountries = async () => {
       const username = 'innodata_test'; // GeoNames username
       try {
@@ -1625,96 +1615,104 @@ const handleFormEmpInfoSubmit = async (e) => {
           throw new Error('Failed to fetch countries');
         }
         const data = await response.json();
-        console.log('Countries data:', data); // Log the response data
         const countries = data.geonames.map(country => country.countryName);
-        console.log('Countries:', countries); // Log the countries array
-        populateCountryDropdown(countries);
+        setCountries(countries);
       } catch (error) {
         console.error('Error fetching countries:', error);
       }
     };
   
-    const populateCountryDropdown = (countries) => {
-      const countryDropdown = document.getElementById('countryDropdown');
-      countries.forEach(country => {
-        const option = document.createElement('option');
-        option.text = country;
-        option.value = country;
-        countryDropdown.appendChild(option);
-      });
-    };
-  //function that handldes the country
     const handleCountryChange = async (e) => {
       const selectedCountry = e.target.value;
       handleInputChange(e); // To update the country in employeeData
       setRegions([]); // Clear regions when country changes
+      setProvinces([]);
+      setCities([]);
+      setBarangay([]);
       try {
-        const username = 'innodata_test'; // GeoNames username
-        const response = await fetch(`http://api.geonames.org/searchJSON?q=${selectedCountry}&maxRows=10&username=${username}`);
+        const username = 'innodata_test';
+        const response = await fetch(`http://api.geonames.org/searchJSON?q=${selectedCountry}&featureCode=ADM1&username=${username}`);
         if (!response.ok) {
           throw new Error('Failed to fetch regions data');
         }
         const data = await response.json();
         const regions = data.geonames.map(region => region.name);
         setRegions(regions);
-        setProvinces([]); // Clear provinces when country changes
       } catch (error) {
         console.error('Error fetching regions data:', error);
       }
     };
-// Update handleRegionChange function to fetch regions correctly
+  
     const handleRegionChange = async (e) => {
       const selectedRegion = e.target.value;
       handleInputChange(e); // To update the region in employeeData
+      setProvinces([]); // Clear provinces when region changes
+      setCities([]);
+      setBarangay([]);
       try {
-        const username = 'innodata_test'; // GeoNames username
-        const response = await fetch(`http://api.geonames.org/searchJSON?q=${selectedRegion}&maxRows=10&username=${username}`);
+        const username = 'innodata_test';
+        const response = await fetch(`http://api.geonames.org/searchJSON?q=${selectedRegion}&featureCode=ADM2&username=${username}`);
         if (!response.ok) {
-          throw new Error('Failed to fetch address data');
+          throw new Error('Failed to fetch provinces data');
         }
         const data = await response.json();
-        const provinces = data.geonames.map(item => item.adminName1);
+        const provinces = data.geonames.map(item => item.name);
         setProvinces(provinces);
-        setCities([]); // Clear cities when region changes
       } catch (error) {
-        console.error('Error fetching address data:', error);
+        console.error('Error fetching provinces data:', error);
       }
     };
-    //function that handldes the province 
+
     const handleProvinceChange = async (e) => {
       const selectedProvince = e.target.value;
       handleInputChange(e); // To update the province in employeeData
+      setCities([]); // Clear cities when province changes
+      setBarangay([]);
       try {
-        const username = 'innodata_test'; // GeoNames username
-        const response = await fetch(`http://api.geonames.org/searchJSON?q=${selectedProvince}&maxRows=10&username=${username}`);
+        const username = 'innodata_test';
+        const response = await fetch(`http://api.geonames.org/searchJSON?q=${selectedProvince}&featureCode=PPLA3&username=${username}`);
         if (!response.ok) {
           throw new Error('Failed to fetch cities data');
         }
         const data = await response.json();
-        const cities = data.geonames.map(item => item.name);
+         const cities = data.geonames.map(item => item.name);
+        // const cities = data.geonames.filter(item => item.fcode !== 'PPLX  ').map(item => item.name);
         setCities(cities);
       } catch (error) {
         console.error('Error fetching cities data:', error);
       }
     };
-    //function that handles the city/municipality
+    
     const handleCityChange = async (e) => {
       const selectedCity = e.target.value;
-      handleInputChange(e); // To update the city in employeeData
+      handleInputChange(e); //  this function updates employeeData
+      
       try {
-        const username = 'innodata_test'; // GeoNames username
-        const response = await fetch(`http://api.geonames.org/searchJSON?q=${selectedCity}&maxRows=10&username=${username}`);
+        const username = 'innodata_test';
+        // Fetch barangays (PPL feature code) within the selected city/municipality
+        const response = await fetch(`http://api.geonames.org/searchJSON?q=${selectedCity}&featureCode=PPLX&username=${username}`);
+        
         if (!response.ok) {
           throw new Error('Failed to fetch barangays data');
         }
+        
         const data = await response.json();
         const barangays = data.geonames.map(item => item.name);
+        console.log('Barangays:', barangays); // Log barangays data
         setBarangay(barangays);
+        
+        // set the zip code based on the first entry (if it has the zip code)
+        if (data.geonames.length > 0) {
+          const zipCode = data.geonames[0].postalCode; // the first entry has the zip code
+          setEmployeeData(prevData => ({
+            ...prevData,
+            ZipCode: zipCode
+          }));
+        }
       } catch (error) {
         console.error('Error fetching barangays data:', error);
-      }
-    }; 
-
+           }
+         };
 
   //array lists all the fields that are mandatory
   const requiredFields = [
@@ -2097,7 +2095,7 @@ const toSentenceCase = (text) => {
                           <div className="container">
                             <form onSubmit={handleFormEmpInfoSubmit}>
                             <div className='card-body'>
-                              <h5 className='text-primary'>Section 1</h5>
+                              {/* <h5 className='text-primary'>Section 1</h5> */}
                                 <hr className="hr-cobalt-blue"/>
                                 <br/>
                                 <div className="row justify-content-center">
@@ -2329,7 +2327,7 @@ const toSentenceCase = (text) => {
                                             </div>
                                 </div>
                                 <hr/>
-                                  <h5 className='text-primary'>Section 2</h5>
+                                  {/* <h5 className='text-primary'>Section 2</h5> */}
                                   <hr className="hr-cobalt-blue"/>
                                 <br/>
                                 <div className="row ">
@@ -2505,86 +2503,6 @@ const toSentenceCase = (text) => {
                                                 <option value=" FIXED - 6 Day 8:00AM to 4:00PM"> FIXED - 6 Day 8:00AM to 4:00PM</option>
                                                 <option value=" FIXED - 6 Day 8:00PM to 4:00AM"> FIXED - 6 Day 8:00PM to 4:00AM</option>
                                             </select>
-                                              {/* <select className="form-control" value={employeeData.ShiftCode + '' + employeeData.ShiftName} name="ShiftName" onChange={handleInputChange}>
-                                                      <option value="[G1] FIXED - 6 Day 6:00AM to 2:00PM ">[G1] FIXED - 6 Day 6:00AM to 2:00PM</option>
-                                                      <option value="[F54] FIXED - 5 Day 8:00PM to 5:12AM">[F54] FIXED - 5 Day 8:00PM to 5:12AM</option>
-                                                      <option value="[G3] FIXED - 6 Day 10:00PM to 6:00AM">[G3] FIXED - 6 Day 10:00PM to 6:00AM</option>
-                                                      <option value="[F39] FIXED - 5 Day 9:00PM to 6:12AM">[F39] FIXED - 5 Day 9:00PM to 6:12AM</option>
-                                                      <option value="[F47] FIXED - 5 Day 9:00AM to 6:12PM">[F47] FIXED - 5 Day 9:00AM to 6:12PM</option>
-                                                      <option value="[C3] FLEXI - 8:00AM to 8:00PM">[C3] FLEXI - 8:00AM to 8:00PM</option>
-                                                      <option value="G2">[G2] FIXED - 6 Day 2:00PM to 10:00PM</option>
-                                                      <option value="F14">[F14] FIXED - 5 Day 11:00AM to 8:12PM</option>
-                                                      <option value="F11">[F11] FIXED - 5 Day 6:00AM to 3:12PM</option>
-                                                      <option value="C9">[C9] FLEXI - 10:00AM to 10:00PM</option>
-                                                      <option value="F40">[F40] FIXED - 5 Day 12:00PM to 9:12PM</option>
-                                                      <option value="F43">[F43] FIXED - 5 Day 11:00PM to 8:12AM</option>
-                                                      <option value="HB">[HB] HOME-BASED ONLY</option>
-                                                      <option value="F1">[F1] FIXED - 6 Day 6:00AM to 2:00PM</option>
-                                                      <option value="F4">[F4] FIXED - 6 Day 9:00AM to 5:00PM</option>
-                                                      <option value="N1">[N1] FLEXI 2 - 6:00AM to 6:00PM</option>
-                                                      <option value="F13">[F13] FIXED - 5 Day 10:00AM to 7:12PM</option>
-                                                      <option value="F3">[F3] FIXED - 6 Day 10:00PM to 6:00AM</option>
-                                                      <option value="F18">[F18] FIXED - 5 Day 10:00PM to 7:12AM</option>
-                                                      <option value="N2">[N2] FLEXI 2 - 12:00PM to 12:00AM</option>
-                                                      <option value="F55">[F55] FIXED - 5 Day 4:00PM to 1:12AM</option>
-                                                      <option value="F77">[F77] FIXED - 5 Day 5:00AM to 2:12PM</option>
-                                                      <option value="N9">[N9] FLEXI 2 - 10:00AM to 10:00PM</option>
-                                                      <option value="F41">[F41] FIXED - 6 Day 10:00AM to 6:00PM</option>
-                                                      <option value="F46">[F46] FIXED - 5 Day 4:00AM to 1:12PM</option>
-                                                      <option value="C1">[C1] FLEXI - 6:00AM to 6:00PM</option>
-                                                      <option value="F81">[F81] FIXED - 5 Day 3:15PM to 12:27AM</option>
-                                                      <option value="N10">[N10] FLEXI 2 - 9:00AM to 9:00PM</option>
-                                                      <option value="N3">[N3] FLEXI 2 - 8:00AM to 8:00PM</option>
-                                                      <option value="F62">[F62] FIXED - 5 Day 3:00PM to 12:12AM</option>
-                                                      <option value="F48">[F48] FIXED - 5 Day 12:00MN to 9:12AM</option>
-                                                      <option value="C7">[C7] FLEXI - 7:00AM to 7:00PM</option>
-                                                      <option value="F7">[F7] FIXED - 6 Day 12:00AM to 8:00AM</option>
-                                                      <option value="F86">[F86] FIXED - 5 Day 6:20AM to 3:32PM</option>
-                                                      <option value="F69">[F69] FIXED - 5 Day 7:00AM to 4:12PM</option>
-                                                      <option value="F12">[F12] FIXED - 5 Day 8:00AM to 5:12PM</option>
-                                                      <option value="G79">[G79] FIXED - 6 Day 12:00AM to 8:00AM</option>
-                                                      <option value="G59">[G59] FIXED - 6 Day 8:00AM to 4:00PM</option>
-                                                      <option value="C10">[C10] FLEXI - 9:00AM to 9:00PM</option>
-                                                      <option value="F2">[F2] FIXED - 6 Day 2:00PM to 10:00PM</option>
-                                                      <option value="F61">[F61] FIXED - 6 Day 7:00AM to 3:00PM</option>
-                                                      <option value="G4">[G4] FIXED - 6 Day 9:00AM to 5:00PM</option>
-                                                      <option value="N4">[N4] FLEXI 2 - 3:00PM to 3:00AM</option>
-                                                      <option value="N8">[N8] FLEXI 2 - 5:00PM to 5:00AM</option>
-                                                      <option value="C2">[C2] FLEXI - 12:00PM to 12:00AM</option>
-                                                      <option value="N6">[N6] FLEXI 2 - 10:00PM to 10:00AM</option>
-                                                      <option value="C6">[C6] FLEXI - 10:00PM to 10:00AM</option>
-                                                      <option value="F15">[F15] FIXED - 5 Day 1:00PM to 10:12PM</option>
-                                                      <option value="F82">[F82] FIXED - 5 Day 2:12PM to 11:24PM</option>
-                                                      <option value="F57">[F57] FIXED - 5 Day 11:30AM to 8:42PM</option>
-                                                      <option value="G41">[G41] FIXED - 6 Day 10:00AM to 6:00PM</option>
-                                                      <option value="F60">[F60] FIXED - 6 Day 3:00PM to 11:00PM</option>
-                                                      <option value="N11">[N11] FLEXI 2 - 11:00AM to 11:00PM</option>
-                                                      <option value="F76">[F76] FIXED - 5 Day 10:30PM to 7:42AM</option>
-                                                      <option value="N5">[N5] FLEXI 2 - 8:00PM to 8:00AM</option>
-                                                      <option value="F17">[F17] FIXED - 5 Day 3:12PM to 12:25AM</option>
-                                                      <option value="F72">[F72] FIXED - 5 Day 5:00PM to 2:12AM</option>
-                                                      <option value="F73">[F73] FIXED - 5 Day 6:00PM to 3:12AM</option>
-                                                      <option value="F84">[F84] FIXED - 5 Day 7:20AM to 4:32PM</option>
-                                                      <option value="F68">[F68] FIXED - 6 Day 6:00PM to 2:00AM</option>
-                                                      <option value="C4">[C4] FLEXI - 3:00PM to 3:00AM</option>
-                                                      <option value="N12">[N12] FLEXI 2 - 2:00PM to 2:00AM</option>
-                                                      <option value="F5">[F5] FIXED - 6 Day 12:00PM to 8:00PM</option>
-                                                      <option value="F83">[F83] FIXED - 5 Day 12:40PM to 9:52PM</option>
-                                                      <option value="F50">[F50] FIXED - 5 Day 2:00AM to 11:12AM</option>
-                                                      <option value="F9">[F9] FIXED - 6 Day 4:00PM to 12:00AM</option>
-                                                      <option value="C5">[C5] FLEXI - 8:00PM to 8:00AM</option>
-                                                      <option value="C11">[C11] FLEXI - 11:00AM to 11:00PM</option>
-                                                      <option value="C8">[C8] FLEXI - 5:00PM to 5:00AM</option>
-                                                      <option value="G5">[G5] FIXED - 6 Day 12:00PM to 8:00PM</option>
-                                                      <option value="F63">[F63] FIXED - 5 Day 7:00PM to 4:12AM</option>
-                                                      <option value="G61">[G61] FIXED - 6 Day 7:00AM to 3:00PM</option>
-                                                      <option value="F16">[F16] FIXED - 5 Day 2:00PM to 11:12PM</option>
-                                                      <option value="F64">[F64] FIXED - 5 Day 1:00AM to 10:12AM</option>
-                                                      <option value="F80">[F80] FIXED - 5 Day 8:20AM to 5:32PM</option>
-                                                      <option value="F74">[F74] FIXED - 5 Day 3:00AM to 12:12PM</option>
-                                                      <option value="F59">[F59] FIXED - 6 Day 8:00AM to 4:00PM</option>
-                                                      <option value="F6">[F6] FIXED - 6 Day 8:00PM to 4:00AM</option>
-                                                    </select>    */}
                                               </div>
                                             </div>
                                             <div className="col-md-4">
@@ -2620,7 +2538,7 @@ const toSentenceCase = (text) => {
                                             
                                 </div>
                                 <hr/>
-                                  <h5 className='text-primary'>Section 3</h5>
+                                  {/* <h5 className='text-primary'>Section 3</h5> */}
                                   <hr className="hr-cobalt-blue"/>
                                 <br/>
                                 <div className="row justify-content-center">
@@ -3745,7 +3663,7 @@ const toSentenceCase = (text) => {
                                             </div>
                                    </div>
                                    <hr/>
-                                  <h5 className='text-primary'>Section 4</h5>
+                                  {/* <h5 className='text-primary'>Section 4</h5> */}
                                   <hr className="hr-cobalt-blue"/>
                                 <br/>
                                   <div className="row justify-content-center">
@@ -3950,9 +3868,27 @@ const toSentenceCase = (text) => {
                                             <label htmlFor="country">Country</label>
                                             <select id="countryDropdown" className="form-control" value={employeeData.Country} name="Country" onChange={handleCountryChange}>
                                               <option value="">Select Country</option>
+                                              {countries.map(country => (
+                                                <option key={country} value={country}>{country}</option>
+                                              ))}
                                             </select>
+
+                                            {/* <select id="countryDropdown" className="form-control" value={employeeData.Country} name="Country" onChange={handleCountryChange}>
+                                              <option value="">Select Country</option>
+                                            </select> */}
                                           </div>
                                         </div>
+                                        {/* <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label htmlFor="region">Region</label>
+                                            <select id="regionDropdown" className="form-control" value={employeeData.Region || ''} name="Region" onChange={handleRegionChange}>
+                                              {!employeeData.Region && <option value="">Select Region</option>}
+                                              {regions.map(region => (
+                                                <option key={region} value={region}>{region}</option>
+                                              ))}
+                                            </select>
+                                          </div>
+                                        </div> */}
                                       <div className="col-md-4">
                                           <div className="form-group">
                                             <label htmlFor="region">Region</label>
@@ -3991,12 +3927,14 @@ const toSentenceCase = (text) => {
                                         <div className="col-md-4">
                                           <div className="form-group">
                                             <label htmlFor="brgy">Barangay</label>
-                                            <select id="barangayDropdown" className="form-control" value={employeeData.Barangay} name="Barangay" onChange={handleInputChange}>
+                                            {/* <select id="barangayDropdown" className="form-control" value={employeeData.Barangay} name="Barangay" onChange={handleBarangayChange}> */}
+                                            {/* <select id="barangayDropdown" className="form-control" value={employeeData.Barangay} name="Barangay">
                                               <option value="">Select Barangay</option>
                                               {barangay.map(b => (
                                                 <option key={b} value={b}>{b}</option>
                                               ))}
-                                            </select>
+                                            </select> */}
+                                             <input type="text" className="form-control" placeholder="Enter Barangay" name="Barangay" value={employeeData.Barangay} onChange={handleInputChange} />
                                           </div>
                                         </div>
                                         <div className="col-md-4">

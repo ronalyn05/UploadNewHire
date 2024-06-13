@@ -169,7 +169,11 @@ app.post('/login', async (req, res) => {
       console.log('User found:', user);
 
       // Check if the employee status is Active
-      if (user.EmployeeStatus !== 'Active') {
+      // if (user.EmployeeStatus !== 'Active') {
+      //   res.status(401).json({ error: `Your account status is currently ${user.EmployeeStatus}. Please contact HRAdmin for assistance.` });
+      //   return;
+      // }
+      if (user.EmployeeStatus == 'Separated' || user.EmployeeStatus == 'Inactive - Absent Without Leave') {
         res.status(401).json({ error: `Your account status is currently ${user.EmployeeStatus}. Please contact HRAdmin for assistance.` });
         return;
       }
