@@ -373,12 +373,24 @@ const handleInputChange = (e) => {
       ...employeeData,
       [name]: newValue
     });
+    // setEmployeeData(prevData => ({
+    //   ...prevData,
+    //   [name]: value
+    // }));
 
       // Reset otherHRANType if it's not the "Others" option
       if (name === 'HRANType' && value !== 'Others') {
         setOtherHRANType('');
     }
   };
+  // const handleInputChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setEmployeeData(prevData => ({
+  //     ...prevData,
+  //     [name]: value
+  //   }));
+  // };
+  
 
   //function to handle the additional input for hran type
   const handleOtherInputChange = (event) => {
@@ -1666,53 +1678,130 @@ const handleFormEmpInfoSubmit = async (e) => {
     const handleProvinceChange = async (e) => {
       const selectedProvince = e.target.value;
       handleInputChange(e); // To update the province in employeeData
-      setCities([]); // Clear cities when province changes
-      setBarangay([]);
+      setCities([]);
       try {
         const username = 'innodata_test';
-        const response = await fetch(`http://api.geonames.org/searchJSON?q=${selectedProvince}&featureCode=PPLA3&username=${username}`);
-        if (!response.ok) {
+        const provinceResponse = await fetch(`http://api.geonames.org/searchJSON?q=${selectedProvince}&featureCode=PPLA&featureCode=PPLA3&username=${username}`);
+        if (!provinceResponse.ok) {
           throw new Error('Failed to fetch cities data');
         }
-        const data = await response.json();
-         const cities = data.geonames.map(item => item.name);
-        // const cities = data.geonames.filter(item => item.fcode !== 'PPLX  ').map(item => item.name);
-        setCities(cities);
+        const provinceData = await provinceResponse.json();
+        const provinceCities = provinceData.geonames.map(item => item.name);
+  
+        // Fetching highly urbanized cities separately
+        const hucResponse = await fetch(`http://api.geonames.org/searchJSON?country=PH&featureCode=PPLA2&featureCode=PPLA3&featureCode=PPLA4&username=${username}`);
+        if (!hucResponse.ok) {
+          throw new Error('Failed to fetch highly urbanized cities');
+        }
+        const hucData = await hucResponse.json();
+        const hucCities = hucData.geonames
+          .filter(item => item.adminName1 === selectedProvince)
+          .map(item => item.name);
+  
+        const allCities = [...new Set([...provinceCities, ...hucCities])];
+        setCities(allCities);
       } catch (error) {
         console.error('Error fetching cities data:', error);
       }
     };
-    
+
     const handleCityChange = async (e) => {
       const selectedCity = e.target.value;
-      handleInputChange(e); //  this function updates employeeData
-      
+      handleInputChange(e); // Update employeeData
+    
       try {
         const username = 'innodata_test';
-        // Fetch barangays (PPL feature code) within the selected city/municipality
+        // Fetch places (PPL or PPLX) within the selected city/municipality
         const response = await fetch(`http://api.geonames.org/searchJSON?q=${selectedCity}&featureCode=PPLX&username=${username}`);
         
         if (!response.ok) {
-          throw new Error('Failed to fetch barangays data');
+          throw new Error('Failed to fetch places data');
         }
         
         const data = await response.json();
-        const barangays = data.geonames.map(item => item.name);
-        console.log('Barangays:', barangays); // Log barangays data
-        setBarangay(barangays);
+        const barangay = data.geonames.map(item => item.name);
+        console.log('Barangays:', barangay); // Log barangay data
+        setBarangay(barangay);
         
-        // set the zip code based on the first entry (if it has the zip code)
+        // Autofill zip code based on the first entry (if available)
         if (data.geonames.length > 0) {
-          const zipCode = data.geonames[0].postalCode; // the first entry has the zip code
+          const firstBarangay = data.geonames[0].name; // Use the first barangay for zip code lookup
+          const zipCode = await fetchZipCode(selectedCity, firstBarangay);
           setEmployeeData(prevData => ({
             ...prevData,
-            ZipCode: zipCode
+            ZipCode: zipCode || ''
           }));
         }
       } catch (error) {
-        console.error('Error fetching barangays data:', error);
-           }
-         };
+        console.error('Error fetching places data:', error);
+      }
+    };
+    
+    const fetchZipCode = async (city, barangay) => {
+      try {
+        const username = 'innodata_test';
+        const response = await fetch(`http://api.geonames.org/postalCodeSearchJSON?placename=${barangay}&country=PH&adminCode1=&adminCode2=&adminCode3=&username=${username}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch zip code');
+        }
+        
+        const data = await response.json();
+        if (data.postalCodes.length > 0) {
+          return data.postalCodes[0].postalCode; // Return the first zip code found
+        } else {
+          console.warn('No zip code found for the selected barangay');
+          return '';
+        }
+      } catch (error) {
+        console.error('Error fetching zip code:', error);
+        return '';
+      }
+    };
+    
+  
+    // const handleCityChange = async (e) => {
+    //   const selectedCity = e.target.value;
+    //   handleInputChange(e); // this function updates employeeData
+    //   try {
+    //     const username = 'innodata_test';
+    //     // Fetch places (PPL or PPLX) within the selected city/municipality
+    //     const response = await fetch(`http://api.geonames.org/searchJSON?q=${selectedCity}&featureCode=PPLX&username=${username}`);
+        
+    //     if (!response.ok) {
+    //       throw new Error('Failed to fetch places data');
+    //     }
+        
+    //     const data = await response.json();
+    //     const barangay = data.geonames.map(item => item.name);
+    //     console.log('Places:', barangay); // Log places data
+    //     // Set barangay data to state or wherever needed
+    //     setBarangay(barangay);
+        
+    //     // set other data like postal code based on the first entry
+    //     if (data.geonames.length > 0) {
+    //       const zipCode = data.geonames[0].postalCode; // postalCode is available
+    //       setEmployeeData(prevData => ({
+    //         ...prevData,
+    //         ZipCode: zipCode
+    //       }));
+    //     }
+    //   } catch (error) {
+    //     console.error('Error fetching places data:', error);
+    //   }
+    // };
+    
+    const ensureOption = (options, value) => {
+      if (value && !options.includes(value)) {
+        return [value, ...options];
+      }
+      return options;
+    };
+  
+    const countriesWithExisting = ensureOption(countries, employeeData.Country);
+    const regionsWithExisting = ensureOption(regions, employeeData.Region);
+    const provincesWithExisting = ensureOption(provinces, employeeData.Province);
+    const citiesWithExisting = ensureOption(cities, employeeData.CityMunicipality);
 
   //array lists all the fields that are mandatory
   const requiredFields = [
@@ -2096,7 +2185,7 @@ const toSentenceCase = (text) => {
                             <form onSubmit={handleFormEmpInfoSubmit}>
                             <div className='card-body'>
                               {/* <h5 className='text-primary'>Section 1</h5> */}
-                                <hr className="hr-cobalt-blue"/>
+                                {/* <hr className="hr-cobalt-blue"/> */}
                                 <br/>
                                 <div className="row justify-content-center">
                                 <div className="col-md-4">
@@ -2328,7 +2417,7 @@ const toSentenceCase = (text) => {
                                 </div>
                                 <hr/>
                                   {/* <h5 className='text-primary'>Section 2</h5> */}
-                                  <hr className="hr-cobalt-blue"/>
+                                  {/* <hr className="hr-cobalt-blue"/> */}
                                 <br/>
                                 <div className="row ">
                                 <div className="col-md-4">
@@ -2539,7 +2628,7 @@ const toSentenceCase = (text) => {
                                 </div>
                                 <hr/>
                                   {/* <h5 className='text-primary'>Section 3</h5> */}
-                                  <hr className="hr-cobalt-blue"/>
+                                  {/* <hr className="hr-cobalt-blue"/> */}
                                 <br/>
                                 <div className="row justify-content-center">
                                 <div className="col-md-4">
@@ -3664,7 +3753,7 @@ const toSentenceCase = (text) => {
                                    </div>
                                    <hr/>
                                   {/* <h5 className='text-primary'>Section 4</h5> */}
-                                  <hr className="hr-cobalt-blue"/>
+                                  {/* <hr className="hr-cobalt-blue"/> */}
                                 <br/>
                                   <div className="row justify-content-center">
                                               <div className="col-md-4">
@@ -3866,83 +3955,94 @@ const toSentenceCase = (text) => {
                                         <div className="col-md-4">
                                           <div className="form-group">
                                             <label htmlFor="country">Country</label>
-                                            <select id="countryDropdown" className="form-control" value={employeeData.Country} name="Country" onChange={handleCountryChange}>
-                                              <option value="">Select Country</option>
-                                              {countries.map(country => (
-                                                <option key={country} value={country}>{country}</option>
-                                              ))}
+                                            <select
+                                                id="countryDropdown"
+                                                className="form-control"
+                                                value={employeeData.Country || ""}
+                                                name="Country"
+                                                onChange={handleCountryChange}
+                                              >
+                                                {countriesWithExisting.map(country => (
+                                                  <option key={country} value={country}>{country}</option>
+                                                ))}
                                             </select>
-
-                                            {/* <select id="countryDropdown" className="form-control" value={employeeData.Country} name="Country" onChange={handleCountryChange}>
-                                              <option value="">Select Country</option>
-                                            </select> */}
                                           </div>
                                         </div>
-                                        {/* <div className="col-md-4">
-                                          <div className="form-group">
-                                            <label htmlFor="region">Region</label>
-                                            <select id="regionDropdown" className="form-control" value={employeeData.Region || ''} name="Region" onChange={handleRegionChange}>
-                                              {!employeeData.Region && <option value="">Select Region</option>}
-                                              {regions.map(region => (
+                                     <div className="col-md-4">
+                                        <div className="form-group">
+                                          <label htmlFor="region">Region</label>
+                                          <select
+                                              id="regionDropdown"
+                                              className="form-control"
+                                              value={employeeData.Region || ""}
+                                              name="Region"
+                                              onChange={handleRegionChange}
+                                            >
+                                              {regionsWithExisting.map(region => (
                                                 <option key={region} value={region}>{region}</option>
                                               ))}
                                             </select>
-                                          </div>
-                                        </div> */}
+                                        </div>
+                                      </div>
                                       <div className="col-md-4">
-                                          <div className="form-group">
-                                            <label htmlFor="region">Region</label>
-                                            <select id="regionDropdown" className="form-control" value={employeeData.Region} name="Region" onChange={handleRegionChange}>
-                                              <option value="">Select Region</option>
-                                              {regions.map(region => (
-                                                <option key={region} value={region}>{region}</option>
-                                              ))}
-                                            </select>
-                                          </div>
-                                        </div>
-                                        <div className="col-md-4">
-                                          <div className="form-group">
-                                            <label htmlFor="province">Province</label>
-                                            <select id="provinceDropdown" className="form-control" value={employeeData.Province} name="Province" onChange={handleProvinceChange}>
-                                              <option value="">Select Province</option>
-                                              {provinces.map(province => (
+                                        <div className="form-group">
+                                          <label htmlFor="province">Province</label>
+                                          <select
+                                              id="provinceDropdown"
+                                              className="form-control"
+                                              value={employeeData.Province || ""}
+                                              name="Province"
+                                              onChange={handleProvinceChange}
+                                            >
+                                              {provincesWithExisting.map(province => (
                                                 <option key={province} value={province}>{province}</option>
                                               ))}
-                                          </select>
-                                          </div>
+                                            </select>
                                         </div>
+                                      </div>
                                       </div>
                                       <div className="row justify-content-center">
                                       <div className="col-md-4">
                                           <div className="form-group">
                                             <label htmlFor="cityMunicipality">City / Municipality</label>
-                                            <select id="cityDropdown" className="form-control" value={employeeData.CityMunicipality} name="CityMunicipality" onChange={handleCityChange}>
-                                              <option value="">Select City/Municipality</option>
-                                              {cities.map(city => (
-                                                <option key={city} value={city}>{city}</option>
-                                              ))}
-                                            </select>
+                                                 <select
+                                                    id="cityDropdown"
+                                                    className="form-control"
+                                                    value={employeeData.CityMunicipality || ""}
+                                                    name="CityMunicipality"
+                                                    onChange={handleCityChange}
+                                                  >
+                                                    {citiesWithExisting.map(city => (
+                                                      <option key={city} value={city}>{city}</option>
+                                                    ))}
+                                                  </select>
                                           </div>
                                         </div>
                                         <div className="col-md-4">
                                           <div className="form-group">
                                             <label htmlFor="brgy">Barangay</label>
-                                            {/* <select id="barangayDropdown" className="form-control" value={employeeData.Barangay} name="Barangay" onChange={handleBarangayChange}> */}
-                                            {/* <select id="barangayDropdown" className="form-control" value={employeeData.Barangay} name="Barangay">
-                                              <option value="">Select Barangay</option>
-                                              {barangay.map(b => (
-                                                <option key={b} value={b}>{b}</option>
-                                              ))}
-                                            </select> */}
                                              <input type="text" className="form-control" placeholder="Enter Barangay" name="Barangay" value={employeeData.Barangay} onChange={handleInputChange} />
                                           </div>
                                         </div>
                                         <div className="col-md-4">
                                           <div className="form-group">
                                             <label htmlFor="zipcode">Zip Code</label>
-                                            <input type="text" className="form-control" placeholder="Enter Zip Code" name="ZipCode" value={employeeData.ZipCode} onChange={handleInputChange} />
+                                            <input
+                                              type="text"
+                                              className="form-control"
+                                              placeholder="Enter Zip Code"
+                                              name="ZipCode"
+                                              value={employeeData.ZipCode}
+                                              onChange={handleInputChange}
+                                            />
                                           </div>
                                         </div>
+                                        {/* <div className="col-md-4">
+                                          <div className="form-group">
+                                            <label htmlFor="zipcode">Zip Code</label>
+                                            <input type="text" className="form-control" placeholder="Enter Zip Code" name="ZipCode" value={employeeData.ZipCode} onChange={handleInputChange} />
+                                          </div>
+                                        </div> */}
                                       </div>
                                       <div className="row justify-content-center">
                                         <div className="col-md-4">
